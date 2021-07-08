@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "repl_python3_Discord-Bot"
+version = "1.15.0"
+description = ""
+authors = ["Avaneesh Shetye"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+nest-asyncio = "1.5.1"
+flask = "^2.0.1"
+opencv-python = "4.5.2.54"
+pypokedex = "1.6.0"
+youtube-dl = "2021.6.6"
+discord = "1.0.1"
+lavalink = "3.1.4"
+wikipedia = "1.4.0"
+pycountry = "20.7.3"
+python-dotenv = "^0.17.1"
+xkcd = "2.4.2"
+imageio = "2.9.0"
+openai = "0.6.4"
+discord-py-slash-command = "1.2.2"
+multidict = "4.7.6"
+chardet = "3.0.4"
+yarl = "1.5.1"
+aiohttp = "3.6.3"
+certifi = "2020.12.5"
+soupsieve = "2.2.1"
+urllib3 = "1.26.4"
+tqdm = "4.61.1"
+replit = "^3.1.0"
+beautifulsoup4 = "^4.9.3"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
