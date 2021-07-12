@@ -71,6 +71,7 @@ e_content2 = {}
 gaem = []
 start_time = time()
 once = 0
+flag = False
 trusted = [
 	785230154258448415, 781150150630440970, 777217934074445834,
 	785564485384405033, 783643344202760213, 767752540980248586
@@ -153,8 +154,8 @@ async def on_ready():
 	await bot.wait_until_ready()
 	# await bot.change_presence(activity=discord.Activity(
 	# 	type=discord.ActivityType.watching, name="Avadhoot's birthday"))
-	# await bot.change_presence(activity=discord.Game(name="Call of Duty because exams are over (temporarily)"))
-	await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="my master panik about exams"))
+	await bot.change_presence(activity=discord.Game(name=">>patchnotes"))
+	# await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="my master panik about exams"))
 	# await bot.change_presence(status=discord.Status.dnd)
 	# await bot.change_presence(activity=discord.Streaming(name="the exam answers", url="https://youtu.be/dQw4w9WgXcQ"))
 	cur_date = datetime.utcnow()
@@ -206,17 +207,26 @@ async def on_guild_remove(guild):
 
 @bot.event
 async def on_message_delete(message):
-	global d_author, d_content
+	global d_author, d_content, flag
 	if not (message.author.bot):
 		d_author[message.channel.id] = message.author
 		d_content[message.channel.id] = message.content
-		await asyncio.sleep(90)
+		if not d_content[message.channel.id]:
+			d_content[message.channel.id] = message.attachments[0].proxy_url
+			flag = True
+		await asyncio.sleep(75)
 		try:
 			del d_author[message.channel.id]
 			del d_content[message.channel.id]
 		except KeyError:
 			d_author = {}
 			d_content = {}
+	if message.guild.id == 785230154258448415:
+		c = bot.get_channel(853643406329118740)
+		try:
+			await c.send(message.content)
+		except discord.errors.HTTPException:
+			await c.send(message.attachments[0].proxy_url)
 
 
 @bot.event
@@ -1465,18 +1475,23 @@ async def stalkermode(ctx, flag: str = None):
 
 @bot.command()
 async def snipe(ctx, cid: int = None):
+	global flag
 	if cid:
 		channel = await bot.fetch_channel(cid)
 	else:
 		channel = ctx.channel
 		cid = channel.id
-	try:
+	if not flag:
 		em = discord.Embed(title=f"Last deleted message in {channel.name}",
-						   description=d_content[cid])
-		em.set_footer(text=f"Author: {d_author[cid]}")
-		await ctx.send(embed=em)
-	except:
-		await ctx.send(f"There are no recently deleted messages in <#{cid}>")
+							description=d_content[cid])
+	else:
+		em = discord.Embed(title=f"Last deleted image in {channel.name}")
+		em.set_image(url=d_content[cid])
+		flag = False
+	em.set_footer(text=f"Author: {d_author[cid]}")
+	await ctx.send(embed=em)
+	# except:
+	# 	await ctx.send(f"There are no recently deleted messages in <#{cid}>")
 
 
 @bot.command(aliases=['esnipe'])
@@ -1489,7 +1504,7 @@ async def editsnipe(ctx, cid: int = None):
 	try:
 		em = discord.Embed(
 			title=f"Last edited message in {channel.name}",
-			description=f"**Original message:** {e_content1[cid]}\n \
+			description=f"**Original message:** {e_content1[cid]}\n \n \
 		**Edited message:** {e_content2[cid]}")
 		em.set_footer(text=f"Author: {e_author[cid]}")
 		await ctx.send(embed=em)
@@ -1526,13 +1541,13 @@ async def patchnotes(ctx):
 		p = db[str(ctx.guild.id)][1]
 	else:
 		p = ">>"
-	e = discord.Embed(title="Updates for SlaveBot v1.15",
+	e = discord.Embed(title="Updates for SlaveBot v1.15.1",
 					  description=f"\
-	**1.** Updated `{p}help` page UI even more, now you can search for `{p} help actions|utils|fun|stonks|music` if you want only a specific topic\n \
+	**1. IMPORTANT ANNOUNCEMENT**: CHANGED PROBABILITIES OF JACKPOT!\n \
+	 Winning the `100,000x` multiplier has a `0.1%` chance, `10,000x` is `0.25%`, and `1,000x` is `0.5%`. This is because SOMEONE won the jackpot 11 times in under an hour <:mikebruh:828462333926834176>\n \
 	**2.** Added support for using commands in DMs (WARNING: Lots of errors, every error reported has a 10000 SlaveBot currency (trademark pending) reward.)\n \
 	**3.** Since many of you (read: no one) have been asking for this, new **Utility**, `{p}editsnipe`\n \
-	**3.** Added a **Utility**, `{p}suggest`\n \
-	**4.** `{p}slots` now gives payouts based on the fruit you win in jackpot. Let's just say you don't want an orange or a pear.\n \
+	**4.** Added a **Utility**, `{p}suggest`\n \
 	**5.** Bug fixes\n \
 	**6.** Removed Herobrine.",
 					  colour=discord.Color.dark_grey())
@@ -1541,12 +1556,13 @@ async def patchnotes(ctx):
 @bot.command()
 @commands.cooldown(1, 30, commands.BucketType.user)
 async def suggest(ctx):
-	msg = await ctx.send("Select 1 if you're reporting a bug, 2 if you want to suggest a command to be added, 3 for other")
+	msg = await ctx.send("Select 1 if you're reporting a bug, 2 if you want to suggest a command to be added, 3 for other, or 4 to cancel")
 	await msg.add_reaction("1⃣")
 	await msg.add_reaction("2⃣")
 	await msg.add_reaction("3⃣")
+	await msg.add_reaction("4⃣")
 	def check(reaction, user):
-		return str(reaction.emoji) in ['1⃣', '2⃣', "3⃣"] and user == ctx.author and msg == reaction.message
+		return str(reaction.emoji) in ['1⃣', '2⃣', "3⃣", "4⃣"] and user == ctx.author and msg == reaction.message
 	try:
 		reaction, user = await bot.wait_for('reaction_add', check=check, timeout=60)
 		await msg.delete()
@@ -1555,14 +1571,20 @@ async def suggest(ctx):
 			await user.send(f"{ctx.author.name} from {ctx.guild.name} wants to report a bug")
 		elif str(reaction.emoji) == "2⃣":
 			await user.send(f"{ctx.author.name} from {ctx.guild.name} wants to suggest something")
-		else:
+		elif str(reaction.emoji) == "3⃣":
 			await user.send(f"{ctx.author.name} from {ctx.guild.name} has something else to say")
+		else:
+			await ctx.send("Cancelled.")
+			return
 		await ctx.send("Send your message")
 		def check2(message):
 			return message.author == ctx.author and message.channel == ctx.message.channel
 		try:
 			message = await bot.wait_for('message', check=check2, timeout=60)
-			await user.send(message.content)
+			try:
+				await user.send(message.content)
+			except discord.errors.HTTPException:
+				await user.send(message.attachments[0].proxy_url)
 			await ctx.send("Message sent!")
 		except asyncio.TimeoutError:
 			await ctx.send("Message sent to my master that you're stupid")	
@@ -1690,18 +1712,18 @@ async def edit(ctx, member: Optional[discord.Member], aid: str = None):
 		emojis = ["✅", "❎"]
 		amt = str(mesg.content)
 		if amt[0] == "+":
-			e = discord.Embed(title="Addition confirmation", description = f"Are you sure you want to add {amt[1:]} to {member.mention}'s account?",\
+			e = discord.Embed(title="Addition confirmation", description = f"Are you sure you want to add {int(amt[1:]):,} to {member.mention}'s account?",\
 								 colour = discord.Colour.random(), timestamp=datetime.utcnow())
 		elif amt[0] == "-":
 			if int(amt[1:]) > db[mid][1]:
 				await ctx.send(
-					f"{member.name} has only ||{db[mid][1]}|| in their account"
+					f"{member.name} has only ||{db[mid][1]:,}|| in their account"
 				)
 				return
-			e = discord.Embed(title="Subtraction confirmation", description = f"Are you sure you want to subtract {amt[1:]} from {member.mention}'s account?",\
+			e = discord.Embed(title="Subtraction confirmation", description = f"Are you sure you want to subtract {int(amt[1:]):,} from {member.mention}'s account?",\
 								 colour = discord.Colour.random(), timestamp=datetime.utcnow())
 		elif amt[0] == "=":
-			e = discord.Embed(title="Eval confirmation", description = f"Are you sure you want to change {member.mention}'s balance to {amt[1:]}?",\
+			e = discord.Embed(title="Eval confirmation", description = f"Are you sure you want to change {member.mention}'s balance to {int(amt[1:]):,}?",\
 								 colour = discord.Colour.random(), timestamp=datetime.utcnow())
 		else:
 			await ctx.reply("Transaction error 3913", mention_author=False)
@@ -1717,17 +1739,17 @@ async def edit(ctx, member: Optional[discord.Member], aid: str = None):
 		emojis = ["✅", "❎"]
 		amt = str(mesg.content)
 		if amt[0] == "+":
-			e = discord.Embed(title="Addition confirmation", description = f"Are you sure you want to add {amt[1:]} to <@!{aid}>'s account?",\
+			e = discord.Embed(title="Addition confirmation", description = f"Are you sure you want to add {int(amt[1:]):,} to <@!{aid}>'s account?",\
 								 colour = discord.Colour.random(), timestamp=datetime.utcnow())
 		elif amt[0] == "-":
 			if int(amt[1:]) > db[mid][1]:
 				await ctx.send(
-					f"<@!{aid}> has only ||{db[mid][1]}|| in their account")
+					f"<@!{aid}> has only ||{db[mid][1]:,}|| in their account")
 				return
-			e = discord.Embed(title="Subtraction confirmation", description = f"Are you sure you want to subtract {amt[1:]} from <@!{aid}>'s account?",\
+			e = discord.Embed(title="Subtraction confirmation", description = f"Are you sure you want to subtract {int(amt[1:]):,} from <@!{aid}>'s account?",\
 								 colour = discord.Colour.random(), timestamp=datetime.utcnow())
 		elif amt[0] == "=":
-			e = discord.Embed(title="Eval confirmation", description = f"Are you sure you want to change <@!{aid}>'s balance to {amt[1:]}?",\
+			e = discord.Embed(title="Eval confirmation", description = f"Are you sure you want to change <@!{aid}>'s balance to {int(amt[1:]):,}?",\
 								 colour = discord.Colour.random(), timestamp=datetime.utcnow())
 		else:
 			await ctx.reply("Transaction error 3913", mention_author=False)
@@ -1770,7 +1792,7 @@ async def getdata(ctx):
 	s = ""
 	for i in db:
 		s += (str(i) + ": [" + str(db[i][0]) + "," + str(db[i][1]) + "]\n")
-	await ctx.send(f"```{s}```")
+	await ctx.send(f"```java\n{s}```")
 
 @bot.command(pass_context=True)
 @commands.cooldown(1, 10, commands.BucketType.user)
@@ -2699,7 +2721,6 @@ async def hangman(ctx, topic: str = None):
 					await _save()
 				gaem.remove(ctx.channel.id)
 				return
-
 		count -= 1
 
 
@@ -2724,7 +2745,7 @@ async def slots(ctx, amount: str = None):
 		gaem.remove(ctx.channel.id)
 		return
 	if not amount.isdigit():
-		if amount[-1].lower() in ["k", "m", "b", "t"
+		if amount[-1].lower() in ["k", "m", "b", "t", "q"
 								  ] and amount[:-1].isdigit():
 			amt2 = amount[:-1]
 			mul = amount[-1].lower()
@@ -2736,6 +2757,8 @@ async def slots(ctx, amount: str = None):
 				amount = int(amt2) * 1000000000
 			elif mul == "t":
 				amount = int(amt2) * 1000000000000
+			elif mul == "q":
+				amount = int(amt2) * 1000000000000000
 		elif amount.lower() == "table":
 			e = discord.Embed(title="Slots table",
 							  description="**3 in a row (Jackpot):**\n \
@@ -2784,13 +2807,23 @@ async def slots(ctx, amount: str = None):
 		b = random.choice(emojis)
 		c = random.choice(emojis)
 		slotmachine = f"**{ctx.author.name}'s ~~gambling addiction~~ slots game** \n[ {a} {b} {c} ]"
-		await asyncio.sleep(1.1)
+		await asyncio.sleep(1.2)
 		await msg.edit(content=slotmachine)
 		if i == 3:
-			hax = random.randint(1, 1000)
-			if hax in (1, 2, 3, 4, 5):
+			hax = random.randint(1, 10000)
+			if hax in ([x for x in range(1,51)]):
+				fruits = ["🍊", "🍐"]
+				a = random.choice(fruits)
 				a = b = c
-			elif hax in ([x for x in range(10, 31)]):
+			elif hax in ([x for x in range(100, 125)]):
+				fruits = ["🍎", "🍍", "🍉"]
+				a = random.choice(fruits)
+				a = b = c
+			elif hax in ([x for x in range(150, 160)]):
+				fruits = ["🍇", '🍓', "🍒"]
+				a = random.choice(fruits)
+				a = b = c
+			elif hax in ([x for x in range(200, 400)]):
 				if a != b:
 					a = b
 					if b == c:
@@ -2837,6 +2870,7 @@ async def slots(ctx, amount: str = None):
 			db[aid][1] += amount * 2
 			e = discord.Embed(
 				description=f"{amount*2:,} credits added to account",
+				colour=discord.Colour.dark_blue(),
 				timestamp=datetime.utcnow())
 			e.set_author(name="You didn't lose!",
 						 icon_url=ctx.author.avatar_url)
@@ -3667,8 +3701,12 @@ async def on_message(message):
 				await message.channel.send(ans)
 		elif message.content.lower(
 		) == "how you doin" or message.content.lower(
-		) == "how you doin?" and message.guild.id in trusted:
-			await message.channel.send(":relaxed:")
+		) == "how you doin?":
+			if message.guild:
+				if message.guild.id in trusted:
+					await message.channel.send(":relaxed:")
+			else:
+				await message.channel.send(":relaxed:")
 		elif message.content.lower(
 		) == "pp!release spoilerman":  # or message.content.lower() == "pp!release apoora":
 			e = discord.Embed(
@@ -3680,10 +3718,18 @@ async def on_message(message):
 			e.timestamp = datetime.utcnow()
 			await message.channel.send(embed=e)
 		elif message.content.lower() == "bye" or message.content.lower(
-		) == "byebye" and message.guild.id in trusted:
-			await message.channel.send("Goodnight")
-		elif message.content.lower() == "bai" and message.guild.id in trusted:
-			await message.channel.send("Goodbye sir")
+		) == "byebye":
+			if message.guild:
+				if message.guild.id in trusted:
+					await message.channel.send("Goodnight")
+			else:
+				await message.channel.send("Goodnight")
+		elif message.content.lower() == "bai":
+			if message.guild:
+				if message.guild.id in trusted:
+					await message.channel.send("Goodbye sir")
+			else:
+				await message.channel.send("Goodbye sir")
 		elif 'chup' == message.content.lower(
 		) or 'shup' == message.content.lower(
 		) or 'shut up' == message.content.lower():
@@ -3722,28 +3768,36 @@ async def on_message(message):
 			await message.channel.send("You are excused.")
 		elif '420 ' in message.content:
 			await message.channel.send(":fire: Blaze it :fire:")
-		elif 'sorry' in message.content.lower():
+		elif 'sorry' == message.content.lower():
 			await message.channel.send("It's okay I forgive you")
 		elif 'kabam' == message.content.lower(
-		) and message.guild.id in trusted:
-			rplies = [
-				'Ghar pe ja', 'KABABYBABYBABYOOOOHHHHHM', 'Go to home idiot'
-			]
-			ans = random.randint(0, 2)
-			await message.channel.send(rplies[ans])
-		elif '49 ' in message.content and message.guild.id in [
-			767752540980248586, 783643344202760213, 781150150630440970,
-			812261291632099348
-		]:
-			await message.channel.send(":bear:")
+		):
+			if message.guild:
+				if message.guild.id in trusted:
+					rplies = [
+						'Ghar pe ja', 'KABABYBABYBABYOOOOHHHHHM', 'Go to home idiot'
+					]
+					ans = random.randint(0, 2)
+					await message.channel.send(rplies[ans])
+		elif '49 ' in message.content:
+			if message.guild:
+				if message.guild.id in [
+				767752540980248586, 783643344202760213, 781150150630440970,
+				812261291632099348
+				]:
+					await message.channel.send(":bear:")
 		elif message.content.lower(
-		) == "i know" and message.guild.id in trusted:
-			monica = discord.File("images/tenor.gif")
-			await message.channel.send(file=monica)
+		) == "i know":
+			if message.guild:
+				if message.guild.id in trusted:
+					monica = discord.File("images/tenor.gif")
+					await message.channel.send(file=monica)
 		elif message.content.lower(
-		) == "i know!" and message.guild.id in trusted:
-			candylady = discord.File("images/index.gif")
-			await message.channel.send(file=candylady)
+		) == "i know!":
+			if message.guild:
+				if message.guild.id in trusted:
+					candylady = discord.File("images/index.gif")
+					await message.channel.send(file=candylady)
 		elif message.content.lower() == "i'm sad" or message.content.lower(
 		) == "i am sad" or message.content.lower(
 		) == "i'm depressed" or message.content.lower() == "i am depressed":
@@ -3754,17 +3808,16 @@ async def on_message(message):
 		elif message.content.lower() == 'stonks':
 			await message.channel.send(file=discord.File('images/stonks.jpg'))
 		elif "why aren't pokemon spawning" in message.content.lower(
-		) and message.guild.id in trusted and message.channel.guild:
-			await message.guild.me.edit(nick="Pokecord")
-			await message.channel.send("Mujhe kya pata, mai Pokecord nahi hu")
-			await message.channel.trigger_typing()
-			await asyncio.sleep(3)
-			await message.channel.send("wait a minute")
-			await asyncio.sleep(1)
-			await message.guild.me.edit(nick="SlaveBot")
-		elif "so many pokemon spawning" in message.content.lower(
-		) and message.guild.id in trusted:
-			await message.channel.send("ikr")
+		):
+			if message.guild:
+				if message.guild.id in trusted:
+					await message.guild.me.edit(nick="Pokecord")
+					await message.channel.send("Mujhe kya pata, mai Pokecord nahi hu")
+					await message.channel.trigger_typing()
+					await asyncio.sleep(3)
+					await message.channel.send("wait a minute")
+					await asyncio.sleep(1)
+					await message.guild.me.edit(nick="SlaveBot")
 #		 elif 'start the spam' == message.content.lower():
 #			 temp = 1
 #			 while True:
@@ -3777,11 +3830,17 @@ async def on_message(message):
 #			 temp = 0
 		elif "leat" in message.content.lower(
 		) and "fingies" not in message.content.lower(
-		) and message.guild.id in trusted:
-			await message.channel.send("fingies")
-		elif message.content.lower() == "yes." and message.guild.id in trusted:
-			apoora = discord.File('images/apoorafull.jpeg')
-			await message.channel.send(file=apoora)
+		):
+			if message.guild:
+				if message.guild.id in trusted:
+					await message.channel.send("fingies")
+			else:
+				await message.channel.send("fingies")
+		elif message.content.lower() == "yes.":
+			if message.guild:
+				if message.guild.id in trusted:
+					apoora = discord.File('images/apoorafull.jpeg')
+					await message.channel.send(file=apoora)
 		elif message.content.lower() == "troll hehe" and message.channel.guild:
 			await message.delete()
 			await message.guild.me.edit(nick="Real Pokecord")
@@ -3794,8 +3853,7 @@ async def on_message(message):
 			await message.channel.send(file=fle, embed=e)
 			await asyncio.sleep(30)
 			await message.guild.me.edit(nick="SlaveBot")
-		elif 'thanks' in message.content.lower() or message.content.lower(
-		) == "thank you":
+		elif 'thanks' == message.content.lower():
 			await message.channel.send("No problemo")
 		elif 'test' == message.content.lower() and str(
 			message.author) == "SkullBlazer#9339":
