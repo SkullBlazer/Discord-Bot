@@ -154,7 +154,7 @@ async def on_ready():
 	await bot.wait_until_ready()
 	# await bot.change_presence(activity=discord.Activity(
 	# 	type=discord.ActivityType.watching, name="Avadhoot's birthday"))
-	await bot.change_presence(activity=discord.Game(name=">>patchnotes"))
+	await bot.change_presence(activity=discord.Game(name="End of First Year"))
 	# await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="my master panik about exams"))
 	# await bot.change_presence(status=discord.Status.dnd)
 	# await bot.change_presence(activity=discord.Streaming(name="the exam answers", url="https://youtu.be/dQw4w9WgXcQ"))
@@ -259,13 +259,18 @@ async def on_command_error(ctx, error):
 				await ctx.send(
 					f"Bro how many {p} are you gonna put in the command")
 		else:
-			await ctx.send("That.... that's not a valid command")
+			rng = random.randint(1,100)
+			if rng == 78:
+				await ctx.send("You do not have permissions to run this command.")
+				await asyncio.sleep(1)
+				await ctx.send("~~Jk that's not a real command, but you received the secret error message!~~")
+			else:
+				await ctx.send("That.... that's not a valid command")
 	elif isinstance(error, commands.CheckAnyFailure) and (ctx.command.name == edit):
 		await ctx.send("That.... that's not a valid command")
 		return
 	elif (not isinstance(error, commands.CheckAnyFailure)) and (ctx.command.name != edit):
 		await ctx.send(error)
-
 
 @bot.command(aliases=['h'])
 @commands.cooldown(1, 2, commands.BucketType.user)
@@ -310,9 +315,10 @@ async def help(ctx, page: str = None):
 	**Actions**\n \
 		`{p}choose <options separated by spaces>` \n > Give the bot some options, and it will choose one for you!\n \
 		`{p}hello` \n > Just say hello, you don't need to be a rocket scientist to figure this out\n \
-		`{p}stab <@person(s)> [reason]` \n > Stab someone (or many people, in case you're really mad) for some reason\n \
-		`{p}pat <@person(s)> [reason]` \n > Pat someone (I am that 'someone')\n \
-		`{p}bonk <@person> [reason]` \n > Bonk someone to their senses. Or just do a :sparkles: Vibe check :sparkles:\n \
+		`{p}stab [@person(s)] [reason]` \n > Stab someone (or many people, in case you're really mad) for some reason\n \
+		`{p}pat [@person(s)] [reason]` \n > Pat someone (I am that 'someone')\n \
+		`{p}bonk [@person] [reason]` \n > Bonk someone to their senses. Or just do a :sparkles: Vibe check :sparkles:\n \
+		`{p}yeet [@person] [reason]`\n > Yeet someone when you're sick of them\n \
 		`{p}say <phrase>`\n > Make the bot say something, like admit to a crime ~~you committed~~ they didn't commit \n \
 		`{p}poll <question>`\n > ~~Watch live footage of SlaveBot dancing on a pole.~~ Make a poll. \n \
 		`{p}fight <@person> <weapon>` \n > Worried someone might defeat you in a fight in real life? Well now you can test the outcomes!",
@@ -364,7 +370,7 @@ async def help(ctx, page: str = None):
 		`{p}lyrics <song name>` \n > See the lyrics to a song and realize you've been singing nonsense this whole time\n \
 		`{p}leave` \n > Make the bot leave the channel ~~because you found out that the bot records conversations~~"
 		]
-		#53
+		#57
 		cur_page = 1
 		ncontents = []
 		if page:
@@ -715,6 +721,13 @@ async def help(ctx, page: str = None):
 			"Person annoying you? Bonk em. \n ~~I will allow bonking me.~~")
 		e.add_field(name="Syntax",
 					value=f"`{p}bonk|vibecheck [@mention] [reason]`")
+	elif page == "yeet":
+		e = discord.Embed(
+			title=f"Help on `{p}yeet`",
+			description=
+			"Throw someone like REALLY hard"
+		)
+		e.add_field(name="Syntax", value=f"`{p}yeet [@mention] [reason]`")
 	elif page == "encrypt":
 		e = discord.Embed(
 			title=f"Help on `{p}encrypt`",
@@ -1402,7 +1415,7 @@ async def nick(ctx, member: Optional[discord.Member], *, name: str = None):
 
 @bot.command(aliases=['changeprefix'])
 @commands.guild_only()
-@commands.cooldown(1, 20, commands.BucketType.user)
+@commands.cooldown(1, 15, commands.BucketType.user)
 async def prefix(ctx, prefx='>>'):
 	if db[str(ctx.guild.id)][1] == prefx:
 		await ctx.reply(f"Your prefix is already {prefx}",
@@ -1438,7 +1451,7 @@ async def prefix(ctx, prefx='>>'):
 
 @bot.command(aliases=['autoresponse'])
 @commands.guild_only()
-@commands.cooldown(1, 20, commands.BucketType.user)
+@commands.cooldown(1, 15, commands.BucketType.user)
 async def stalkermode(ctx, flag: str = None):
 	if flag is None:
 		if db[str(ctx.guild.id)][0] == "false":
@@ -1481,17 +1494,18 @@ async def snipe(ctx, cid: int = None):
 	else:
 		channel = ctx.channel
 		cid = channel.id
-	if not flag:
-		em = discord.Embed(title=f"Last deleted message in {channel.name}",
-							description=d_content[cid])
-	else:
-		em = discord.Embed(title=f"Last deleted image in {channel.name}")
-		em.set_image(url=d_content[cid])
-		flag = False
-	em.set_footer(text=f"Author: {d_author[cid]}")
-	await ctx.send(embed=em)
-	# except:
-	# 	await ctx.send(f"There are no recently deleted messages in <#{cid}>")
+	try:
+		if not flag:
+			em = discord.Embed(title=f"Last deleted message in {channel.name}",
+								description=d_content[cid])
+		else:
+			em = discord.Embed(title=f"Last deleted image in {channel.name}")
+			em.set_image(url=d_content[cid])
+			flag = False
+		em.set_footer(text=f"Author: {d_author[cid]}")
+		await ctx.send(embed=em)
+	except KeyError:
+		await ctx.send(f"There are no recently deleted messages in <#{cid}>")
 
 
 @bot.command(aliases=['esnipe'])
@@ -1508,7 +1522,7 @@ async def editsnipe(ctx, cid: int = None):
 		**Edited message:** {e_content2[cid]}")
 		em.set_footer(text=f"Author: {e_author[cid]}")
 		await ctx.send(embed=em)
-	except:
+	except KeyError:
 		await ctx.send(f"There are no recently edited messages in <#{cid}>")
 
 
@@ -1544,12 +1558,13 @@ async def patchnotes(ctx):
 	e = discord.Embed(title="Updates for SlaveBot v1.15.1",
 					  description=f"\
 	**1. IMPORTANT ANNOUNCEMENT**: CHANGED PROBABILITIES OF JACKPOT!\n \
-	 Winning the `100,000x` multiplier has a `0.1%` chance, `10,000x` is `0.25%`, and `1,000x` is `0.5%`. This is because SOMEONE won the jackpot 11 times in under an hour <:mikebruh:828462333926834176>\n \
+	 Winning the `100,000x` multiplier has a `0.1%` chance, `10,000x` is `0.25%`, and `1,000x` is `0.5%`. Edit: Changing the probabilities did nothing <:mikebruh:828462333926834176>\n \
 	**2.** Added support for using commands in DMs (WARNING: Lots of errors, every error reported has a 10000 SlaveBot currency (trademark pending) reward.)\n \
 	**3.** Since many of you (read: no one) have been asking for this, new **Utility**, `{p}editsnipe`\n \
-	**4.** Added a **Utility**, `{p}suggest`\n \
-	**5.** Bug fixes\n \
-	**6.** Removed Herobrine.",
+	**4.** Added an **Action**, `{p}yeet`\n \
+	**5.** Added a **Utility**, `{p}suggest`\n \
+	**6.** Bug fixes\n \
+	**7.** Removed Herobrine.",
 					  colour=discord.Color.dark_grey())
 	await ctx.send(embed=e)
 
@@ -2983,11 +2998,13 @@ async def ball8(ctx, *, q=None):
 
 
 @bot.command(name="say")
-async def _say(ctx, *, phrase: str = None):
+async def _say(ctx, member:Optional[discord.Member], *, phrase: str = None):
 	if phrase is None:
 		await ctx.reply("What do you want me to say, dumdum",
 						mention_author=False)
 		return
+	if member is None:
+		member = ctx.author
 	elif "@everyone" in phrase or "@here" in phrase:
 		await ctx.send(
 			f"<:mikebruh:819137093850759169> Did you seriously just try and make me say that {ctx.author.mention}"
@@ -3002,7 +3019,7 @@ async def _say(ctx, *, phrase: str = None):
 	mt = ""
 	for i in range(len(phrase) // 2):
 		mt += "⠀"
-	await ctx.reply(f'"{phrase}"\n {mt} **-{ctx.author}, {n.year}**',
+	await ctx.reply(f'"{phrase}"\n {mt} **-{member}, {n.year}**',
 					mention_author=False)
 
 
@@ -3218,7 +3235,7 @@ async def fight(ctx, user: discord.Member = None, *, weapon: str = None):
 			colour=discord.Colour.from_rgb(0, 0, 0))
 		await ctx.send(embed=e)
 	else:
-		if (user2 is None) or (user == ctx.author.mention):
+		if (user2 is None) or (user == ctx.author):
 			e = discord.Embed(title="Attack failed",\
 							  description=f"{ctx.author.mention} just tried to fight themselves, so now they're in a ~~mental~~ hospital", colour=discord.Colour.dark_red())
 			await ctx.send(embed=e)
@@ -3312,6 +3329,7 @@ async def pat(ctx,
 		await ctx.send(
 			"Patting yourself is banned in 130 countries. Ask someone else to do it"
 		)
+		return
 	else:
 		patted = ", ".join(x.name for x in members)
 	await ctx.send('{} just got patted {}'.format(patted, reason))
@@ -3335,6 +3353,7 @@ async def stab(ctx,
 	elif ctx.author in members:
 		fle = discord.File('images/scarn.gif')
 		await ctx.send(file=fle)
+		return
 	else:
 		stabbed = ", ".join(x.name for x in members)
 	if stabbed == 'asgardian88' or stabbed == 'Akshita':
@@ -3391,8 +3410,10 @@ async def bonk(ctx,
 	#	 out.save('images/edit.png')
 	rav1 = rescale(av1, (190, 190))
 	rav2 = rescale(av2, (190, 190))
-	base.paste(rav1, (150, 37))
-	base.paste(rav2, (500, 185))
+	rav1 = rav1.convert("RGBA")
+	rav2 = rav2.convert("RGBA")
+	base.paste(rav1, (149, 38), rav1)
+	base.paste(rav2, (498, 182), rav2)
 	base.save("images/edit.png")
 	if bonker == ctx.author:
 		await ctx.send('{} just got bonked {}'.format(bonked.name, reason))
@@ -3405,6 +3426,39 @@ async def bonk(ctx,
 		await asyncio.sleep(1)
 		await ctx.send("ouch indeed")
 
+@bot.command()
+async def yeet(ctx, member:Optional[discord.Member], *, reason:str="why not"):
+	if "@everyone" in reason or "@here" in reason:
+		await ctx.send(
+			"You try to yeet a ton of people and break your arm. Great job!"
+		)
+		return
+	if not member:
+		member = ctx.guild.me
+	if member == ctx.author:
+		fle = discord.File('images/scarn.gif')
+		await ctx.send(file=fle)
+		return
+	download_file(get_avatar(member, False), "images/yeet2.png")
+	av2 = Image.open("images/yeet2.png")
+	base = Image.open("images/yeet.png")
+	download_file(get_avatar(ctx.author, False), "images/yeet1.png")
+	av1 = Image.open("images/yeet1.png")
+	rav1 = rescale(av1, (35, 35))
+	rav2 = rescale(av2, (35, 35))
+	rav1 = rav1.convert("RGBA")
+	rav2 = rav2.convert("RGBA")
+	base.paste(rav1, (50, 30), rav1)
+	base.paste(rav2, (0, 9), rav2)
+	base.paste(rav1, (220, 40), rav1)
+	base.paste(rav2, (305, 12), rav2)
+	base.save("images/yedit.png")
+	await ctx.send(f"{ctx.author.name} yeeted {member.name} into oblivion because {reason}")
+	await ctx.send(file=discord.File('images/yedit.png'))
+	if member.name == "SlaveBot":
+		await ctx.channel.trigger_typing()
+		await asyncio.sleep(1)
+		await ctx.send("AAAAAAAAAᴬᴬᴬᴬᴬᴬᴬᴬᴬᴬᴬᴬᵃᵃᵃᵃᵃᵃᵃᵃᵃᵃᵃᵃᵃᵃᵃᵃ")
 
 @bot.command(aliases=['wiki'])
 @commands.cooldown(rate=1, per=5.0, type=commands.BucketType.user)
@@ -3444,10 +3498,20 @@ async def wikisearch(ctx, *, term: str = None):
 						 text=f"Requested by: {ctx.author}")
 			await ctx.send(embed=e)
 
+@bot.command()
+async def meme(ctx):
+	complete_url = "https://api.imgflip.com/get_memes"
+	response = requests.get(complete_url)
+	x = response.json()['data']['memes']
+	await ctx.send(random.choice(x))
 
 @bot.command()
 @commands.cooldown(1, 5, commands.BucketType.user)
 async def weather(ctx, *, city=None):
+	if not city:
+		await ctx.send("Temperature: 0K \nHumidity: 101% \nDescription: Dry")
+		await ctx.send("That doesn't sound right? Oh maybe that's because you DIDN'T ENTER A CITY")
+		return
 	api_key = os.environ['WEATHER_KEY']
 	base_url = "https://api.openweathermap.org/data/2.5/weather?"
 	complete_url = base_url + "appid=" + api_key + "&q=" + city
