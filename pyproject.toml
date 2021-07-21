@@ -30,6 +30,7 @@ urllib3 = "1.26.4"
 tqdm = "4.61.1"
 replit = "^3.1.0"
 beautifulsoup4 = "^4.9.3"
+PyNaCl = "^1.4.0"
 
 [tool.poetry.dev-dependencies]
 
