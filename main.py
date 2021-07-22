@@ -283,10 +283,10 @@ async def help(ctx, page: str = None):
 		p = db[str(ctx.guild.id)][1]
 	else:
 		p = ">>"
-	if page is None or page.lower() in ("1", "2", "3", "4", "5", "6", "7",
+	if page is None or page.lower() in ("1", "2", "3", "4", "5", "6", "7", "8",
 										"action", "actions", "utilities",
 										"utils", "fun", "games", "currency",
-										"stonks", "youtube"):
+										"stonks", "music", "songs"):
 		contents = [
 			f"**Side note: Commands in `<brackets>` are required, commands in `[brackets]` are optional,\
 	 and `x|y` signifies x OR y**\n \
@@ -365,16 +365,27 @@ async def help(ctx, page: str = None):
 			f"**Side note: Commands in `<brackets>` are required, commands in `[brackets]` are optional,\
 	 and `x|y` signifies x OR y**\n \
 	*Pssst, you! Yes I'm talking to you! You can do `{p}help <command>` for more info on any command!*\n \n \
-	**Youtube**\n \
+	**Music**\n \
 		`{p}join` \n > Join our cult. Jk, makes the bot join your voice channel ~~to spy on your conversations~~\n \
-		`{p}play <URL|song name>` \n > Play dem beats. Give either the link to the Youtube video or type its name\n \
+		`{p}play <song name>` \n > Play dem beats.\n \
 		`{p}pause` \n > Pause the music to hear your friend's ranting\n \
 		`{p}resume` \n > Resume the music because their ranting's too boring\n \
 		`{p}stop` \n > Stop the music ~~Get some help~~\n \
 		`{p}lyrics <song name>` \n > See the lyrics to a song and realize you've been singing nonsense this whole time\n \
-		`{p}leave` \n > Make the bot leave the channel ~~because you found out that the bot records conversations~~"
+		`{p}leave` \n > Make the bot leave the channel ~~because you found out that the bot records conversations~~",
+		f"**Side note: Commands in `<brackets>` are required, commands in `[brackets]` are optional,\
+	 and `x|y` signifies x OR y**\n \
+	*Pssst, you! Yes I'm talking to you! You can do `{p}help <command>` for more info on any command!*\n \n \
+	**Music** (continued)\n \
+		`{p}now` \n > See what garbage song is playing now so you can `{p}skip` it\n \
+		`{p}queue` \n > See how long the queue is for a COVID-19 vacc- I mean, see the music queue.\n \
+		`{p}volume [volume]` \n > Change the volume to 100 when that beat drops.\n \
+		`{p}remove [index]` \n > Remove that one song from the playlist that no one likes.\n \
+		`{p}skip` \n > When the person next to you has one Uno card left, use this. Or you can also use it to skip a song.\n \
+		`{p}shuffle` \n > Use the bot's specially engineered shuffling mechanism to ensure all the bad songs are played together.\n \
+		`{p}loop` \n > When the song is just too good."
 		]
-		#57
+		#64
 		cur_page = 1
 		ncontents = []
 		if page:
@@ -414,13 +425,17 @@ async def help(ctx, page: str = None):
 				else:
 					ncontents = contents
 					cur_page = 6
-			elif page == "7" or page.lower() == "youtube" or page.lower(
-			) == "music":
+			elif page == "7" or page.lower() == "music" or page.lower(
+			) == "songs":
 				if page.isalpha():
 					ncontents.append(contents[6])
+					ncontents.append(contents[7])
 				else:
 					ncontents = contents
 					cur_page = 7
+			elif page == "8":
+				ncontents = contents
+				cur_page = 8
 		else:
 			ncontents = contents
 
@@ -444,7 +459,7 @@ async def help(ctx, page: str = None):
 				"◀️", "⏹️", "▶️"
 			] and reaction.message == message
 
-		while True:
+		while 1:
 			try:
 				reaction, user = await bot.wait_for("reaction_add",
 													timeout=120.0,
@@ -500,7 +515,7 @@ async def help(ctx, page: str = None):
 				elif str(reaction.emoji) == '⏹️':
 					if ctx.guild:
 						await message.clear_reactions()
-					break
+					return
 				else:
 					if ctx.guild:
 						await message.remove_reaction(reaction, user)
@@ -824,6 +839,41 @@ async def help(ctx, page: str = None):
 			title=f"Help on `{p}lyrics`",
 			description="Get the lyrics to a song, credits to KSoft.Si API")
 		e.add_field(name="Syntax", value=f"`{p}lyrics <song name>`")
+	elif page == "volume":
+		e = discord.Embed(
+			title=f"Help on `{p}volume`",
+			description="Change the volume of the bot, from 0 to 100.")
+		e.add_field(name="Syntax", value=f"`{p}volume [value]`")
+	elif page == "now":
+		e = discord.Embed(
+			title=f"Help on `{p}now`",
+			description="See the details of the song playing currently")
+		e.add_field(name="Syntax", value=f"`{p}now`")
+	elif page == "skip":
+		e = discord.Embed(
+			title=f"Help on `{p}skip`",
+			description="Skip the current song. (Person who requested the song can skip instantly, others need 3 skips.)")
+		e.add_field(name="Syntax", value=f"`{p}skip`")
+	elif page == "queue" or page == "q":
+		e = discord.Embed(
+			title=f"Help on `{p}queue`",
+			description="See the song queue.")
+		e.add_field(name="Syntax", value=f"`{p}queue|q`")
+	elif page == "shuffle":
+		e = discord.Embed(
+			title=f"Help on `{p}shuffle`",
+			description="Shuffle the queue")
+		e.add_field(name="Syntax", value=f"`{p}shuffle`")
+	elif page == "remove":
+		e = discord.Embed(
+			title=f"Help on `{p}remove`",
+			description="Remove a song from the queue")
+		e.add_field(name="Syntax", value=f"`{p}remove <index>`")
+	elif page == "loop":
+		e = discord.Embed(
+			title=f"Help on `{p}loop`",
+			description="Loop/unloop the currently playing song.")
+		e.add_field(name="Syntax", value=f"`{p}loop`")
 	else:
 		await ctx.send("Why do you need help with stuff that doesn't exist")
 		page = None
@@ -1559,16 +1609,15 @@ async def patchnotes(ctx):
 		p = db[str(ctx.guild.id)][1]
 	else:
 		p = ">>"
-	e = discord.Embed(title="Updates for SlaveBot v1.15.1",
+	e = discord.Embed(title="Updates for SlaveBot v1.16.1",
 					  description=f"\
 	**1. IMPORTANT ANNOUNCEMENT**: CHANGED PROBABILITIES OF JACKPOT!\n \
-	 Winning the `100,000x` multiplier has a `0.1%` chance, `10,000x` is `0.25%`, and `1,000x` is `0.5%`. Edit: Changing the probabilities did nothing <:mikebruh:828462333926834176>\n \
-	**2.** Added support for using commands in DMs (WARNING: Lots of errors, every error reported has a 10000 SlaveBot currency (trademark pending) reward.)\n \
-	**3.** Since many of you (read: no one) have been asking for this, new **Utility**, `{p}editsnipe`\n \
+	 Winning the `100,000x` multiplier has a `0.1%` chance, `10,000x` is `0.25%`, and `1,000x` is `0.5%`.\n \
+	**2.** Added more music commands, `{p}volume`, `{p}now`, `{p}skip`, `{p}queue`, `{p}shuffle`, `{p}remove`, `{p}loop`\n \
+	**3.** Added support for using commands in DMs (WARNING: Lots of errors, every error reported has a 10000 SlaveBot currency (trademark pending) reward.)\n \
 	**4.** Added an **Action**, `{p}yeet`\n \
 	**5.** Added a **Utility**, `{p}suggest`\n \
-	**6.** Bug fixes\n \
-	**7.** Removed Herobrine.",
+	**6.** Removed Herobrine.",
 					  colour=discord.Color.dark_grey())
 	await ctx.send(embed=e)
 
@@ -3611,46 +3660,6 @@ async def weather(ctx, *, city=None):
 # 		voice.volume = 100
 # 		voice.is_playing()
 
-
-# @bot.command(pass_context=True)
-# @commands.guild_only()
-# async def pause(ctx):
-# 	voice = get(bot.voice_clients, guild=ctx.guild)
-# 	if voice and voice.is_playing():
-# 		print("Music paused")
-# 		voice.pause()
-# 		await ctx.reply("Music paused", mention_author=False)
-# 	else:
-# 		print("Music not playing")
-# 		await ctx.reply("Music not playing", mention_author=False)
-
-
-# @bot.command(pass_context=True)
-# @commands.guild_only()
-# async def resume(ctx):
-# 	voice = get(bot.voice_clients, guild=ctx.guild)
-# 	if voice and voice.is_paused():
-# 		print("Resumed music")
-# 		voice.resume()
-# 		await ctx.reply("Resumed music", mention_author=False)
-# 	else:
-# 		print("Music is not paused")
-# 		await ctx.reply("Music is not paused", mention_author=False)
-
-
-# @bot.command(pass_context=True)
-# @commands.guild_only()
-# async def stop(ctx):
-# 	voice = get(bot.voice_clients, guild=ctx.guild)
-# 	if voice and voice.is_playing():
-# 		print("Music stopped")
-# 		voice.stop()
-# 		await ctx.reply("Music stopped", mention_author=False)
-# 	else:
-# 		print("No music playing")
-# 		await ctx.reply("No music playing", mention_author=False)
-##################################################################################################################
-
 #@bot.command(name='lyrics')
 #@commands.guild_only()
 #async def get_lyrics(ctx, *, query: str=""):
@@ -3682,16 +3691,6 @@ async def weather(ctx, *, city=None):
 #		for embed in embeds:
 #			await ctx.send(embed=embed)
 #	kclient.close()
-
-#####################################################################################################################
-# @bot.command(pass_context=True)
-# @commands.guild_only()
-# async def leave(ctx):
-# 	guild = ctx.message.guild
-# 	channel = guild.me.voice.channel
-# 	voice = guild.voice_client
-# 	await ctx.reply(f"Left {channel}", mention_author=False)
-# 	await voice.disconnect()
 
 youtube_dl.utils.bug_reports_message = lambda: ''
 
@@ -3822,7 +3821,7 @@ class Song:
 
 	def create_embed(self):
 		embed = (discord.Embed(title='Now playing',
-							   description='```css\n{0.source.title}\n```'.format(self),
+							   description='```{0.source.title}\n```'.format(self),
 							   color=discord.Color.blurple())
 				 .add_field(name='Duration', value=self.source.duration)
 				 .add_field(name='Requested by', value=self.requester.mention)
@@ -3963,14 +3962,12 @@ class Music(commands.Cog):
 	async def cog_before_invoke(self, ctx: commands.Context):
 		ctx.voice_state = self.get_voice_state(ctx)
 
-	async def cog_command_error(self, ctx: commands.Context, error: commands.CommandError):
-		await ctx.send('An error occurred: {}'.format(str(error)))
-
 	@commands.command(name='join', invoke_without_subcommand=True)
 	async def _join(self, ctx: commands.Context):
 		"""Joins a voice channel."""
 
 		destination = ctx.author.voice.channel
+
 		if ctx.voice_state.voice:
 			await ctx.voice_state.voice.move_to(destination)
 			return
@@ -3991,7 +3988,7 @@ class Music(commands.Cog):
 		await ctx.send(f"Left {ctx.guild.me.voice.channel}")
 
 	@commands.command(name='volume')
-	async def _volume(self, ctx: commands.Context, *, volume: int):
+	async def _volume(self, ctx: commands.Context, *, volume: int=50):
 		"""Sets the volume of the player."""
 
 		if not ctx.voice_state.is_playing:
@@ -4006,7 +4003,8 @@ class Music(commands.Cog):
 	@commands.command(name='now', aliases=['current', 'playing'])
 	async def _now(self, ctx: commands.Context):
 		"""Displays the currently playing song."""
-
+		if not ctx.voice_state.is_playing:
+			return await ctx.send('Nothing being played at the moment.')
 		await ctx.send(embed=ctx.voice_state.current.create_embed())
 
 	@commands.command(name='pause')
@@ -4017,6 +4015,8 @@ class Music(commands.Cog):
 		if ctx.voice_state.is_playing and ctx.voice_state.voice.is_playing():
 			ctx.voice_state.voice.pause()
 			await ctx.message.add_reaction('⏸️')
+		else:
+			return await ctx.send('Nothing being played at the moment.')
 
 	@commands.command(name='resume')
 	@commands.has_permissions(manage_guild=True)
@@ -4026,6 +4026,8 @@ class Music(commands.Cog):
 		if ctx.voice_state.is_playing and ctx.voice_state.voice.is_paused():
 			ctx.voice_state.voice.resume()
 			await ctx.message.add_reaction('⏯')
+		else:
+			return await ctx.send('Nothing being played at the moment.')
 
 	@commands.command(name='stop')
 	@commands.has_permissions(manage_guild=True)
@@ -4037,6 +4039,8 @@ class Music(commands.Cog):
 		if ctx.voice_state.is_playing:
 			ctx.voice_state.voice.stop()
 			await ctx.message.add_reaction('⏹')
+		else:
+			return await ctx.send('Nothing being played at the moment.')
 
 	@commands.command(name='skip')
 	async def _skip(self, ctx: commands.Context):
@@ -4065,7 +4069,7 @@ class Music(commands.Cog):
 		else:
 			await ctx.send('You have already voted to skip this song.')
 
-	@commands.command(name='queue')
+	@commands.command(aliases=['queue', 'q'])
 	async def _queue(self, ctx: commands.Context, *, page: int = 1):
 		"""Shows the player's queue.
 
@@ -4100,9 +4104,11 @@ class Music(commands.Cog):
 		await ctx.message.add_reaction('🔀')
 
 	@commands.command(name='remove')
-	async def _remove(self, ctx: commands.Context, index: int):
+	async def _remove(self, ctx: commands.Context, index: int=None):
 		"""Removes a song from the queue at a given index."""
 
+		if not int:
+			return await ctx.send("Since no song index was specified, all songs will be removed <:yeet:817301996256231444>")
 		if len(ctx.voice_state.songs) == 0:
 			return await ctx.send('Empty queue.')
 
