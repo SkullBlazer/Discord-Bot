@@ -205,7 +205,7 @@ class Currency(commands.Cog):
 
 	@commands.command(pass_context=True)
 	@commands.cooldown(1, 10, commands.BucketType.user)
-	async def transfer(self, ctx, other: discord.Member = None, amount: int = None):
+	async def transfer(self, ctx, other: discord.Member = None, amount: str = None):
 		if other is None:
 			await ctx.reply(
 				"Since no recipient was mentioned, all your money will go to ~~me~~ charity",
@@ -215,6 +215,18 @@ class Currency(commands.Cog):
 				f"Amount not provided, resorting to default value, which is all of {ctx.author.name}'s money",
 				mention_author=False)
 		else:
+			if amount[-1].lower() == 'k':
+				amount = int(amount[:-1]) * 1000
+			elif amount[-1].lower() == 'm':
+				amount = int(amount[:-1]) * 1000000
+			elif amount[-1].lower() == 'b':
+				amount = int(amount[:-1]) * 1000000000
+			elif amount[-1].lower() == 't':
+				amount = int(amount[:-1]) * 1000000000000
+			elif amount[-1].lower() == 'q':
+				amount = int(amount[:-1]) * 1000000000000000
+			else:
+				amount = int(amount)
 			primary_id = str(ctx.message.author.id)
 			other_id = str(other.id)
 			if primary_id == other_id:
@@ -471,7 +483,7 @@ class Currency(commands.Cog):
 			await ctx.reply(embed=e, mention_author=False)
 
 
-	def convert(seconds):
+	def convert(self, seconds):
 		seconds = seconds % (24 * 3600)
 		hour = seconds // 3600
 		seconds %= 3600
@@ -484,7 +496,7 @@ class Currency(commands.Cog):
 	@daily.error
 	async def daily_error(self, ctx, error):
 		if isinstance(error, commands.CommandOnCooldown):
-			currency = self.bot.get_cog('Currencu')
+			currency = self.bot.get_cog('Currency')
 			msg = ('This command is ratelimited, please try again in %s' %
 				currency.convert(error.retry_after))
 			await ctx.reply(msg, mention_author=False)

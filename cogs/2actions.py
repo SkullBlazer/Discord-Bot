@@ -170,7 +170,7 @@ class Actions(commands.Cog):
 			await ctx.send(joke['setup'] + '\n' + f"||{joke['punchline']}||")
 
 
-	def download_file(url, destination):
+	def download_file(self, url, destination):
 		req = requests.get(url)
 		file = open(destination, "wb")
 		for chunk in req.iter_content(100000):
@@ -178,7 +178,7 @@ class Actions(commands.Cog):
 		file.close()
 
 
-	def get_avatar(user, animate=True):
+	def get_avatar(self, user, animate=True):
 		if user.avatar_url and not animate:
 			avatar = str(user.avatar_url).replace(".webp", ".png")
 		elif user.avatar_url and animate:
@@ -188,16 +188,16 @@ class Actions(commands.Cog):
 		return avatar
 
 
-	def rescale(image, dimensions):
+	def rescale(self, image, dimensions):
 		image.thumbnail(dimensions, Image.ANTIALIAS)
 		return image
 
 
-	def grayscale(rgb):
+	def grayscale(self, rgb):
 		return np.dot(rgb[..., :3], [0.299, 0.587, 0.114])
 
 
-	def dodge(front, back):
+	def dodge(self, front, back):
 		result = front * 255 / (256 - back)
 		result[result > 255] = 255
 		result[back == 255] = 255
