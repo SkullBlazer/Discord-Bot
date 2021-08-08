@@ -812,7 +812,7 @@ class Fun(commands.Cog):
 						a = c
 						if b == c:
 							b = random.choice(emojis)
-				await asyncio.sleep(1)
+				await asyncio.sleep(1.1)
 				slotmachine = f"**{ctx.author.name}'s ~~gambling addiction~~ slots game** \n[ {a} {b} {c} ]"
 				await msg.edit(content=slotmachine)
 

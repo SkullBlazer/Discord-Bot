@@ -146,9 +146,6 @@ async def on_guild_join(guild):
 async def on_guild_remove(guild):
 	del db[str(guild.id)]
 
-
-
-
 @bot.event
 async def on_command_error(ctx, error):
 	if ctx.guild:
@@ -175,12 +172,34 @@ async def on_command_error(ctx, error):
 		await ctx.send(error)
 
 @bot.command()
-async def load(ctx, extension):
+@commands.check_any(commands.is_owner())
+async def load(ctx, extension=None):
+	if extension is None:
+		await ctx.send("Missing cog extension, forcing loading of default pins.")
+		return
 	bot.load_extension(f'cogs.{extension}')
+	await ctx.message.add_reaction('👍')
 
 @bot.command()
-async def unload(ctx, extension):
+@commands.check_any(commands.is_owner())
+async def unload(ctx, extension=None):
+	if extension is None:
+		await ctx.send("Missing cog extension, forcing unloading of default pins.")
+		return
+
 	bot.unload_extension(f'cogs.{extension}')
+	await ctx.message.add_reaction('👍')
+
+@bot.command()
+@commands.check_any(commands.is_owner())
+async def reload(ctx, extension=None):
+	if extension is None:
+		await ctx.send("Missing cog extension, forcing reloading of default pins.")
+		return
+
+	bot.unload_extension(f'cogs.{extension}')
+	bot.load_extension(f'cogs.{extension}')
+	await ctx.message.add_reaction('👍')
 
 for filename in os.listdir('./cogs'):
 	if filename.endswith('.py'):
@@ -400,7 +419,6 @@ async def on_message(message):
 #			 temp = 0
 #			 await message.channel.send("<@!305341210443382785>")
 	await bot.process_commands(message)
-
 
 keep_alive()
 bot.run(token)

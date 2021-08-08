@@ -472,7 +472,7 @@ class Utilities(commands.Cog):
 						value=f"`{p}choose <options separated by spaces>`")
 		elif page == "hello" or page == "hemlo" or page == 'henlo' or page == 'hi' or page == 'hai':
 			e = discord.Embed(title=f"Help on `{p}{page}`",
-							description="Greet the self.bot.\n Fun fact: This is the first command I made!")
+							description="Greet the bot.\n Fun fact: This is the first command I made!")
 			e.add_field(name="Syntax", value=f"`{p}hello|hemlo|henlo|hai|hi`")
 		elif page == "trigger":
 			e = discord.Embed(
@@ -691,7 +691,7 @@ class Utilities(commands.Cog):
 
 
 	@commands.command(name='eval')
-	@commands.check_any(commands.is_owner(), is_owner(), is_mod())
+	@commands.check_any(commands.is_owner(), is_owner())#, is_mod())
 	async def _eval(self, ctx):
 		await ctx.message.add_reaction("👀")
 
@@ -717,7 +717,7 @@ class Utilities(commands.Cog):
 	#	 server = self.bot.get_guild(gid)
 	@commands.command(aliases=['colorchange', 'cc'])
 	@commands.guild_only()
-	@commands.cooldown(1, 15, commands.BucketType.user)
+	@commands.cooldown(1, 5, commands.BucketType.user)
 	async def colourchange(self, ctx,
 						member: Optional[discord.Member],
 						role: discord.Role = None):
@@ -1026,7 +1026,7 @@ class Utilities(commands.Cog):
 	@commands.command(name="kick", pass_context=True)
 	@commands.guild_only()
 	@commands.has_permissions(manage_roles=True, kick_members=True)
-	@commands.cooldown(1, 30, commands.BucketType.user)
+	@commands.cooldown(1, 10, commands.BucketType.user)
 	async def _kick(self, ctx, member: discord.Member = None, *, reason=None):
 		if member is None:
 			await ctx.reply(
@@ -1063,7 +1063,7 @@ class Utilities(commands.Cog):
 	@commands.command(name="ban", pass_context=True)
 	@commands.guild_only()
 	@commands.has_permissions(manage_roles=True, kick_members=True)
-	@commands.cooldown(1, 60, commands.BucketType.user)
+	@commands.cooldown(1, 20, commands.BucketType.user)
 	async def _ban(self, ctx, member: discord.Member = None, *, reason=None):
 		if member is None:
 			await ctx.reply(f"Banning {ctx.message.author}...",
@@ -1170,7 +1170,7 @@ class Utilities(commands.Cog):
 
 
 	@commands.command()
-	@commands.cooldown(1, 10, commands.BucketType.user)
+	@commands.cooldown(1, 5, commands.BucketType.user)
 	async def ping(self, ctx):
 		msg = await ctx.send("`Pinging bot latency...`")
 		times = []
@@ -1208,7 +1208,7 @@ class Utilities(commands.Cog):
 
 	@commands.command()
 	@commands.guild_only()
-	@commands.cooldown(1, 10, commands.BucketType.user)
+	@commands.cooldown(1, 5, commands.BucketType.user)
 	async def nick(self, ctx, member: Optional[discord.Member], *, name: str = None):
 		member = member or ctx.author
 		og = str(member.name)
@@ -1249,7 +1249,7 @@ class Utilities(commands.Cog):
 
 	@commands.command(aliases=['changeprefix'])
 	@commands.guild_only()
-	@commands.cooldown(1, 15, commands.BucketType.user)
+	@commands.cooldown(1, 5, commands.BucketType.user)
 	async def prefix(self, ctx, prefx='>>'):
 		if db[str(ctx.guild.id)][1] == prefx:
 			await ctx.reply(f"Your prefix is already {prefx}",
@@ -1285,7 +1285,7 @@ class Utilities(commands.Cog):
 
 	@commands.command(aliases=['autoresponse'])
 	@commands.guild_only()
-	@commands.cooldown(1, 15, commands.BucketType.user)
+	@commands.cooldown(1, 5, commands.BucketType.user)
 	async def stalkermode(self, ctx, flag: str = None):
 		if flag is None:
 			if db[str(ctx.guild.id)][0] == "false":
@@ -1391,14 +1391,14 @@ class Utilities(commands.Cog):
 			p = db[str(ctx.guild.id)][1]
 		else:
 			p = ">>"
-		e = discord.Embed(title="Updates for SlaveBot v1.16.1",
+		e = discord.Embed(title="Updates for SlaveBot v2.0.2",
 						description=f"\
 		**1. IMPORTANT ANNOUNCEMENT**: CHANGED PROBABILITIES OF JACKPOT!\n \
-		Winning the `100,000x` multiplier has a `0.1%` chance, `10,000x` is `0.25%`, and `1,000x` is `0.5%`.\n \
+		Getting the `100,000x` multiplier has a `0.1%` chance, `10,000x` is `0.25%`, and `1,000x` is `0.5%`.\n \
 		**2.** Added more music commands, `{p}volume`, `{p}now`, `{p}skip`, `{p}queue`, `{p}shuffle`, `{p}remove`, `{p}loop`\n \
-		**3.** Added support for using commands in DMs (WARNING: Lots of errors, every error reported has a 10000 SlaveBot currency (trademark pending) reward.)\n \
-		**4.** Added an **Action**, `{p}yeet`\n \
-		**5.** Added a **Utility**, `{p}suggest`\n \
+		**3.** Added an **Action**, `{p}yeet`\n \
+		**4.** Added a **Utility**, `{p}suggest`\n \
+		**5.** Major backend changes, i.e. lots of bugs. Same deal as before, real bugs found get prizes.\n \
 		**6.** Removed Herobrine.",
 						colour=discord.Color.dark_grey())
 		await ctx.send(embed=e)
@@ -1440,5 +1440,6 @@ class Utilities(commands.Cog):
 				await ctx.send("Message sent to my master that you're stupid")	
 		except asyncio.TimeoutError:
 			await ctx.send("Message sent to my master that you're stupid")
+
 def setup(bot):
 	bot.add_cog(Utilities(bot))
