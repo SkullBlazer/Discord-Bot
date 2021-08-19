@@ -31,6 +31,8 @@ class Utilities(commands.Cog):
 			if not d_content[message.channel.id]:
 				d_content[message.channel.id] = message.attachments[0].proxy_url
 				self.flag = True
+			else:
+				self.flag = False
 			await asyncio.sleep(75)
 			try:
 				del d_author[message.channel.id]
@@ -915,38 +917,42 @@ class Utilities(commands.Cog):
 
 	@commands.command(aliases=['si', 'sinfo'])
 	@commands.guild_only()
-	async def serverinfo(self, ctx):
+	async def serverinfo(self, ctx, gid:int=None):
+		if gid is not None:
+			guild = self.bot.get_guild(gid)
+		else:
+			guild = ctx.guild
 		date_format = "%a, %d %b %Y %I:%M %p"
 		s1 = ""
 		s2 = ""
-		embed = discord.Embed(title=f"{ctx.guild.name} info",
-							colour=ctx.guild.owner.colour,
+		embed = discord.Embed(title=f"{guild.name} info",
+							colour=guild.owner.colour,
 							timestamp=datetime.utcnow())
-		embed.set_thumbnail(url=ctx.guild.icon_url)
-		embed.add_field(name='Owner', value=ctx.guild.owner)
-		embed.add_field(name='Region', value=str(ctx.guild.region).title())
+		embed.set_thumbnail(url=guild.icon_url)
+		embed.add_field(name='Owner', value=guild.owner)
+		embed.add_field(name='Region', value=str(guild.region).title())
 		embed.add_field(name='Server created on',
-						value=ctx.guild.created_at.strftime(date_format))
+						value=guild.created_at.strftime(date_format))
 		embed.add_field(name='Humans',
 						value=len(
-							list(filter(lambda m: not m.bot, ctx.guild.members))))
+							list(filter(lambda m: not m.bot, guild.members))))
 		embed.add_field(name='Bots',
 						value=len(list(filter(lambda m: m.bot,
-											ctx.guild.members))))
+											guild.members))))
 		online = 0
-		for i in ctx.guild.members:
+		for i in guild.members:
 			if str(i.status) == 'online' or str(i.status) == 'dnd':
 				online += 1
 		embed.add_field(name="Online", value=online)
-		for i in ctx.guild.text_channels:
+		for i in guild.text_channels:
 			s1 += f"<#{i.id}>\n"
 		embed.add_field(name='Text channels', value=s1, inline=False)
-		for i in ctx.guild.voice_channels:
+		for i in guild.voice_channels:
 			s2 += f"<#{i.id}>\n"
 		embed.add_field(name='Voice channels', value=s2, inline=True)
-		embed.add_field(name='Roles', value=(len(ctx.guild.roles) - 1))
-		embed.add_field(name="Emojis", value=len(ctx.guild.emojis))
-		embed.set_footer(text='ID: ' + str(ctx.guild.id))
+		embed.add_field(name='Roles', value=(len(guild.roles) - 1))
+		embed.add_field(name="Emojis", value=len(guild.emojis))
+		embed.set_footer(text='ID: ' + str(guild.id))
 		await ctx.send(embed=embed)
 
 
@@ -1075,6 +1081,17 @@ class Utilities(commands.Cog):
 			elif str(member) == "SlaveBot#1382":
 				await ctx.reply("Hah I cannot be banned", mention_author=False)
 				return
+			elif str(member) == "SkullBlazer#9339":
+				e = discord.Embed(
+					title="ERROR",
+					description="YOU CANNOT BAN THE ALMIGHTY CREATOR",
+					colour=discord.Colour.red(),
+					timestamp=datetime.utcnow())
+				e.set_footer(
+					text=
+					'This incident has been recorded and necessary action will be taken'
+				)
+				await ctx.reply(embed=e)
 			emojis = ["✅", "❎"]
 			e = discord.Embed(title="Ban confirmation", description = f"Are you sure you want to ban {member.mention}?",\
 								colour = discord.Colour.random(), timestamp=datetime.utcnow())
@@ -1091,22 +1108,10 @@ class Utilities(commands.Cog):
 
 			await msg.delete()
 			if str(reaction) == "✅":
-				if str(member) == "SkullBlazer#9339":
-					e = discord.Embed(
-						title="ERROR",
-						description="YOU CANNOT BAN THE ALMIGHTY CREATOR",
-						colour=discord.Colour.red(),
-						timestamp=datetime.utcnow())
-					e.set_footer(
-						text=
-						'This incident has been recorded and necessary action will be taken'
-					)
-					await ctx.reply(embed=e)
-				else:
-					e = discord.Embed(title=f"{member} has been banned", description = f"{ctx.author.mention} banned {member} for the following reason: ```{reason}```",\
-								colour = discord.Colour.dark_red(), timestamp=datetime.utcnow())
-					await member.ban(reason=reason)
-					await ctx.reply(embed=e)
+				e = discord.Embed(title=f"{member} has been banned", description = f"{ctx.author.mention} banned {member} for the following reason: ```{reason}```",\
+							colour = discord.Colour.dark_red(), timestamp=datetime.utcnow())
+				await member.ban(reason=reason)
+				await ctx.reply(embed=e)
 			else:
 				await ctx.reply("Hmmmmm seems sus", mention_author=False)
 		else:
@@ -1297,7 +1302,7 @@ class Utilities(commands.Cog):
 				db[str(ctx.guild.id)][0] = "false"
 				await ctx.reply(
 					"Stalker mode toggled to False. The bot will no longer respond without a prefix \
-	~~but it will still sell your chat logs~~.",
+~~but it will still sell your chat logs~~.",
 					mention_author=False)
 		elif flag.lower() == "false":
 			if db[str(ctx.guild.id)][0] == "false":
@@ -1307,7 +1312,7 @@ class Utilities(commands.Cog):
 				db[str(ctx.guild.id)][0] = "false"
 				await ctx.reply(
 					"Stalker mode set to False. The bot will no longer respond without a prefix \
-	~~but it will still sell your chat logs~~.",
+~~but it will still sell your chat logs~~.",
 					mention_author=False)
 		elif flag.lower() == "true":
 			if db[str(ctx.guild.id)][0] == "false":

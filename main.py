@@ -47,7 +47,7 @@ def get_prefix(bot, message):
 	# with open('datafiles/prefixes.json') as fle:
 		# prefixes = json.load(fle)
 	if not isinstance(message.channel, discord.DMChannel):
-		return db[str(message.guild.id)]
+		return db[str(message.guild.id)][1]
 	else:
 		return ">>"
 
@@ -124,6 +124,7 @@ async def on_guild_join(guild):
 				i += 1
 				continue
 			await channel.send("Hi! I'm SlaveBot, a bot made by SkullBlazer#9339. My prefix is `>>`, but you can customize it using `>>prefix newPrefix`.\n Do `>>help` to get a list of all commands.")
+			break
 		except:
 			i += 1
 
@@ -159,10 +160,10 @@ async def on_command_error(ctx, error):
 					f"Bro how many {p} are you gonna put in the command")
 		else:
 			rng = random.randint(1,100)
-			if rng == 78:
+			if rng == 76:
 				await ctx.send("You do not have permissions to run this command.")
 				await asyncio.sleep(1)
-				await ctx.send("~~Jk that's not a real command, but you received the secret error message!~~")
+				await ctx.send("~~Jk it's not a valid command, but you received the secret error message!~~")
 			else:
 				await ctx.send("That.... that's not a valid command")
 	elif isinstance(error, commands.CheckAnyFailure):

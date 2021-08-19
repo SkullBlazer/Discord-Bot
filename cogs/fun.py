@@ -775,7 +775,6 @@ class Fun(commands.Cog):
 			self.gaem.remove(ctx.channel.id)
 			return
 
-		db[aid][1] -= amount
 		slotmachine = f"**{ctx.author.name}'s ~~gambling addiction~~ slots game** \n[ {a} {b} {c} ]"
 		msg = await ctx.send(slotmachine)
 		for i in range(4):
@@ -828,7 +827,7 @@ class Fun(commands.Cog):
 			else:
 				multi = 1000
 			if aid in db:
-				db[aid][1] += amount * multi
+				db[aid][1] += (amount * multi) - amount
 				e = discord.Embed(
 					description=f"{amount*multi:,} credits added to account",
 					colour=discord.Colour.green(),
@@ -842,7 +841,7 @@ class Fun(commands.Cog):
 				f"**{ctx.author.name}'s ~~gambling addiction~~ slots game** \n[ {a} {b} {c} ] \n2 in a row, so close!"
 			)
 			if aid in db:
-				db[aid][1] += amount * 2
+				db[aid][1] += (amount * 2) - amount
 				e = discord.Embed(
 					description=f"{amount*2:,} credits added to account",
 					colour=discord.Colour.dark_blue(),
@@ -852,6 +851,7 @@ class Fun(commands.Cog):
 				await ctx.send(embed=e)
 				self.gaem.remove(ctx.channel.id)
 		else:
+			db[aid][1] -= amount
 			await msg.edit(
 				content=
 				f"**{ctx.author.name}'s ~~gambling addiction~~ slots game** \n[ {a} {b} {c} ] \nNo match, you lost 😢"
