@@ -777,43 +777,124 @@ class Fun(commands.Cog):
 
 		slotmachine = f"**{ctx.author.name}'s ~~gambling addiction~~ slots game** \n[ {a} {b} {c} ]"
 		msg = await ctx.send(slotmachine)
-		for i in range(4):
-			a = random.choice(emojis)
-			b = random.choice(emojis)
-			c = random.choice(emojis)
-			slotmachine = f"**{ctx.author.name}'s ~~gambling addiction~~ slots game** \n[ {a} {b} {c} ]"
-			await asyncio.sleep(1.2)
-			await msg.edit(content=slotmachine)
-			if i == 3:
-				hax = random.randint(1, 10000)
-				if hax in ([x for x in range(1,51)]):
-					fruits = ["🍊", "🍐"]
-					a = random.choice(fruits)
-					a = b = c
-				elif hax in ([x for x in range(100, 125)]):
-					fruits = ["🍎", "🍍", "🍉"]
-					a = random.choice(fruits)
-					a = b = c
-				elif hax in ([x for x in range(150, 160)]):
-					fruits = ["🍇", '🍓', "🍒"]
-					a = random.choice(fruits)
-					a = b = c
-				elif hax in ([x for x in range(200, 400)]):
-					if a != b:
-						a = b
-						if b == c:
-							c = random.choice(emojis)
-					elif b != c:
-						b = c
-						if a == c:
-							a = random.choice(emojis)
-					elif c != a:
-						a = c
-						if b == c:
-							b = random.choice(emojis)
-				await asyncio.sleep(1.1)
+		if db[str(ctx.author.id)][2]['supercharm']:
+			await ctx.send("Supercharm active")
+			for i in range(4):
+				a = random.choice(emojis)
+				b = random.choice(emojis)
+				c = random.choice(emojis)
 				slotmachine = f"**{ctx.author.name}'s ~~gambling addiction~~ slots game** \n[ {a} {b} {c} ]"
+				await asyncio.sleep(1.2)
 				await msg.edit(content=slotmachine)
+				if i == 3:
+					hax = random.randint(1, 10000)
+					if hax in ([x for x in range(1,301)]):
+						fruits = ["🍊", "🍐"]
+						a = random.choice(fruits)
+						a = b = c
+					elif hax in ([x for x in range(350, 625)]):
+						fruits = ["🍎", "🍍", "🍉"]
+						a = random.choice(fruits)
+						a = b = c
+					elif hax in ([x for x in range(650, 910)]):
+						fruits = ["🍇", '🍓', "🍒"]
+						a = random.choice(fruits)
+						a = b = c
+					elif hax in ([x for x in range(1000, 2200)]):
+						if a != b:
+							a = b
+							if b == c:
+								c = random.choice(emojis)
+						elif b != c:
+							b = c
+							if a == c:
+								a = random.choice(emojis)
+						elif c != a:
+							a = c
+							if b == c:
+								b = random.choice(emojis)
+					await asyncio.sleep(1.1)
+					slotmachine = f"**{ctx.author.name}'s ~~gambling addiction~~ slots game** \n[ {a} {b} {c} ]"
+					await msg.edit(content=slotmachine)
+			db[str(ctx.author.id)][2]['supercharm'] -= 1
+		elif db[str(ctx.author.id)][2]['charm']:
+			await ctx.send("Charm active")
+			for i in range(4):
+				a = random.choice(emojis)
+				b = random.choice(emojis)
+				c = random.choice(emojis)
+				slotmachine = f"**{ctx.author.name}'s ~~gambling addiction~~ slots game** \n[ {a} {b} {c} ]"
+				await asyncio.sleep(1.2)
+				await msg.edit(content=slotmachine)
+				if i == 3:
+					hax = random.randint(1, 10000)
+					if hax in ([x for x in range(1,201)]):
+						fruits = ["🍊", "🍐"]
+						a = random.choice(fruits)
+						a = b = c
+					elif hax in ([x for x in range(250, 425)]):
+						fruits = ["🍎", "🍍", "🍉"]
+						a = random.choice(fruits)
+						a = b = c
+					elif hax in ([x for x in range(450, 610)]):
+						fruits = ["🍇", '🍓', "🍒"]
+						a = random.choice(fruits)
+						a = b = c
+					elif hax in ([x for x in range(700, 1500)]):
+						if a != b:
+							a = b
+							if b == c:
+								c = random.choice(emojis)
+						elif b != c:
+							b = c
+							if a == c:
+								a = random.choice(emojis)
+						elif c != a:
+							a = c
+							if b == c:
+								b = random.choice(emojis)
+					await asyncio.sleep(1.1)
+					slotmachine = f"**{ctx.author.name}'s ~~gambling addiction~~ slots game** \n[ {a} {b} {c} ]"
+					await msg.edit(content=slotmachine)
+			db[str(ctx.author.id)][2]['charm'] -= 1
+		else:
+			for i in range(4):
+				a = random.choice(emojis)
+				b = random.choice(emojis)
+				c = random.choice(emojis)
+				slotmachine = f"**{ctx.author.name}'s ~~gambling addiction~~ slots game** \n[ {a} {b} {c} ]"
+				await asyncio.sleep(1.2)
+				await msg.edit(content=slotmachine)
+				if i == 3:
+					hax = random.randint(1, 10000)
+					if hax in ([x for x in range(1,51)]):
+						fruits = ["🍊", "🍐"]
+						a = random.choice(fruits)
+						a = b = c
+					elif hax in ([x for x in range(100, 125)]):
+						fruits = ["🍎", "🍍", "🍉"]
+						a = random.choice(fruits)
+						a = b = c
+					elif hax in ([x for x in range(150, 160)]):
+						fruits = ["🍇", '🍓', "🍒"]
+						a = random.choice(fruits)
+						a = b = c
+					elif hax in ([x for x in range(200, 400)]):
+						if a != b:
+							a = b
+							if b == c:
+								c = random.choice(emojis)
+						elif b != c:
+							b = c
+							if a == c:
+								a = random.choice(emojis)
+						elif c != a:
+							a = c
+							if b == c:
+								b = random.choice(emojis)
+					await asyncio.sleep(1.1)
+					slotmachine = f"**{ctx.author.name}'s ~~gambling addiction~~ slots game** \n[ {a} {b} {c} ]"
+					await msg.edit(content=slotmachine)
 
 		if (a == b == c):
 			await msg.edit(

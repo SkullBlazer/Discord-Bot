@@ -8,59 +8,66 @@ from typing import Optional
 from replit import db
 
 class Utilities(commands.Cog):
-	start_time = time()
 	def __init__(self, bot):
 		self.bot = bot
 		self.start_time = time()
 		self.flag = False
+		self.flag2 = True
+		self.d_author = {}
+		self.d_content = {}
+		self.e_author = {}
+		self.e_content1 = {}
+		self.e_content2 = {}
 
 	@commands.Cog.listener()
 	async def on_message_delete(self, message):
-		global d_author, d_content
-		d_author = {}
-		d_content = {}
 		if message.guild.id == 785230154258448415:
 			c = self.bot.get_channel(853643406329118740)
 			try:
 				await c.send(message.content)
 			except discord.errors.HTTPException:
-				await c.send(message.attachments[0].proxy_url)
+				try:
+					await c.send(message.attachments[0].proxy_url)
+				except:
+					await c.send(message.embeds[0].to_dict())
 		if not (message.author.bot):
-			d_author[message.channel.id] = message.author
-			d_content[message.channel.id] = message.content
-			if not d_content[message.channel.id]:
-				d_content[message.channel.id] = message.attachments[0].proxy_url
+			self.d_author[message.channel.id] = message.author
+			self.d_content[message.channel.id] = message.content
+			if not self.d_content[message.channel.id]:
+				self.d_content[message.channel.id] = message.attachments[0].proxy_url
+				self.d_author[message.channel.id] = message.author
 				self.flag = True
 			else:
 				self.flag = False
-			await asyncio.sleep(75)
+			await asyncio.sleep(60)
 			try:
-				del d_author[message.channel.id]
-				del d_content[message.channel.id]
+				del self.d_author[message.channel.id]
+				del self.d_content[message.channel.id]
 			except KeyError:
-				d_author = {}
-				d_content = {}
+				self.d_author = {}
+				self.d_content = {}
+		elif len(message.embeds):
+			self.d_author[message.channel.id] = message.author
+			self.d_content[message.channel.id] = message.embeds[0].to_dict()
+			self.flag = True
+			self.flag2 = False
 
 
 	@commands.Cog.listener()
 	async def on_message_edit(self, message_before, message_after):
-		global e_author, e_content1, e_content2
-		e_author = {}
-		e_content1 = {}
-		e_content2 = {}
 		if not (message_before.author.bot):
-			e_author[message_before.channel.id] = message_before.author
-			e_content1[message_before.channel.id] = message_before.content
-			e_content2[message_after.channel.id] = message_after.content
-			await asyncio.sleep(90)
+			self.e_author[message_before.channel.id] = message_before.author
+			self.e_content1[message_before.channel.id] = message_before.content
+			self.e_content2[message_after.channel.id] = message_after.content
+			await asyncio.sleep(60)
 			try:
-				del e_author[message_before.channel.id]
-				del e_content1[message_before.channel.id]
-				del e_content2[message_after.channel.id]
+				del self.e_author[message_before.channel.id]
+				del self.e_content1[message_before.channel.id]
+				del self.e_content2[message_after.channel.id]
 			except KeyError:
-				e_author = {}
-				e_content1 = {}
-				e_content2 = {}
+				self.e_author = {}
+				self.e_content1 = {}
+				self.e_content2 = {}
 	
 	@commands.command(aliases=['h'])
 	@commands.cooldown(1, 2, commands.BucketType.user)
@@ -308,7 +315,7 @@ class Utilities(commands.Cog):
 				except asyncio.TimeoutError:
 					if ctx.guild:
 						await ctx.message.delete()
-						await message.delete()
+					await message.delete()
 					return
 
 		elif page == "help" or page == 'h' or page == 'plshelp':
@@ -858,7 +865,7 @@ class Utilities(commands.Cog):
 	#		 await ctx.send("That role does not exist")
 
 
-	@commands.command(aliases=['inv'])
+	@commands.command()
 	async def invite(self, ctx):
 		if str(ctx.message.author) != "SkullBlazer#9339":
 			user = self.bot.get_user(305341210443382785)
@@ -941,7 +948,7 @@ class Utilities(commands.Cog):
 											guild.members))))
 		online = 0
 		for i in guild.members:
-			if str(i.status) == 'online' or str(i.status) == 'dnd':
+			if str(i.status) == 'online' or str(i.status) == 'dnd' or str(i.status) == "idle":
 				online += 1
 		embed.add_field(name="Online", value=online)
 		for i in guild.text_channels:
@@ -1327,7 +1334,6 @@ class Utilities(commands.Cog):
 
 	@commands.command()
 	async def snipe(self, ctx, cid: int = None):
-		global d_author, d_content
 		if cid:
 			channel = await self.bot.fetch_channel(cid)
 		else:
@@ -1336,12 +1342,40 @@ class Utilities(commands.Cog):
 		try:
 			if not self.flag:
 				em = discord.Embed(title=f"Last deleted message in {channel.name}",
-									description=d_content[cid])
+									description=self.d_content[cid])
+			elif not self.flag2:
+				self.flag = False
+				self.flag2 = True
+				if ('title' in self.d_content[cid]) and ('description' in self.d_content[cid]) and ('fields' not in self.d_content[cid]):
+					em = discord.Embed(title=self.d_content[cid]['title'], description=self.d_content[cid]['description'], colour=self.d_content[cid]['color'])
+				elif ('title' not in self.d_content[cid]) and ('description' in self.d_content[cid]) and ('fields' not in self.d_content[cid]):
+					em = discord.Embed(description=self.d_content[cid]['description'], colour=self.d_content[cid]['color'])
+				elif ('title' in self.d_content[cid]) and ('description' in self.d_content[cid]) and ('fields' in self.d_content[cid]):
+					em = discord.Embed(title=self.d_content[cid]['title'], description=self.d_content[cid]['description'], colour=self.d_content[cid]['color'])
+					for field in self.d_content[cid]['fields']:
+						em.add_field(value=field['value'], name=field['name'], inline=field['inline'])
+				elif ('title' not in self.d_content[cid]) and ('description' in self.d_content[cid]) and ('fields' in self.d_content[cid]):
+					em = discord.Embed(description=self.d_content[cid]['description'], colour=self.d_content[cid]['color'])
+					for field in self.d_content[cid]['fields']:
+						em.add_field(value=field['value'], name=field['name'], inline=field['inline'])
+				elif ('title' in self.d_content[cid]) and ('description' not in self.d_content[cid]) and ('fields' in self.d_content[cid]):
+					em = discord.Embed(title=self.d_content[cid]['title'], colour=self.d_content[cid]['color'])
+					for field in self.d_content[cid]['fields']:
+						em.add_field(value=field['value'], name=field['name'], inline=field['inline'])
+				elif ('title' not in self.d_content[cid]) and ('description' not in self.d_content[cid]) and ('fields' in self.d_content[cid]):
+					em = discord.Embed(colour=self.d_content[cid]['color'])
+					for field in self.d_content[cid]['fields']:
+						em.add_field(value=field['value'], name=field['name'], inline=field['inline'])
+				if 'name' in self.d_content[cid]:
+					em.set_author(name=self.d_content[cid]['name'])
+				em.set_footer(text=f"Author: {self.d_author[cid]}")
+				await ctx.send(embed=em)
+				return
 			else:
 				em = discord.Embed(title=f"Last deleted image in {channel.name}")
-				em.set_image(url=d_content[cid])
+				em.set_image(url=self.d_content[cid])
 				self.flag = False
-			em.set_footer(text=f"Author: {d_author[cid]}")
+			em.set_footer(text=f"Author: {self.d_author[cid]}")
 			await ctx.send(embed=em)
 		except KeyError:
 			await ctx.send(f"There are no recently deleted messages in <#{cid}>")
@@ -1349,7 +1383,6 @@ class Utilities(commands.Cog):
 
 	@commands.command(aliases=['esnipe'])
 	async def editsnipe(self, ctx, cid: int = None):
-		global e_author, e_content1, e_content2
 		if cid:
 			channel = await self.bot.fetch_channel(cid)
 		else:
@@ -1358,10 +1391,11 @@ class Utilities(commands.Cog):
 		try:
 			em = discord.Embed(
 				title=f"Last edited message in {channel.name}",
-				description=f"**Original message:** {e_content1[cid]}\n \n \
-			**Edited message:** {e_content2[cid]}")
-			em.set_footer(text=f"Author: {e_author[cid]}")
+				description=f"**Original message:** {self.e_content1[cid]}\n \n \
+			**Edited message:** {self.e_content2[cid]}")
+			em.set_footer(text=f"Author: {self.e_author[cid]}")
 			await ctx.send(embed=em)
+			
 		except KeyError:
 			await ctx.send(f"There are no recently edited messages in <#{cid}>")
 
@@ -1380,14 +1414,25 @@ class Utilities(commands.Cog):
 
 	@commands.command(aliases=['ut'])
 	async def uptime(self, ctx):
-		global start_time
 		second = time() - self.start_time
 		minute, second = divmod(second, 60)
 		hour, minute = divmod(minute, 60)
 		day, hour = divmod(hour, 24)
-		await ctx.send("Bot has been alive ~~since the beginning of time~~ for " +
-					str(int(day)) + " days, " + str(int(hour)) + " hours, " +
-					str(int(minute)) + " minutes and %.2f seconds" % second)
+		dplur = "days"
+		hplur = "hours"
+		mplur = "minutes"
+		splur = "seconds"
+		if int(day) == 1:
+			dplur = "day"
+		elif int(hour) == 1:
+			hplur = "hour"
+		elif int(minute) == 1:
+			mplur = "minute"
+		elif float(second) == 1.0:
+			splur = "second"
+		await ctx.reply(("Bot has been alive ~~since the beginning of time~~ for " +
+					str(int(day)) + f" {dplur}, " + str(int(hour)) + f" {hplur}, " +
+					str(int(minute)) + f" {mplur} and %.2f {splur}" % second), mention_author=False)
 
 
 	@commands.command(aliases=['pn'])

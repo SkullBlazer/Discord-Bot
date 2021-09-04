@@ -170,7 +170,9 @@ async def on_command_error(ctx, error):
 		await ctx.send("That.... that's not a valid command")
 		return
 	elif (not isinstance(error, commands.CheckAnyFailure)):
-		await ctx.send(error)
+		e = discord.Embed(title=f'Error in {ctx.command.name}', description = f'[{error}]({ctx.message.jump_url})', timestamp=datetime.utcnow(), colour=discord.Color.red())
+		e.set_footer(text=ctx.author)
+		await ctx.send(embed=e)
 
 @bot.command()
 @commands.check_any(commands.is_owner())
@@ -178,6 +180,11 @@ async def load(ctx, extension=None):
 	if extension is None:
 		await ctx.send("Missing cog extension, forcing loading of default pins.")
 		return
+	elif extension == "main":
+		bot.load_extension(extension)
+		await ctx.message.add_reaction('👍')
+		return
+
 	bot.load_extension(f'cogs.{extension}')
 	await ctx.message.add_reaction('👍')
 
@@ -186,6 +193,10 @@ async def load(ctx, extension=None):
 async def unload(ctx, extension=None):
 	if extension is None:
 		await ctx.send("Missing cog extension, forcing unloading of default pins.")
+		return
+	elif extension == "main":
+		bot.unload_extension(extension)
+		await ctx.message.add_reaction('👍')
 		return
 
 	bot.unload_extension(f'cogs.{extension}')
@@ -196,6 +207,11 @@ async def unload(ctx, extension=None):
 async def reload(ctx, extension=None):
 	if extension is None:
 		await ctx.send("Missing cog extension, forcing reloading of default pins.")
+		return
+	elif extension == "main":
+		bot.unload_extension(extension)
+		bot.load_extension(extension)
+		await ctx.message.add_reaction('👍')
 		return
 
 	bot.unload_extension(f'cogs.{extension}')
@@ -281,7 +297,7 @@ async def on_message(message):
 					await message.channel.send("Goodnight")
 			else:
 				await message.channel.send("Goodnight")
-		elif message.content.lower() == "bai":
+		elif message.content.lower() == "bai" or message.content.lower() == "baibai":
 			if message.guild:
 				if message.guild.id in trusted:
 					await message.channel.send("Goodbye sir")
@@ -401,7 +417,7 @@ async def on_message(message):
 		elif message.content.lower() == "troll hehe" and message.channel.guild:
 			await message.delete()
 			await message.guild.me.edit(nick="Real Pokecord")
-			fle = discord.File('images/tom.jpg', filename="image.jpeg")
+			fle = discord.File('images/tom.jpeg', filename="image.jpeg")
 			e = discord.Embed(title = "A wild pokemon has appeared",\
 							  description = f"Use `pp!release <pokemon name> to catch it`")
 			e.set_image(url="attachment://image.jpeg")

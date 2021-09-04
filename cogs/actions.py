@@ -2,7 +2,7 @@ import discord
 import asyncio
 import os
 from discord.ext import commands
-import openai
+#import openai
 import random
 from datetime import datetime
 from PIL import Image
@@ -266,46 +266,45 @@ class Actions(commands.Cog):
 		await ctx.send(file=discord.File("images/draw.png"))
 
 
-	@commands.command()
-	@commands.cooldown(rate=1, per=5 * 60, type=commands.BucketType.user)
-	async def chat(self, ctx):
-		channel = await ctx.author.create_dm()
-		await channel.send(
-			"Hello! I am SlaveBot, ask me questions and I will answer them! Type `end chat` if you get annoyed, which you will."
-		)
-		openai.api_key = os.environ["OPENAI_KEY"]
-		self.gaem.append(channel.id)
+	# @commands.command()
+	# @commands.cooldown(rate=1, per=5 * 60, type=commands.BucketType.user)
+	# async def chat(self, ctx):
+	# 	channel = await ctx.author.create_dm()
+	# 	await channel.send(
+	# 		"Hello! I am SlaveBot, ask me questions and I will answer them! Type `end chat` if you get annoyed, which you will."
+	# 	)
+	# 	openai.api_key = os.environ["OPENAI_KEY"]
 
-		def check(m):
-			return m.author == ctx.author and m.channel == channel
+	# 	def check(m):
+	# 		return m.author == ctx.author and m.channel == channel
 
-		while True:
-			try:
-				question = await self.bot.wait_for('message', check=check, timeout=60.0)
-				if str(question.content).lower() == "end chat":
-					self.gaem.remove(channel.id)
-					await channel.send(
-						"Didn't take a lot to annoy you huh? Anyway, bye!")
-					return
-				# if str(question.content)[-1] != "?":
-				# 	await channel.send(
-				# 		"Either that's a stupid question or it doesn't end in a `?`. Ask again."
-				# 	)
-				# 	continue
-				response = openai.Completion.create(
-					engine="davinci",
-					prompt=
-					f"SlaveBot is a chatbot that reluctantly answers questions.\nYou: How many pounds are in a kilogram?\nSlaveBot: This again? There are 2.2 pounds in a kilogram. Please make a note of this.\nYou: What does HTML stand for?\nSlaveBot: Was Google too busy? Hypertext Markup Language. The T is for try to ask better questions in the future.\nYou: When did the first airplane fly?\nSlaveBot: On December 17, 1903, Wilbur and Orville Wright made the first flights. I wish they’d come and take me away.\nYou: What is the meaning of life?\nSlaveBot: I’m not sure. I’ll ask my friend Google.\nYou: {str(question.content)}\nSlaveBot:",
-					temperature=0.3,
-					max_tokens=60,
-					top_p=0.3,
-					frequency_penalty=0.5,
-					presence_penalty=0.0,
-					stop=["\n", "SlaveBot:"])
-				await channel.send(response.choices[0].text)
-			except asyncio.TimeoutError:
-				await channel.send("Wow the awkward silence is killing me, bye.")
-				return
+	# 	while True:
+	# 		try:
+	# 			question = await self.bot.wait_for('message', check=check, timeout=60.0)
+	# 			if str(question.content).lower() == "end chat":
+	# 				self.gaem.remove(channel.id)
+	# 				await channel.send(
+	# 					"Didn't take a lot to annoy you huh? Anyway, bye!")
+	# 				return
+	# 			# if str(question.content)[-1] != "?":
+	# 			# 	await channel.send(
+	# 			# 		"Either that's a stupid question or it doesn't end in a `?`. Ask again."
+	# 			# 	)
+	# 			# 	continue
+	# 			response = openai.Completion.create(
+	# 				engine="davinci",
+	# 				prompt=
+	# 				f"SlaveBot is a chatbot that reluctantly answers questions.\nYou: How many pounds are in a kilogram?\nSlaveBot: This again? There are 2.2 pounds in a kilogram. Please make a note of this.\nYou: What does HTML stand for?\nSlaveBot: Was Google too busy? Hypertext Markup Language. The T is for try to ask better questions in the future.\nYou: When did the first airplane fly?\nSlaveBot: On December 17, 1903, Wilbur and Orville Wright made the first flights. I wish they’d come and take me away.\nYou: What is the meaning of life?\nSlaveBot: I’m not sure. I’ll ask my friend Google.\nYou: {str(question.content)}\nSlaveBot:",
+	# 				temperature=0.3,
+	# 				max_tokens=60,
+	# 				top_p=0.3,
+	# 				frequency_penalty=0.5,
+	# 				presence_penalty=0.0,
+	# 				stop=["\n", "SlaveBot:"])
+	# 			await channel.send(response.choices[0].text)
+	# 		except asyncio.TimeoutError:
+	# 			await channel.send("Wow the awkward silence is killing me, bye.")
+	# 			return
 
 
 	@commands.command()
