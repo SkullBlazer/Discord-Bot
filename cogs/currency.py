@@ -4,8 +4,6 @@ from datetime import datetime
 from typing import Optional
 from replit import db
 
-db["324941809799397377"][1] = 2158356500000000000000
-
 class Currency(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
@@ -44,6 +42,12 @@ class Currency(commands.Cog):
 							f"You have {db[aid][1]:,} in the bank\n\n sucks to be you",
 							colour=discord.Colour.green(),
 							timestamp=datetime.utcnow())
+					elif str(db[aid][1]).startswith("-"):
+						e = discord.Embed(
+							description=
+							f"You have {db[aid][1]:,} in the bank\n\n how the hell did you manage to do that",
+							colour=discord.Colour.green(),
+							timestamp=datetime.utcnow())
 					else:
 						e = discord.Embed(
 							description=f"You have {db[aid][1]:,} in the bank",
@@ -67,6 +71,12 @@ class Currency(commands.Cog):
 						e = discord.Embed(
 							description=
 							f"{member.mention} has {db[aid][1]:,} in their bank\n\n sucks to be them",
+							colour=discord.Colour.green(),
+							timestamp=datetime.utcnow())
+					elif str(db[aid][1]).startswith("-"):
+						e = discord.Embed(
+							description=
+							f"{member.mention} has {db[aid][1]:,} in their bank\n\n how the hell did they manage to do that",
 							colour=discord.Colour.green(),
 							timestamp=datetime.utcnow())
 					else:
@@ -98,6 +108,12 @@ class Currency(commands.Cog):
 						f"You have {db[aid][1]:,} in your bank\n\n sucks to be you",
 						colour=discord.Colour.green(),
 						timestamp=datetime.utcnow())
+				elif str(db[aid][1]).startswith("-"):
+					e = discord.Embed(
+						description=
+						f"You have {db[aid][1]:,} in your bank\n\n how the hell did you manage to do that",
+						colour=discord.Colour.green(),
+						timestamp=datetime.utcnow())
 				else:
 					e = discord.Embed(
 						description=
@@ -120,6 +136,12 @@ class Currency(commands.Cog):
 						f"<@!{aid}> has {db[aid][1]:,} in their bank\n\n sucks to be them",
 						colour=discord.Colour.green(),
 						timestamp=datetime.utcnow())
+				elif str(db[aid][1]).startswith("-"):
+						e = discord.Embed(
+							description=
+							f"<@!{aid}> has {db[aid][1]:,} in their bank\n\n how the hell did they manage to do that",
+							colour=discord.Colour.green(),
+							timestamp=datetime.utcnow())
 				else:
 					e = discord.Embed(
 						description=f"<@!{aid}> has {db[aid][1]:,} in their bank",
@@ -522,17 +544,32 @@ class Currency(commands.Cog):
 			else:
 				db[aid][1] += 1000 + (250 * s)
 			if s % 50 == 0 and s != 0:
-				e.add_field(name=f"{s} daily streak bonus",
-							value=f"Extra {10000*s//50} added")
-				db[aid][1] += 200 * s
+				if db[str(ctx.author.id)][2]["daily"]:
+					e.add_field(name=f"{s} daily streak bonus",
+								value=f"Extra {5000*s} added (`daily` active)")
+					db[aid][1] += 1000 * s				
+				else:
+					e.add_field(name=f"{s} daily streak bonus",
+								value=f"Extra {10000*s//50} added")
+					db[aid][1] += 200 * s
 			elif "69" in str(s):
-				e.add_field(name=f"Funny number bonus",
-							value=f"Extra 696,969 added")
-				db[aid][1] += 696969
+				if db[str(ctx.author.id)][2]["daily"]:
+					e.add_field(name=f"Funny number bonus",
+								value=f"Extra 69,696,969 added (`daily` active)")
+					db[aid][1] += 69696969
+				else:
+					e.add_field(name=f"Funny number bonus",
+								value=f"Extra 696,969 added")
+					db[aid][1] += 696969
 			elif "420" in str(s):
-				e.add_field(name=f"||Weed|| number bonus",
-							value=f"Extra 420,420,420,420 added")
-				db[aid][1] += 420420420420
+				if db[str(ctx.author.id)][2]["daily"]:
+					e.add_field(name=f"||Weed|| number bonus",
+								value=f"Extra 420,420,420,420,420 added (`daily` active)")
+					db[aid][1] += 420420420420420
+				else:
+					e.add_field(name=f"||Weed|| number bonus",
+								value=f"Extra 420,420,420,420 added")
+					db[aid][1] += 420420420420
 			e.set_footer(text=f"Daily streak of {s} days")
 			await ctx.reply(embed=e, mention_author=False)
 
@@ -572,7 +609,7 @@ class Currency(commands.Cog):
 		else:
 			p = ">>"
 		if page == "1":
-			e = discord.Embed(title="Shop", colour=discord.Colour.purple(), timestamp = datetime.utcnow())
+			e = discord.Embed(title=f"Shop - Balance: ||{db[str(ctx.author.id)][1]}||", colour=discord.Colour.purple(), timestamp = datetime.utcnow())
 			e.add_field(name="Extra daily coins (`daily`)", value="Cost - 1,000,000,000 coins", inline=True)
 			e.add_field(name=f"Lucky charm for `{p}slots` (`charm`)", value="Cost - 7,500,000 coins", inline=True)
 			e.add_field(name=f"Super lucky charm for `{p}slots` (`supercharm`)", value="Cost - 1% of your balance or 15,000,000,000", inline=True)
@@ -585,6 +622,7 @@ class Currency(commands.Cog):
 				e.description = f"Increases your chances of winning in `{p}slots` by 2.5% for 3 fruits, and 10% for 2, for 3 games"
 			elif page == "charm":
 				e.description = f"Increases your chances of winning in `{p}slots` by 1.5% for 3 fruits, and 6% for 2, for 5 games"
+			e.set_footer(text=f"Price: {self.shop[page]:,}")
 		else:
 			await ctx.send("That's not a valid item")
 			return
@@ -598,7 +636,7 @@ class Currency(commands.Cog):
 		if item in self.shop:
 			if item == "supercharm":
 				if db[str(ctx.author.id)][1]//200 > 15000000000:
-					e = discord.Embed(title="Confirmation", description = f"Are you sure you want to buy {item} for {db[str(ctx.author.id)][1]//200}?", timestamp = datetime.utcnow(), colour = discord.Colour.green())
+					e = discord.Embed(title="Confirmation", description = f"Are you sure you want to buy {item} for {(db[str(ctx.author.id)][1]//200):,}?", timestamp = datetime.utcnow(), colour = discord.Colour.green())
 				else:
 					e = discord.Embed(title="Confirmation", description = f"Are you sure you want to buy {item} for {self.shop[item]:,}?", timestamp = datetime.utcnow(), colour = discord.Colour.green())
 			else:
@@ -616,14 +654,21 @@ class Currency(commands.Cog):
 				if item == "supercharm":
 					if db[str(ctx.author.id)][1]//200 > 15000000000:
 						db[str(ctx.author.id)][1] -= int(db[str(ctx.author.id)][1]//200)
-					else:
+					elif db[str(ctx.author.id)][1] > 15000000000:
 						db[str(ctx.author.id)][1] -= 15000000000
+					else:
+						await ctx.send("You do not have sufficient funds to purchase this item")
+						return
 					db[str(ctx.author.id)][2]["supercharm"] += 3
 					await ctx.send(f"{item} purchased and in effect!")
 				elif db[str(ctx.author.id)][1] > self.shop[item]:
 					db[str(ctx.author.id)][1] -= self.shop[item]
 					if item == "daily":
-						db[str(ctx.author.id)][2]["daily"] = True
+						if not db[str(ctx.author.id)][2]["daily"]:
+							db[str(ctx.author.id)][2]["daily"] = True
+						else:
+							await ctx.send("You already have purchased a daily, how much more money do you want?")
+							db[str(ctx.author.id)][1] += self.shop[item]
 					elif item == "charm":
 						db[str(ctx.author.id)][2]["charm"] += 5
 					await ctx.send(f"{item} purchased and in effect!")
@@ -636,22 +681,41 @@ class Currency(commands.Cog):
 			return
 
 	@commands.command(aliases=['inv'])
-	async def inventory(self, ctx, page:str="1"):
+	async def inventory(self, ctx, member: Optional[discord.Member], aid:int = None):
 		if ctx.guild:
 			p = db[str(ctx.guild.id)][1]
 		else:
 			p = ">>"
-		if db[str(ctx.author.id)][2]["daily"] == False and db[str(ctx.author.id)][2]["supercharm"] == 0 and db[str(ctx.author.id)][2]["charm"] == 0:
-			await ctx.send(f"You have no items in your inventory. Go buy some from `{p}shop` smh")
-			return
-		e = discord.Embed(title=f"{ctx.author.name}'s inventory", colour=discord.Colour.random(), timestamp=datetime.utcnow())
-		if db[str(ctx.author.id)][2]["daily"]:
-			e.add_field(name="Daily", value="1", inline=True)
-		if db[str(ctx.author.id)][2]["supercharm"]:
-			e.add_field(name="Supercharm", value=db[str(ctx.author.id)][2]["supercharm"], inline=True)
-		if db[str(ctx.author.id)][2]["charm"]:
-			e.add_field(name="Charm", value=db[str(ctx.author.id)][2]["charm"], inline=True)
-		await ctx.send(embed=e)
+		if aid:
+			member = await self.bot.fetch_user(aid)
+		if member:
+			aid = str(member.id)
+			if db[aid][2]["daily"] == False and db[aid][2]["supercharm"] == 0 and db[aid][2]["charm"] == 0:
+				await ctx.send(f"{member.name} has no items in their inventory.")
+				return
+			e = discord.Embed(colour=discord.Colour.random(), timestamp=datetime.utcnow())
+			if db[aid][2]["daily"]:
+				e.add_field(name="Daily", value=db[aid][2]["daily"], inline=True)
+			if db[aid][2]["supercharm"]:
+				e.add_field(name="Supercharm", value=db[aid][2]["supercharm"], inline=True)
+			if db[aid][2]["charm"]:
+				e.add_field(name="Charm", value=db[aid][2]["charm"], inline=True)
+			e.set_author(name=f"{member.name}'s inventory", icon_url=member.avatar_url)
+			await ctx.send(embed=e)
+		else:
+			aid = str(ctx.author.id)
+			if db[aid][2]["daily"] == False and db[aid][2]["supercharm"] == 0 and db[aid][2]["charm"] == 0:
+				await ctx.send(f"You have no items in your inventory. Go buy some from `{p}shop` smh")
+				return
+			e = discord.Embed(colour=discord.Colour.random(), timestamp=datetime.utcnow())
+			if db[aid][2]["daily"]:
+				e.add_field(name="Daily", value="1", inline=True)
+			if db[aid][2]["supercharm"]:
+				e.add_field(name="Supercharm", value=db[aid][2]["supercharm"], inline=True)
+			if db[aid][2]["charm"]:
+				e.add_field(name="Charm", value=db[aid][2]["charm"], inline=True)
+			e.set_author(name=f"{ctx.author.name}'s inventory", icon_url=ctx.author.avatar_url)
+			await ctx.send(embed=e)
 
 def setup(bot):
 	bot.add_cog(Currency(bot))
