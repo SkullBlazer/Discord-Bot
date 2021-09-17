@@ -7,7 +7,7 @@ from replit import db
 class Currency(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.shop = {"daily": 1000000000, "charm": 7500000, "supercharm": 15000000000}
+		self.shop = {"daily": 1000000000, "charm": 25000000, "supercharm": 15000000000}
 
 	@commands.command()
 	async def _save():
@@ -362,7 +362,7 @@ class Currency(commands.Cog):
 				mention_author=False)
 
 
-	@commands.command()
+	@commands.command(aliases=['leaderboard', 'lb'])
 	@commands.cooldown(1, 10, commands.BucketType.user)
 	async def rich(self, ctx, term: str = None, glbal: str = None):
 		count = 0
@@ -536,7 +536,7 @@ class Currency(commands.Cog):
 					e.add_field(
 						name=f"You've been visited by Satan",
 						value=
-						"He stole 666666 coins from your account!"
+						"He stole 666,666 coins from your account!"
 					)
 					db[aid][1] -= 666666
 			if db[str(ctx.author.id)][2]["daily"]:
@@ -546,11 +546,11 @@ class Currency(commands.Cog):
 			if s % 50 == 0 and s != 0:
 				if db[str(ctx.author.id)][2]["daily"]:
 					e.add_field(name=f"{s} daily streak bonus",
-								value=f"Extra {5000*s} added (`daily` active)")
+								value=f"Extra {5000*s:,} added (`daily` active)")
 					db[aid][1] += 1000 * s				
 				else:
 					e.add_field(name=f"{s} daily streak bonus",
-								value=f"Extra {10000*s//50} added")
+								value=f"Extra {(10000*s//50):,} added")
 					db[aid][1] += 200 * s
 			elif "69" in str(s):
 				if db[str(ctx.author.id)][2]["daily"]:
@@ -584,9 +584,9 @@ class Currency(commands.Cog):
 		splur = "seconds"
 		if hours == 1:
 			hplur = "hour"
-		elif minutes == 1:
+		if minutes == 1:
 			mplur = "minute"
-		elif seconds == 1:
+		if seconds == 1:
 			splur = "second"
 
 		return f"%d {hplur} %02d {mplur} %02d {splur}" % (hours, minutes, seconds)
@@ -609,9 +609,9 @@ class Currency(commands.Cog):
 		else:
 			p = ">>"
 		if page == "1":
-			e = discord.Embed(title=f"Shop - Balance: ||{db[str(ctx.author.id)][1]}||", colour=discord.Colour.purple(), timestamp = datetime.utcnow())
+			e = discord.Embed(title=f"Shop - Balance: ||{db[str(ctx.author.id)][1]:,}||", colour=discord.Colour.purple(), timestamp = datetime.utcnow())
 			e.add_field(name="Extra daily coins (`daily`)", value="Cost - 1,000,000,000 coins", inline=True)
-			e.add_field(name=f"Lucky charm for `{p}slots` (`charm`)", value="Cost - 7,500,000 coins", inline=True)
+			e.add_field(name=f"Lucky charm for `{p}slots` (`charm`)", value="Cost - 25,000,000 coins", inline=True)
 			e.add_field(name=f"Super lucky charm for `{p}slots` (`supercharm`)", value="Cost - 1% of your balance or 15,000,000,000", inline=True)
 			e.set_footer(text=f"Use {p}buy <itemname> to buy an item, and {p}shop <itemname> to get more info on that item")
 		elif page in self.shop:
@@ -629,18 +629,38 @@ class Currency(commands.Cog):
 		await ctx.send(embed=e)
 
 	@commands.command()
-	async def buy(self, ctx, *, item:str=None):
+	async def buy(self, ctx, item:str=None, amt:int=1):
 		if item is None:
 			await ctx.send("Congratulations! You just bought all the items from the shop!")
 			return
+		if amt > 50:
+			await ctx.send("Whoa there, calm down! Don't buy the entire store sheesh")
+			return
 		if item in self.shop:
-			if item == "supercharm":
-				if db[str(ctx.author.id)][1]//200 > 15000000000:
-					e = discord.Embed(title="Confirmation", description = f"Are you sure you want to buy {item} for {(db[str(ctx.author.id)][1]//200):,}?", timestamp = datetime.utcnow(), colour = discord.Colour.green())
+			bal = db[str(ctx.author.id)][1]
+			price = 0
+			count = 0
+			for i in range(amt):
+				if item == "supercharm":
+					if bal//200 >= 15000000000:
+						price += bal//200
+						bal -= bal//200
+						count += 1
+					else:
+						price += 15000000000
+						bal -= 15000000000
+						count += 1
 				else:
-					e = discord.Embed(title="Confirmation", description = f"Are you sure you want to buy {item} for {self.shop[item]:,}?", timestamp = datetime.utcnow(), colour = discord.Colour.green())
+					price += self.shop[item]
+					count += 1
+			if price > bal:
+				await ctx.send(f"You do not have sufficient funds to purchase that item, you can only buy {count} of those.")
+				return
+			if bal < 0:
+				await ctx.send("You do not have sufficient funds to purchase that item.")
+				return
 			else:
-				e = discord.Embed(title="Confirmation", description = f"Are you sure you want to buy {item} for {self.shop[item]:,}?", timestamp = datetime.utcnow(), colour = discord.Colour.green())
+				e = discord.Embed(title="Confirmation", description = f"Are you sure you want to buy {amt} {item} for {price:,}?", timestamp = datetime.utcnow(), colour = discord.Colour.green())
 			msg = await ctx.send(embed = e)
 			await msg.add_reaction("✅")
 			await msg.add_reaction("❎")
@@ -651,29 +671,20 @@ class Currency(commands.Cog):
 			reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=69)
 			await msg.clear_reactions()
 			if str(reaction.emoji) == "✅":
+				db[str(ctx.author.id)][1] -= price
 				if item == "supercharm":
-					if db[str(ctx.author.id)][1]//200 > 15000000000:
-						db[str(ctx.author.id)][1] -= int(db[str(ctx.author.id)][1]//200)
-					elif db[str(ctx.author.id)][1] > 15000000000:
-						db[str(ctx.author.id)][1] -= 15000000000
+					for i in range(amt):
+						db[str(ctx.author.id)][2]["supercharm"] += 3
+				elif item == "daily":
+					if not db[str(ctx.author.id)][2]["daily"]:
+						db[str(ctx.author.id)][2]["daily"] = True
 					else:
-						await ctx.send("You do not have sufficient funds to purchase this item")
-						return
-					db[str(ctx.author.id)][2]["supercharm"] += 3
-					await ctx.send(f"{item} purchased and in effect!")
-				elif db[str(ctx.author.id)][1] > self.shop[item]:
-					db[str(ctx.author.id)][1] -= self.shop[item]
-					if item == "daily":
-						if not db[str(ctx.author.id)][2]["daily"]:
-							db[str(ctx.author.id)][2]["daily"] = True
-						else:
-							await ctx.send("You already have purchased a daily, how much more money do you want?")
-							db[str(ctx.author.id)][1] += self.shop[item]
-					elif item == "charm":
+						await ctx.send("You already have purchased a daily, how much more money do you want?")
+						db[str(ctx.author.id)][1] += price
+				elif item == "charm":
+					for i in range(amt):
 						db[str(ctx.author.id)][2]["charm"] += 5
-					await ctx.send(f"{item} purchased and in effect!")
-				else:
-					await ctx.send("You do not have sufficient funds to purchase this item")
+				await ctx.send(f"{item} purchased and in effect!")
 			else:
 				await ctx.send("Order cancelled")
 		else:

@@ -67,7 +67,6 @@ temp = 0
 players = {}
 queues = {}
 gaem = []
-once = 0
 trusted = [
 	785230154258448415, 781150150630440970, 777217934074445834,
 	785564485384405033, 783643344202760213, 767752540980248586
@@ -89,11 +88,11 @@ async def on_ready():
 	# await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="my master panik about exams"))
 	# await bot.change_presence(status=discord.Status.dnd)
 	# await bot.change_presence(activity=discord.Streaming(name="the exam answers", url="https://youtu.be/dQw4w9WgXcQ"))
-	cur_date = datetime.utcnow()
-	if (cur_date >= datetime(2021, 9, 10, 5, 30, 0) and (once == 0)):
-		channel = bot.get_channel(828343472120922176)
-		await channel.send("@everyone your Nitro is about to end!")
-		once += 1
+	# cur_date = datetime.utcnow()
+	# if (cur_date >= datetime(2021, 9, 10, 5, 30, 0) and (once == 0)):
+	# 	channel = bot.get_channel(828343472120922176)
+	# 	await channel.send("@everyone your Nitro is about to end!")
+	# 	once += 1
 
 
 # @bot.event
@@ -225,6 +224,7 @@ for filename in os.listdir('./cogs'):
 @bot.event
 async def on_message(message):
 	global temp, gaem
+	om = bot.get_cog('Fun')
 	if (isinstance(message.channel, discord.DMChannel)
 		and message.channel.id not in gaem) or (
 			(not message.author.bot) and message.channel.id not in gaem):
@@ -232,6 +232,10 @@ async def on_message(message):
 			if db[str(message.guild.id)][0] == "false":
 				await bot.process_commands(message)
 				return
+		something = await om.game_running(message.channel)
+		if not something:
+			await bot.process_commands(message)
+			return
 		if message.content.lower(
 		) == "<@!783314693086380032> hello" or message.content.lower(
 		) == "hello <@!783314693086380032>":

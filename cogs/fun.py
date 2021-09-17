@@ -12,6 +12,11 @@ class Fun(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.gaem = []
+		self.onmessage = True
+
+	@commands.command()
+	async def game_running(self, ctx):
+		return self.onmessage
 
 	@commands.command(aliases=['rockpaperscissors'])
 	async def rps(self, ctx, member: Optional[discord.Member], choice=None):
@@ -192,6 +197,7 @@ class Fun(commands.Cog):
 				"Another game is going on in this channel, please wait or play in a different channel"
 			)
 			return
+		self.onmessage = False
 		self.gaem.append(ctx.channel.id)
 		board = []
 		turn = 0
@@ -229,6 +235,7 @@ class Fun(commands.Cog):
 					await ctx.send("wimp")
 					await ctx.send(f"My ship was at ({ship_col+1},{ship_row+1})")
 					self.gaem.remove(ctx.channel.id)
+					self.onmessage = True
 					return
 				elif "," not in str(message.content):
 					continue
@@ -241,6 +248,7 @@ class Fun(commands.Cog):
 							await ctx.send(
 								"Congratulations! You sank my battleship!")
 							self.gaem.remove(ctx.channel.id)
+							self.onmessage = True
 							return
 						else:
 							if guess_row > 4 or guess_col > 4 or guess_row < 0 or guess_col < 0:
@@ -268,6 +276,7 @@ class Fun(commands.Cog):
 							if turn == 8:
 								e.title = "Game over"
 								self.gaem.remove(ctx.channel.id)
+								self.onmessage = True
 							await ctx.send(embed=e)
 							if turn == 8:
 								await ctx.send(
@@ -278,8 +287,10 @@ class Fun(commands.Cog):
 			except asyncio.TimeoutError:
 				await ctx.send("You took too long to decide and your ship sank")
 				self.gaem.remove(ctx.channel.id)
+				self.onmessage = True
 				return
 		self.gaem.remove(ctx.channel.id)
+		self.onmessage = True
 
 
 	@commands.command(aliases=['guess', 'ng'])
@@ -290,6 +301,7 @@ class Fun(commands.Cog):
 			)
 			return
 		self.gaem.append(ctx.channel.id)
+		self.onmessage = False
 		num = random.randint(1, 250)
 		l = []
 		await ctx.send("Number guesser")
@@ -308,6 +320,7 @@ class Fun(commands.Cog):
 					await ctx.send("wimp")
 					await ctx.send(f"Number was {num}")
 					self.gaem.remove(ctx.channel.id)
+					self.onmessage = True
 					return
 				try:
 					guess = int(message.content)
@@ -365,6 +378,7 @@ class Fun(commands.Cog):
 					await ctx.send(f"You did it in {8 - count} chances!")
 					aid = str(ctx.message.author.id)
 					self.gaem.remove(ctx.channel.id)
+					self.onmessage = True
 					if aid in db:
 						if num == 69 or num == 169:
 							db[aid][1] += 6969
@@ -431,12 +445,14 @@ class Fun(commands.Cog):
 					await ctx.reply("You lose.", mention_author=False)
 					await ctx.send(f"The number was {num}")
 					self.gaem.remove(ctx.channel.id)
+					self.onmessage = True
 					return
 			except asyncio.TimeoutError:
 				await ctx.reply(
 					"Yeah I don't have all day long, I closed the game.",
 					mention_author=False)
 				self.gaem.remove(ctx.channel.id)
+				self.onmessage = True
 				return
 
 
@@ -478,6 +494,7 @@ class Fun(commands.Cog):
 			)
 			return
 		self.gaem.append(ctx.channel.id)
+		self.onmessage = False
 
 		def check(m):
 			return m.author == ctx.author and m.channel == ctx.message.channel
@@ -572,6 +589,7 @@ class Fun(commands.Cog):
 		else:
 			await ctx.send("That's not even a word")
 			self.gaem.remove(ctx.channel.id)
+			self.onmessage = True
 			return
 		await ctx.send("Guess the characters:")
 		guess_msg = await ctx.send(images[turns])
@@ -615,6 +633,7 @@ class Fun(commands.Cog):
 									icon_url=ctx.author.avatar_url)
 						await ctx.send(embed=e)
 					self.gaem.remove(ctx.channel.id)
+					self.onmessage = True
 					return
 			else:
 				second += 1
@@ -625,12 +644,14 @@ class Fun(commands.Cog):
 				if guess == 'end':
 					await ctx.send("You quit :clown:")
 					self.gaem.remove(ctx.channel.id)
+					self.onmessage = True
 					return
 			except asyncio.TimeoutError:
 				await ctx.send("You took too long :hourglass:")
 				await guess_msg.delete()
 				await word_msg.delete()
 				self.gaem.remove(ctx.channel.id)
+				self.onmessage = True
 				return
 
 			if len(guess) > 1:
@@ -666,6 +687,7 @@ class Fun(commands.Cog):
 						if turns == 0:
 							await word_msg.edit(content=f'**{word}**')
 							self.gaem.remove(ctx.channel.id)
+							self.onmessage = True
 							return await ctx.send("You Lose :x:")
 			else:
 				if guess != word:
@@ -673,6 +695,7 @@ class Fun(commands.Cog):
 						turns = 0
 						await word_msg.edit(content=f'**{word}**')
 						self.gaem.remove(ctx.channel.id)
+						self.onmessage = True
 						return await ctx.send("You Lose :x:")
 					else:
 						await ctx.send("You won!", delete_after=5.0)
@@ -698,6 +721,7 @@ class Fun(commands.Cog):
 									icon_url=ctx.author.avatar_url)
 						await ctx.send(embed=e)
 					self.gaem.remove(ctx.channel.id)
+					self.onmessage = True
 					return
 			count -= 1
 
@@ -711,6 +735,7 @@ class Fun(commands.Cog):
 			)
 			return
 		self.gaem.append(ctx.channel.id)
+		self.onmessage = False
 		emojis = "🍎🍊🍐🍍🍉🍇🍓🍒"
 		a = random.choice(emojis)
 		b = random.choice(emojis)
@@ -720,6 +745,7 @@ class Fun(commands.Cog):
 			await ctx.reply("You need to bet some money first",
 							mention_author=False)
 			self.gaem.remove(ctx.channel.id)
+			self.onmessage = True
 			return
 		if not amount.isdigit():
 			if amount[-1].lower() in ["k", "m", "b", "t", "q"
@@ -749,22 +775,26 @@ class Fun(commands.Cog):
 				)
 				await ctx.send(embed=e)
 				self.gaem.remove(ctx.channel.id)
+				self.onmessage = True
 				return
 			else:
 				await ctx.reply("The casino only accepts credits not this garbage",
 								mention_author=False)
 				self.gaem.remove(ctx.channel.id)
+				self.onmessage = True
 				return
 		amount = int(amount)
 		if aid not in db:
 			await ctx.reply("You don't have a bank account.", mention_author=False)
 			self.gaem.remove(ctx.channel.id)
+			self.onmessage = True
 			return
 		elif amount < 1:
 			await ctx.reply(
 				"If you're trying to find loopholes in my code, good job! Have a cookie! 🍪",
 				mention_author=False)
 			self.gaem.remove(ctx.channel.id)
+			self.onmessage = True
 			return
 		elif amount > db[aid][1]:
 			await ctx.send(
@@ -773,6 +803,7 @@ class Fun(commands.Cog):
 			await ctx.reply(f"You have only ||{db[aid][1]:,}||",
 							mention_author=False)
 			self.gaem.remove(ctx.channel.id)
+			self.onmessage = True
 			return
 
 		slotmachine = f"**{ctx.author.name}'s ~~gambling addiction~~ slots game** \n[ {a} {b} {c} ]"
@@ -916,6 +947,7 @@ class Fun(commands.Cog):
 				e.set_author(name="You win!", icon_url=ctx.author.avatar_url)
 				await ctx.send(embed=e)
 				self.gaem.remove(ctx.channel.id)
+				self.onmessage = True
 		elif (a == b) or (a == c) or (b == c):
 			await msg.edit(
 				content=
@@ -931,6 +963,7 @@ class Fun(commands.Cog):
 							icon_url=ctx.author.avatar_url)
 				await ctx.send(embed=e)
 				self.gaem.remove(ctx.channel.id)
+				self.onmessage = True
 		else:
 			db[aid][1] -= amount
 			await msg.edit(
@@ -938,6 +971,7 @@ class Fun(commands.Cog):
 				f"**{ctx.author.name}'s ~~gambling addiction~~ slots game** \n[ {a} {b} {c} ] \nNo match, you lost 😢"
 			)
 			self.gaem.remove(ctx.channel.id)
+			self.onmessage = True
 
 
 	@commands.command()

@@ -797,7 +797,7 @@ class Utilities(commands.Cog):
 			elif role.name == "JAIL":
 				if ctx.author.top_role > member.top_role and member != ctx.author:
 					for usr_role in member.roles:
-						if usr_role.name != "@everyone":
+						if usr_role.name != "@everyone" or not usr_role.is_premium_subscriber() or not usr_role.is_bot_managed():
 							await member.remove_roles(usr_role)
 					await member.add_roles(role, atomic=True)
 					embed.title = "Success!"
@@ -894,33 +894,34 @@ class Utilities(commands.Cog):
 							timestamp=datetime.utcnow())
 		embed.set_author(name=str(user), icon_url=user.avatar_url)
 		embed.set_thumbnail(url=user.avatar_url)
-		if user.premium_since:
-			if user.id == 305341210443382785 or user.id == 822702422303571989:
-				embed.add_field(name="Badges", value="<:SupremeLeader:885084480543522849>   <a:NitroBooster:885089057963638810>", inline=False)
-			elif user.id == 324941809799397377 or user.id == 176947217913872384:
-				embed.add_field(name = "Badges", value="<a:FellowBotDeveloper:885084820592549938>   <:BetaHelper:885084426818687026>   <a:NitroBooster:885089057963638810>", inline=False)
-			elif user.id in self.helpers:
-				embed.add_field(name="Badges", value="<:BetaHelper:885084426818687026>   <a:NitroBooster:885089057963638810>", inline=False)
-			elif user.id == 783314693086380032:
-				embed.add_field(name="Badges", value="<:retar:819137093258838017>", inline=False)
-			else:
-				embed.add_field(name="Badges", value="<a:NitroBooster:885089057963638810>", inline=False)
-		else:
-			if user.id == 305341210443382785 or user.id == 822702422303571989:
-				embed.add_field(name="Badges", value="<:SupremeLeader:885084480543522849>", inline=False)
-			elif user.id == 324941809799397377 or user.id == 176947217913872384:
-				embed.add_field(name = "Badges", value="<a:FellowBotDeveloper:885084820592549938>  <:BetaHelper:885084426818687026>", inline=False)
-			elif user.id in self.helpers:
-				embed.add_field(name="Badges", value="<:BetaHelper:885084426818687026>", inline=False)
-			elif user.id == 783314693086380032:
-				embed.add_field(name="Badges", value="<:retar:819137093258838017>", inline=False)
 		try:
-			embed.add_field(name='Status', value=str(user.status).title())
-		except AttributeError:
+			user.premium_since
+		except:
 			await ctx.send(
 				"This user is not in this guild. Invite them here maybe, server's dead anyway"
 			)
 			return
+		if user.premium_since:
+			if user.id == 305341210443382785 or user.id == 822702422303571989:
+				embed.add_field(name="Badges", value="<:SupremeLeader:885084480543522849>   <a:ServerBooster:885089057963638810>", inline=False)
+			elif user.id == 324941809799397377 or user.id == 176947217913872384:
+				embed.add_field(name = "Badges", value="<a:FellowBotDeveloper:885084820592549938>   <:BetaTester:885084426818687026>   <a:ServerBooster:885089057963638810>", inline=False)
+			elif user.id in self.helpers:
+				embed.add_field(name="Badges", value="<:BetaTester:885084426818687026>   <a:ServerBooster:885089057963638810>", inline=False)
+			else:
+				embed.add_field(name="Badges", value="<a:ServerBooster:885089057963638810>", inline=False)
+		else:
+			if user.id == 305341210443382785 or user.id == 822702422303571989:
+				embed.add_field(name="Badges", value="<:SupremeLeader:885084480543522849>", inline=False)
+			elif user.id == 324941809799397377 or user.id == 176947217913872384:
+				embed.add_field(name = "Badges", value="<a:FellowBotDeveloper:885084820592549938>  <:BetaTester:885084426818687026>", inline=False)
+			elif user.id in self.helpers:
+				embed.add_field(name="Badges", value="<:BetaTester:885084426818687026>", inline=False)
+			elif user.id == 783314693086380032:
+				embed.add_field(name="Badges", value="<:retar:819137093258838017>", inline=False)
+			elif user.bot:
+				embed.add_field(name="Badges", value="<:bot:885186066812899328>", inline=False)
+		embed.add_field(name='Status', value=str(user.status).title())
 		embed.add_field(name='Acccount created on',
 						value=user.created_at.strftime(date_format))
 		embed.add_field(name='Joined server on',
@@ -1445,11 +1446,11 @@ class Utilities(commands.Cog):
 		splur = "seconds"
 		if int(day) == 1:
 			dplur = "day"
-		elif int(hour) == 1:
+		if int(hour) == 1:
 			hplur = "hour"
-		elif int(minute) == 1:
+		if int(minute) == 1:
 			mplur = "minute"
-		elif float(second) == 1.0:
+		if float(second) == 1.0:
 			splur = "second"
 		await ctx.reply(("Bot has been alive ~~since the beginning of time~~ for " +
 					str(int(day)) + f" {dplur}, " + str(int(hour)) + f" {hplur}, " +
