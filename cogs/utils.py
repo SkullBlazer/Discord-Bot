@@ -93,7 +93,8 @@ class Utilities(commands.Cog):
 			`{p}serverinfo` \n > Get your server's info (insert joke here because I ran out)\n \
 			`{p}kick <@person> [reason]` \n > Yeet someone out of the server, but give a reason.\n \
 			`{p}ban <@person> [reason]` \n > Strike the banhammer on a poor victim, with good reason.\n \
-			`{p}suggest` \n > Suggest a command to be added, report a bug, or report that the bot is monitoring you (Warning: You will mysteriously die if you do the last one)",
+			`{p}suggest` \n > Suggest a command to be added, report a bug, or report that the bot is monitoring you (Warning: You will mysteriously die if you do the last one)\n \
+			`{p}inventory` \n > Check your inventory",
 				f"**Side note: Commands in `<brackets>` are required, commands in `[brackets]` are optional,\
 		and `x|y` signifies x OR y**\n \
 		*Pssst, you! Yes I'm talking to you! You can do `{p}help <command>` for more info on any command!*\n \n \
@@ -106,7 +107,9 @@ class Utilities(commands.Cog):
 			`{p}stalkermode [true|false]` \n > Hate it when the bot reads your messages? Now you can get a false sense of belief it's not doing that anymore!\n \
 			`{p}patchnotes`\n > Gives info on the new features\n \
 			`{p}snipe` \n > This command is not for hiring a hitman, it just sends you the last deleted message in the channel.\n \
-			`{p}editsnipe` \n > See what your \"friend\" actually thinks of you, by seeing what they originally said but didn't delete the message to avoid getting `{p}snipe`d ",
+			`{p}editsnipe` \n > See what your \"friend\" actually thinks of you, by seeing what they originally said but didn't delete the message to avoid getting `{p}snipe`d\n \
+			`{p}shop` \n > The only place to buy ~~children~~ items\n \
+			`{p}buy <item>` \n > Buy ~~a child~~ an item from the shop",
 				f"**Side note: Commands in `<brackets>` are required, commands in `[brackets]` are optional,\
 		and `x|y` signifies x OR y**\n \
 		*Pssst, you! Yes I'm talking to you! You can do `{p}help <command>` for more info on any command!*\n \n \
@@ -179,7 +182,7 @@ class Utilities(commands.Cog):
 			`{p}shuffle` \n > Use the bot's specially engineered shuffling mechanism to ensure all the bad songs are played together.\n \
 			`{p}loop` \n > When the song is just too good."
 			]
-			#64
+			#67
 			cur_page = 1
 			ncontents = []
 			if page:
@@ -322,10 +325,10 @@ class Utilities(commands.Cog):
 		elif page == "help" or page == 'h' or page == 'plshelp':
 			e = discord.Embed(title=f"Help on `{p}help`", description="Get help!")
 			e.add_field(name="Syntax", value=f"`{p}help|h [command]`")
-		elif page == "invite" or page == 'inv':
+		elif page == "invite":
 			e = discord.Embed(title=f"Help on `{p}invite`",
 							description="Invite this bot to your server")
-			e.add_field(name="Syntax", value=f"`{p}invite|inv`")
+			e.add_field(name="Syntax", value=f"`{p}invite`")
 		elif page == "colourchange" or page == 'cc' or page == 'colorchange':
 			e = discord.Embed(
 				title=f"Help on `{p}colourchange`",
@@ -340,7 +343,7 @@ class Utilities(commands.Cog):
 		elif page == "userinfo" or page == 'ui':
 			e = discord.Embed(title=f"Help on `{p}userinfo`",
 							description="Get anyone's info")
-			e.add_field(name="Syntax", value=f"`{p}userinfo|uinfo|ui [@mention]`")
+			e.add_field(name="Syntax", value=f"`{p}userinfo|uinfo|ui [@user]`")
 		elif page == "serverinfo" or page == 'si':
 			e = discord.Embed(title=f"Help on `{p}serverinfo`",
 							description="Get server info")
@@ -348,12 +351,12 @@ class Utilities(commands.Cog):
 		elif page == "kick":
 			e = discord.Embed(title=f"Help on `{p}kick`",
 							description="Kick someone off of your server")
-			e.add_field(name="Syntax", value=f"`{p}kick <@mention> [reason]`")
+			e.add_field(name="Syntax", value=f"`{p}kick <@user> [reason]`")
 		elif page == "ban":
 			e = discord.Embed(
 				title=f"Help on `{p}ban`",
 				description="Ban someone from this server. Use wisely.")
-			e.add_field(name="Syntax", value=f"`{p}ban <@mention> [reason]`")
+			e.add_field(name="Syntax", value=f"`{p}ban <@user> [reason]`")
 		elif page == "ping":
 			e = discord.Embed(
 				title=f"Help on `{p}ping`",
@@ -371,7 +374,7 @@ class Utilities(commands.Cog):
 				description=
 				"Change your (or someone else's) nickname.\n Leave blank to reset."
 			)
-			e.add_field(name="Syntax", value=f"`{p}nick [@mention] [newname]`")
+			e.add_field(name="Syntax", value=f"`{p}nick [@user] [newname]`")
 		elif page == "patchnotes" or page == 'pn':
 			e = discord.Embed(title=f"Help on `{p}patchnotes`",
 							description="See latest updates and commands here")
@@ -386,12 +389,12 @@ class Utilities(commands.Cog):
 				title=f"Help on `{p}prefix`",
 				description=
 				"Change the prefix to some other prefix. Leave blank to reset.")
-			e.add_field(name="Syntax", value=f"`{p}nick [@mention] [newname]`")
+			e.add_field(name="Syntax", value=f"`{p}prefix <newprefix>`")
 		elif page == "snipe":
 			e = discord.Embed(
 				title=f"Help on `{p}snipe`",
 				description=
-				"See the message that was deleted in the channel. \nNote: Does not work for images."
+				"See the message that was deleted in the channel."
 			)
 			e.add_field(name="Syntax", value=f"`{p}snipe`")
 		elif page == "editsnipe":
@@ -413,11 +416,39 @@ class Utilities(commands.Cog):
 			)
 			e.add_field(name="Syntax",
 						value=f"`{p}suggest`")
+		elif page == "shop" or page == "market" or page == "store":
+			e = discord.Embed(
+				title=f"Help on {p}shop",
+				description="A place where you can buy various items from."
+			)
+			e.add_field(name="Syntax",
+						value=f"`{p}shop|store|market`")
+		elif page == "buy":
+			e = discord.Embed(
+				title=f"Help on {p}buy",
+				description="Buy an item from the shop."
+			)
+			e.add_field(name="Syntax",
+						value=f"`{p}buy <item> [amount]`")
+		elif page == "sell":
+			e = discord.Embed(
+				title=f"Help on {p}sell",
+				description="Sell an item from your inventory for 2% of its price (Note: You get 5 charms for 25 mil, for example, and you're selling 1 charm for 2% of 25 mil.)"
+			)
+			e.add_field(name="Syntax",
+						value=f"`{p}sell <item> [amount]`")
+		elif page == "inventory" or page == "inv":
+			e = discord.Embed(
+				title=f"Help on {p}inventory",
+				description="See all the items in your inventory."
+			)
+			e.add_field(name="Syntax",
+						value=f"`{p}inventory|inv [@user]`")
 		elif page == "rps" or page == 'rockpaperscissors':
 			e = discord.Embed(title=f"Help on `{p}rps`",
 							description="Play rock, paper, scissors with me")
 			e.add_field(name="Syntax",
-						value=f"`{p}rps|rockpaperscissors <rock|paper|scissors>`")
+						value=f"`{p}rps|rockpaperscissors <rock|paper|scissors|@user>`")
 		elif page == "cointoss" or page == 'ct' or page == 'toss':
 			e = discord.Embed(
 				title=f"Help on `{p}cointoss`",
@@ -461,7 +492,7 @@ class Utilities(commands.Cog):
 				title=f"Help on `{p}slots`",
 				description="Get three of the same emoji to win a huge money prize"
 			)
-			e.add_field(name="Syntax", value=f"`{p}slots`")
+			e.add_field(name="Syntax", value=f"`{p}slots <amount>`")
 		elif page == "joke":
 			e = discord.Embed(
 				title=f"Help on `{p}joke`",
@@ -488,29 +519,29 @@ class Utilities(commands.Cog):
 			e = discord.Embed(
 				title=f"Help on `{p}trigger`",
 				description="To show how triggered you are by someone")
-			e.add_field(name="Syntax", value=f"`{p}trigger [@member]`")
+			e.add_field(name="Syntax", value=f"`{p}trigger [@user]`")
 		elif page == "blackandwhite" or page == 'b&w' or page == 'bw' or page == 'bnw':
 			e = discord.Embed(
 				title=f"Help on `{p}blackandwhite`",
 				description="Shows your profile photo, old timey style")
 			e.add_field(name="Syntax",
-						value=f"`{p}blackandwhite|b&w|bw|bnw [@member]`")
+						value=f"`{p}blackandwhite|b&w|bw|bnw [@user]`")
 		elif page == "cartoon":
 			e = discord.Embed(
 				title=f"Help on `{p}cartoon`",
 				description=
 				"Change your profile picture to a cartoon. (Command is still in beta)"
 			)
-			e.add_field(name="Syntax", value=f"`{p}cartoon [@member]`")
+			e.add_field(name="Syntax", value=f"`{p}cartoon [@user]`")
 		elif page == "draw" or page == "sketch":
 			e = discord.Embed(title=f"Help on `{p}draw`",
 							description="Turns your photo into a drawing")
-			e.add_field(name="Syntax", value=f"`{p}draw|sketch [@member]`")
+			e.add_field(name="Syntax", value=f"`{p}draw|sketch [@user]`")
 		elif page == "fight":
 			e = discord.Embed(
 				title=f"Help on `{p}fight`",
 				description="Fight someone with a weapon of your choice.")
-			e.add_field(name="Syntax", value=f"`{p}fight <@mention> <weapon>`")
+			e.add_field(name="Syntax", value=f"`{p}fight <@user> <weapon>`")
 		elif page == "stab" or page == 'hauserify':
 			e = discord.Embed(
 				title=f"Help on `{p}stab`",
@@ -518,7 +549,7 @@ class Utilities(commands.Cog):
 				"Angy? Stab someone. If that someone is SkullBlazer(aka me), don't."
 			)
 			e.add_field(name="Syntax",
-						value=f"`{p}stab|hauserify [@mention] [reason]`")
+						value=f"`{p}stab|hauserify [@user] [reason]`")
 		elif page == "pat" or page == 'patpat':
 			e = discord.Embed(
 				title=f"Help on `{p}pat`",
@@ -526,21 +557,21 @@ class Utilities(commands.Cog):
 				"Pat someone, if that someone isn't SkullBlazer(aka me), don't bother."
 			)
 			e.add_field(name="Syntax",
-						value=f"`{p}pat|patpat [@mention] [reason]`")
+						value=f"`{p}pat|patpat [@user] [reason]`")
 		elif page == "bonk" or page == 'vibecheck':
 			e = discord.Embed(
 				title=f"Help on `{p}bonk`",
 				description=
 				"Person annoying you? Bonk em. \n ~~I will allow bonking me.~~")
 			e.add_field(name="Syntax",
-						value=f"`{p}bonk|vibecheck [@mention] [reason]`")
+						value=f"`{p}bonk|vibecheck [@user] [reason]`")
 		elif page == "yeet":
 			e = discord.Embed(
 				title=f"Help on `{p}yeet`",
 				description=
 				"Throw someone like REALLY hard"
 			)
-			e.add_field(name="Syntax", value=f"`{p}yeet [@mention] [reason]`")
+			e.add_field(name="Syntax", value=f"`{p}yeet [@user] [reason]`")
 		elif page == "encrypt":
 			e = discord.Embed(
 				title=f"Help on `{p}encrypt`",
@@ -566,11 +597,11 @@ class Utilities(commands.Cog):
 		elif page == "balance" or page == 'bal':
 			e = discord.Embed(title=f"Help on `{p}balance`",
 							description="Check your (or someone else's) balance")
-			e.add_field(name="Syntax", value=f"`{p}balance|bal [@mention]`")
+			e.add_field(name="Syntax", value=f"`{p}balance|bal [@user]`")
 		elif page == "transfer":
 			e = discord.Embed(title=f"Help on `{p}transfer`",
 							description="Transfer money to someone")
-			e.add_field(name="Syntax", value=f"`{p}transfer <@mention> <amount>`")
+			e.add_field(name="Syntax", value=f"`{p}transfer <@user> <amount>`")
 		elif page == "save":
 			e = discord.Embed(title=f"Help on `{p}save`",
 							description="Save your progress")
@@ -578,14 +609,14 @@ class Utilities(commands.Cog):
 		elif page == "rich":
 			e = discord.Embed(title=f"Help on `{p}rich`",
 							description="See the richest people in the server")
-			e.add_field(name="Syntax", value=f"`{p}rich`")
+			e.add_field(name="Syntax", value=f"`{p}rich [d|g]`")
 		elif page == "poll":
 			e = discord.Embed(
 				title=f"Help on `{p}poll`",
 				description=
 				"Make a poll by giving a question with the command, then options separated by commas (max. 10)"
 			)
-			e.add_field(name="Syntax", value=f"`{p}poll|quickpoll <question>`")
+			e.add_field(name="Syntax", value=f"`{p}poll|quickpoll <question>` \n `<option1>, <option2>, ... , <otion10>`")
 		elif page == "say":
 			e = discord.Embed(title=f"Help on `{p}say`",
 							description="Make the bot repeat what you said")
@@ -594,8 +625,8 @@ class Utilities(commands.Cog):
 			e = discord.Embed(
 				title=f"Help on `{p}wikisearch`",
 				description=
-				"Look up various terms on Wikipedia. Doesn't work all the time :/")
-			e.add_field(name="Syntax", value=f"`{p}wikisearch|wiki <search term>`")
+				"Look up various terms on Wikipedia, leave empty for a random term. Doesn't work all the time :/")
+			e.add_field(name="Syntax", value=f"`{p}wikisearch|wiki [search term]`")
 		elif page == "weather":
 			e = discord.Embed(title=f"Help on `{p}weather`",
 							description="Check the weather of any city")
@@ -631,7 +662,7 @@ class Utilities(commands.Cog):
 		elif page == "lyrics":
 			e = discord.Embed(
 				title=f"Help on `{p}lyrics`",
-				description="Get the lyrics to a song, credits to KSoft.Si API")
+				description="Get the lyrics to a song, credits to KSoft.Si API. Note: Doesn't work as of now, I've applied for the API key for the lyrics for like 4 months now.")
 			e.add_field(name="Syntax", value=f"`{p}lyrics <song name>`")
 		elif page == "volume":
 			e = discord.Embed(
@@ -1463,13 +1494,13 @@ class Utilities(commands.Cog):
 			p = db[str(ctx.guild.id)][1]
 		else:
 			p = ">>"
-		e = discord.Embed(title="Updates for SlaveBot v2.0.2",
+		e = discord.Embed(title="Updates for SlaveBot v2.1.2",
 						description=f"\
 		**1. IMPORTANT ANNOUNCEMENT**: CHANGED PROBABILITIES OF JACKPOT!\n \
 		Getting the `100,000x` multiplier has a `0.1%` chance, `10,000x` is `0.25%`, and `1,000x` is `0.5%`.\n \
-		**2.** Added more music commands, `{p}volume`, `{p}now`, `{p}skip`, `{p}queue`, `{p}shuffle`, `{p}remove`, `{p}loop`\n \
-		**3.** Added an **Action**, `{p}yeet`\n \
-		**4.** Added a **Utility**, `{p}suggest`\n \
+		**2.** Added {p}shop, {p}buy, {p}sell, {p}inventory\n \
+		**3.** Added more music commands, `{p}volume`, `{p}now`, `{p}skip`, `{p}queue`, `{p}shuffle`, `{p}remove`, `{p}loop`\n \
+		**4.** Added an **Action**, `{p}yeet`\n \
 		**5.** Major backend changes, i.e. lots of bugs. Same deal as before, real bugs found get prizes.\n \
 		**6.** Removed Herobrine.",
 						colour=discord.Color.dark_grey())

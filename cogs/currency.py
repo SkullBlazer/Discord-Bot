@@ -609,7 +609,7 @@ class Currency(commands.Cog):
 		else:
 			p = ">>"
 		if page == "1":
-			e = discord.Embed(title=f"Shop - Balance: ||{db[str(ctx.author.id)][1]:,}||", colour=discord.Colour.purple(), timestamp = datetime.utcnow())
+			e = discord.Embed(title=f"Balance: ||{db[str(ctx.author.id)][1]:,}||", colour=discord.Colour.purple(), timestamp = datetime.utcnow())
 			e.add_field(name="Extra daily coins (`daily`)", value="Cost - 1,000,000,000 coins", inline=True)
 			e.add_field(name=f"Lucky charm for `{p}slots` (`charm`)", value="Cost - 25,000,000 coins", inline=True)
 			e.add_field(name=f"Super lucky charm for `{p}slots` (`supercharm`)", value="Cost - 1% of your balance or 15,000,000,000", inline=True)
@@ -626,6 +626,7 @@ class Currency(commands.Cog):
 		else:
 			await ctx.send("That's not a valid item")
 			return
+		e.set_author(name="Shop", icon_url=ctx.author.avatar_url)
 		await ctx.send(embed=e)
 
 	@commands.command()
@@ -636,11 +637,16 @@ class Currency(commands.Cog):
 		if amt > 50:
 			await ctx.send("Whoa there, calm down! Don't buy the entire store sheesh")
 			return
+		if amt < 1:
+			await ctx.send("-_-")
+			return
 		if item in self.shop:
 			bal = db[str(ctx.author.id)][1]
 			price = 0
 			count = 0
 			for i in range(amt):
+				if price > bal:
+					break
 				if item == "supercharm":
 					if bal//200 >= 15000000000:
 						price += bal//200
@@ -654,7 +660,7 @@ class Currency(commands.Cog):
 					price += self.shop[item]
 					count += 1
 			if price > bal:
-				await ctx.send(f"You do not have sufficient funds to purchase that item, you can only buy {count} of those.")
+				await ctx.send(f"You do not have sufficient funds to purchase that item, you can only buy {count-1} of those.")
 				return
 			if bal < 0:
 				await ctx.send("You do not have sufficient funds to purchase that item.")
@@ -673,8 +679,7 @@ class Currency(commands.Cog):
 			if str(reaction.emoji) == "✅":
 				db[str(ctx.author.id)][1] -= price
 				if item == "supercharm":
-					for i in range(amt):
-						db[str(ctx.author.id)][2]["supercharm"] += 3
+					db[str(ctx.author.id)][2]["supercharm"] += 3 * amt
 				elif item == "daily":
 					if not db[str(ctx.author.id)][2]["daily"]:
 						db[str(ctx.author.id)][2]["daily"] = True
@@ -682,14 +687,44 @@ class Currency(commands.Cog):
 						await ctx.send("You already have purchased a daily, how much more money do you want?")
 						db[str(ctx.author.id)][1] += price
 				elif item == "charm":
-					for i in range(amt):
-						db[str(ctx.author.id)][2]["charm"] += 5
+					db[str(ctx.author.id)][2]["charm"] += 5 * amt
 				await ctx.send(f"{item} purchased and in effect!")
 			else:
 				await ctx.send("Order cancelled")
 		else:
 			await ctx.send("That item code doesn't exist :/")
 			return
+
+	@commands.command()
+	async def sell(self, ctx, item:str=None, amt:int=1):
+		if item is None:
+			await ctx.send("Sold all of your items and your money")
+			return
+		if item not in self.shop:
+			await ctx.send("Do I look like a scrap dealer that you can sell anything to")
+			return
+		if amt > db[str(ctx.author.id)][2][item]:
+			await ctx.send("Why are you trying to sell more things than you have")
+			return
+		if amt < 1:
+			await ctx.send("Either you're bug hunting or you're just plain stupid")
+			return
+		e = discord.Embed(title="Confirmation", description = f"Are you sure you want to sell {amt} {item} for {(amt * self.shop[item]//50):,}?", timestamp = datetime.utcnow(), colour = discord.Colour.dark_gold())
+		msg = await ctx.send(embed = e)
+		await msg.add_reaction("✅")
+		await msg.add_reaction("❎")
+		def check(reaction, user):
+			return str(reaction.emoji) in [
+			"✅", "❎"
+		] and user == ctx.author and reaction.message == msg
+		reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=69)
+		await msg.clear_reactions()
+		if str(reaction.emoji) == "✅":
+			db[str(ctx.author.id)][2][item] -= amt
+			db[str(ctx.author.id)][1] += amt * self.shop[item]//50
+			await ctx.send(f"Sold {amt} {item} for {amt * self.shop[item]//50}")
+		else:
+			await ctx.send("Selling cancelled")
 
 	@commands.command(aliases=['inv'])
 	async def inventory(self, ctx, member: Optional[discord.Member], aid:int = None):

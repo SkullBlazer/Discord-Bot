@@ -405,10 +405,6 @@ class Music(commands.Cog):
 
 		if not ctx.voice_state.voice:
 			return await ctx.send('Not connected to any voice channel.')
-
-		destination = ctx.author.voice.channel
-		if not destination:
-			return await ctx.send("You're not in a voice channel.")
 		
 		await ctx.voice_state.stop()
 		del self.voice_states[ctx.guild.id]
@@ -418,8 +414,9 @@ class Music(commands.Cog):
 	async def _volume(self, ctx: commands.Context, *, volume: int=50):
 		"""Sets the volume of the player."""
 
-		destination = ctx.author.voice.channel
-		if not destination:
+		try:
+			ctx.author.voice.channel
+		except AttributeError:
 			return await ctx.send("You're not in a voice channel.")
 
 		if not ctx.voice_state.is_playing:
@@ -443,8 +440,9 @@ class Music(commands.Cog):
 	async def _pause(self, ctx: commands.Context):
 		"""Pauses the currently playing song."""
 
-		destination = ctx.author.voice.channel
-		if not destination:
+		try:
+			ctx.author.voice.channel
+		except AttributeError:
 			return await ctx.send("You're not in a voice channel.")
 
 		if ctx.voice_state.is_playing and ctx.voice_state.voice.is_playing():
@@ -458,8 +456,9 @@ class Music(commands.Cog):
 	async def _resume(self, ctx: commands.Context):
 		"""Resumes a currently paused song."""
 
-		destination = ctx.author.voice.channel
-		if not destination:
+		try:
+			ctx.author.voice.channel
+		except AttributeError:
 			return await ctx.send("You're not in a voice channel.")
 
 		if ctx.voice_state.is_playing and ctx.voice_state.voice.is_paused():
@@ -473,8 +472,9 @@ class Music(commands.Cog):
 	async def _stop(self, ctx: commands.Context):
 		"""Stops playing song and clears the queue."""
 
-		destination = ctx.author.voice.channel
-		if not destination:
+		try:
+			ctx.author.voice.channel
+		except AttributeError:
 			return await ctx.send("You're not in a voice channel.")
 
 		ctx.voice_state.songs.clear()
@@ -491,8 +491,9 @@ class Music(commands.Cog):
 		3 skip votes are needed for the song to be skipped.
 		"""
 
-		destination = ctx.author.voice.channel
-		if not destination:
+		try:
+			ctx.author.voice.channel
+		except AttributeError:
 			return await ctx.send("You're not in a voice channel.")
 
 		if not ctx.voice_state.is_playing:
@@ -544,8 +545,9 @@ class Music(commands.Cog):
 	async def _shuffle(self, ctx: commands.Context):
 		"""Shuffles the queue."""
 
-		destination = ctx.author.voice.channel
-		if not destination:
+		try:
+			ctx.author.voice.channel
+		except AttributeError:
 			return await ctx.send("You're not in a voice channel.")
 
 		if len(ctx.voice_state.songs) == 0:
@@ -558,8 +560,9 @@ class Music(commands.Cog):
 	async def _remove(self, ctx: commands.Context, index: int=None):
 		"""Removes a song from the queue at a given index."""
 
-		destination = ctx.author.voice.channel
-		if not destination:
+		try:
+			ctx.author.voice.channel
+		except AttributeError:
 			return await ctx.send("You're not in a voice channel.")
 
 		if not index:
@@ -578,8 +581,9 @@ class Music(commands.Cog):
 		Invoke this command again to unloop the song.
 		"""
 
-		destination = ctx.author.voice.channel
-		if not destination:
+		try:
+			ctx.author.voice.channel
+		except AttributeError:
 			return await ctx.send("You're not in a voice channel.")
 
 		if not ctx.voice_state.is_playing:
