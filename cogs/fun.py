@@ -35,19 +35,23 @@ class Fun(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if choice is None and member is None:
 			await ctx.reply(
 				"I choose rock and it has chosen to knock your teeth out",
 				mention_author=False)
+			self.onmessage = True
 		elif member:
 			if member == ctx.author:
 				file = discord.File("images/killyou.png")
 				await ctx.send(file=file)
+				self.onmessage = True
 				return
 			if member.bot:
 				await ctx.send(
 					"Imagine being so bad at rock paper scissors that you need to play with a bot to win"
 				)
+				self.onmessage = True
 				return
 			await ctx.send(
 				f"{member.mention}, you have been summoned by {ctx.author.name} to play a game of rock, paper, scissors."
@@ -161,16 +165,19 @@ class Fun(commands.Cog):
 							f"Game ended. Wasted so much time for it to be a tie."
 						]
 						await ctx.send(random.choice(l))
+					self.onmessage = True
 				except asyncio.TimeoutError:
 					await m1.delete()
 					await m2.delete()
 					await ctx.send(
 						"Someone didn't respond, and my master doesn't know how to check who was it, so you two figure it out amongst yourselves"
 					)
+					self.onmessage = True
 			else:
 				await ctx.send(
 					f"oof looks like {member.name} is either busy or hates your guts. No other reason to reject a simple game of rock, paper, scissors"
 				)
+				self.onmessage = True
 
 		else:
 			options = ['rock', 'paper', 'scissors']
@@ -195,6 +202,7 @@ class Fun(commands.Cog):
 					await ctx.send("Hah I won now all your money is mine")
 				elif bchoice == 'scissors' and choice.lower() == 'rock':
 					await ctx.send("WHAT! how did you win")
+				self.onmessage = True
 			else:
 				await ctx.reply(
 					"You have entered an invalid input. Bot will self destruct in",
@@ -203,6 +211,7 @@ class Fun(commands.Cog):
 					await asyncio.sleep(1)
 					await ctx.send(i)
 				await ctx.send("boom")
+				self.onmessage = True
 
 
 	@commands.command(aliases=['bs'])
@@ -518,6 +527,7 @@ class Fun(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if ctx.guild:
 			p = db[str(ctx.guild.id)][1]
 		else:
@@ -544,6 +554,7 @@ class Fun(commands.Cog):
 			else:
 				result = "Tails"
 			await ctx.reply(result, mention_author=False)
+		self.onmessage = True
 
 
 	@commands.command()
@@ -1083,6 +1094,7 @@ class Fun(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		dieroll = random.randint(1, 6)
 		if guess is None:
 			await ctx.send(f"The die says {dieroll}!")
@@ -1095,6 +1107,7 @@ class Fun(commands.Cog):
 					await ctx.reply(
 						f"Aw man, you didn't get it right! The die gave a {dieroll}.",
 						mention_author=False)
+		self.onmessage = True
 
 
 	# @commands.command(aliases=['rt'])

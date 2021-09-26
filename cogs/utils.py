@@ -100,6 +100,7 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if ctx.guild:
 			p = db[str(ctx.guild.id)][1]
 		else:
@@ -339,6 +340,7 @@ class Utilities(commands.Cog):
 					elif str(reaction.emoji) == '⏹️':
 						if ctx.guild:
 							await message.clear_reactions()
+						self.onmessage = True
 						return
 					else:
 						if ctx.guild:
@@ -347,6 +349,7 @@ class Utilities(commands.Cog):
 					if ctx.guild:
 						await ctx.message.delete()
 					await message.delete()
+					self.onmessage = True
 					return
 
 		elif page == "help" or page == 'h' or page == 'plshelp':
@@ -737,6 +740,7 @@ class Utilities(commands.Cog):
 			e.colour = discord.Colour.dark_blue()
 			e.timestamp = datetime.utcnow()
 			await ctx.send(embed=e)
+		self.onmessage = True
 
 	def is_owner():
 		async def predicate(self, ctx):
@@ -786,6 +790,7 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		now = datetime.utcnow()
 		replies = [
 			'Hello!', 'Hey there!',
@@ -794,6 +799,7 @@ class Utilities(commands.Cog):
 		]
 		choose = random.randint(0, 4)
 		await ctx.send(replies[choose])
+		self.onmessage = True
 
 
 	#	 gid = ctx.guild.id
@@ -819,6 +825,7 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if ctx.guild:
 			p = db[str(ctx.guild.id)][1]
 		else:
@@ -847,6 +854,7 @@ class Utilities(commands.Cog):
 				embed = discord.Embed(colour = discord.Colour.red(), title = "Error",\
 									description = f"{role.name} does not exist. Do `{p}help colourchange` to see available colours")
 				await message.edit(embed=embed)
+				self.onmessage = True
 				return
 			elif role in member.roles:
 				if ctx.author == member:
@@ -875,12 +883,14 @@ class Utilities(commands.Cog):
 						embed.description = f"I've given {member.mention} the {role.name} role!"
 					embed.colour = discord.Colour(0x7289da)
 					await message.edit(embed=embed)
+					self.onmessage = True
 					return
 				else:
 					embed.title = "Error"
 					embed.description = "You do not have the sufficient permissions to assign the Moderator role"
 					embed.colour = discord.Colour.dark_red()
 					await message.edit(embed=embed)
+					self.onmessage = True
 					return
 			elif role.name == "JAIL":
 				if ctx.author.top_role > member.top_role and member != ctx.author:
@@ -892,16 +902,19 @@ class Utilities(commands.Cog):
 					embed.description = f"{member.mention} has been successfully jailed!"
 					embed.colour = discord.Colour(0x546e7a)
 					await message.edit(embed=embed)
+					self.onmessage = True
 					return
 				elif member == ctx.author:
 					await ctx.send("Why would you ever want to jail yourself")
 					await message.delete()
+					self.onmessage = True
 					return
 				else:
 					await ctx.send(
 						"Shut up peasant you don't have the rights to jail that person"
 					)
 					await message.delete()
+					self.onmessage = True
 					return
 			for usr_role in member.roles:
 				if usr_role.name in colours:
@@ -946,6 +959,7 @@ class Utilities(commands.Cog):
 				await asyncio.sleep(2)
 				await message.delete()
 				await ctx.message.delete()
+		self.onmessage = True
 
 
 	# @colourchange.error
@@ -971,6 +985,7 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if str(ctx.message.author) != "SkullBlazer#9339":
 			user = self.bot.get_user(305341210443382785)
 			await user.send(f"{ctx.message.author} made an invite for your bot")
@@ -982,6 +997,7 @@ class Utilities(commands.Cog):
 			timestamp=datetime.utcnow(),
 			color=0x00ebff)
 		await ctx.reply(embed=e, mention_author=False)
+		self.onmessage = True
 
 
 	@commands.command(aliases=['ui', 'uinfo'])
@@ -1002,6 +1018,7 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if user is None and uid is None:
 			user = ctx.author
 		elif uid:
@@ -1018,6 +1035,7 @@ class Utilities(commands.Cog):
 			await ctx.send(
 				"This user is not in this guild. Invite them here maybe, server's dead anyway"
 			)
+			self.onmessage = True
 			return
 		if user.premium_since:
 			if user.id == 305341210443382785 or user.id == 822702422303571989:
@@ -1060,6 +1078,7 @@ class Utilities(commands.Cog):
 							value=user.premium_since.strftime(date_format),
 							inline=False)
 		await ctx.send(embed=embed)
+		self.onmessage = True
 
 
 	@commands.command(aliases=['si', 'sinfo'])
@@ -1080,6 +1099,7 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if gid is not None:
 			guild = self.bot.get_guild(gid)
 		else:
@@ -1116,6 +1136,7 @@ class Utilities(commands.Cog):
 		embed.add_field(name="Emojis", value=len(guild.emojis))
 		embed.set_footer(text='ID: ' + str(guild.id))
 		await ctx.send(embed=embed)
+		self.onmessage = True
 
 
 	@commands.command()
@@ -1135,6 +1156,7 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		a = ''
 		try:
 			for letter in s:
@@ -1166,6 +1188,7 @@ class Utilities(commands.Cog):
 			reaction, user = await self.bot.wait_for("reaction_add", check=check)
 			await message.delete()
 			await ctx.message.delete()
+		self.onmessage = True
 
 
 	@commands.command()
@@ -1185,6 +1208,7 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if s2[-1] == ".":
 			s2 = s2[:-1]
 		a2 = ''
@@ -1219,6 +1243,7 @@ class Utilities(commands.Cog):
 			reaction2, user2 = await self.bot.wait_for("reaction_add", check=check)
 			await message2.delete()
 			await ctx.message.delete()
+		self.onmessage = True
 
 
 	@commands.command(name="kick", pass_context=True)
@@ -1241,6 +1266,7 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if member is None:
 			await ctx.reply(
 				"Since no member was given to kick, the user of this command will be kicked",
@@ -1264,6 +1290,7 @@ class Utilities(commands.Cog):
 									colour = discord.Colour.dark_red(), timestamp=datetime.utcnow())
 			await ctx.reply(embed=e, mention_author=False)
 			await member.kick(reason=reason)
+		self.onmessage = True
 
 
 	@_kick.error
@@ -1293,12 +1320,14 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if member is None:
 			await ctx.reply(f"Banning {ctx.message.author}...",
 							mention_author=False)
 		elif str(ctx.message.author) != "SkullBlazer#9339":
 			if member == ctx.author:
 				await ctx.reply("bruh", mention_author=False)
+				self.onmessage = True
 				return
 			elif str(member) == "SlaveBot#1382":
 				await ctx.reply("Hah I cannot be banned", mention_author=False)
@@ -1359,6 +1388,7 @@ class Utilities(commands.Cog):
 					await ctx.reply(
 						"Hah I cannot be banned, even by the master himself",
 						mention_author=False)
+					self.onmessage = True
 					return
 				else:
 					e = discord.Embed(title=f"{member} has been banned", description = f"The master himself has struck the banhammer on {member} due to the following reason:```{reason}```",\
@@ -1369,6 +1399,7 @@ class Utilities(commands.Cog):
 				await ctx.send(
 					"Dang what did you do to convince the supreme master not to ban you"
 				)
+		self.onmessage = True
 
 
 	@_ban.error
@@ -1396,9 +1427,11 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		user = await self.bot.fetch_user(uid)
 		await ctx.guild.unban(user)
 		await ctx.reply(f"Unbanned <!@{uid}>", mention_author=False)
+		self.onmessage = True
 
 
 	# @commands.command()
@@ -1429,6 +1462,7 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		msg = await ctx.send("`Pinging bot latency...`")
 		times = []
 		embed = discord.Embed(
@@ -1459,6 +1493,7 @@ class Utilities(commands.Cog):
 			content=
 			f":ping_pong: **{round((round(sum(times)) + round(self.bot.latency * 1000))/4)}ms**",
 			embed=embed)
+		self.onmessage = True
 
 
 	@commands.command()
@@ -1480,23 +1515,27 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		member = member or ctx.author
 		og = str(member.name)
 		if name is None:
 			if member.display_name == og:
 				await ctx.reply(f"Believe it or not, {og} is their real name",
 								mention_author=False)
+				self.onmessage = True
 				return
 		else:
 			if member.display_name == name:
 				await ctx.reply(f"Believe it or not, {og} is their real name",
 								mention_author=False)
+				self.onmessage = True
 				return
 		if name:
 			if len(name) > 32:
 				await ctx.reply(
 					"Are you trying to beat the record for longest name in the world? Keep it below 32 characters",
 					mention_author=False)
+				self.onmessage = True
 				return
 		if name is None:
 			name = og
@@ -1515,6 +1554,7 @@ class Utilities(commands.Cog):
 				await ctx.reply(
 					f"{member.mention}'s name has been changed to {name}",
 					mention_author=False)
+		self.onmessage = True
 
 
 	@commands.command(aliases=['changeprefix'])
@@ -1536,6 +1576,7 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if db[str(ctx.guild.id)][1] == prefx:
 			await ctx.reply(f"Your prefix is already {prefx}",
 							mention_author=False)
@@ -1566,6 +1607,7 @@ class Utilities(commands.Cog):
 			else:
 				db[str(ctx.guild.id)][1] = prefx
 				await ctx.reply(f"Prefix changed to {prefx}", mention_author=False)
+		self.onmessage = True
 
 
 	@commands.command(aliases=['autoresponse'])
@@ -1587,6 +1629,7 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if flag is None:
 			if db[str(ctx.guild.id)][0] == "false":
 				db[str(ctx.guild.id)][0] = "true"
@@ -1618,6 +1661,7 @@ class Utilities(commands.Cog):
 			else:
 				await ctx.reply("Stalker mode is already True.",
 								mention_author=False)
+		self.onmessage = True
 
 
 	@commands.command()
@@ -1637,6 +1681,7 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if cid:
 			channel = await self.bot.fetch_channel(cid)
 		else:
@@ -1673,6 +1718,7 @@ class Utilities(commands.Cog):
 					em.set_author(name=self.d_content[cid]['name'])
 				em.set_footer(text=f"Author: {self.d_author[cid]}")
 				await ctx.send(embed=em)
+				self.onmessage = True
 				return
 			else:
 				em = discord.Embed(title=f"Last deleted image in {channel.name}")
@@ -1682,6 +1728,7 @@ class Utilities(commands.Cog):
 			await ctx.send(embed=em)
 		except KeyError:
 			await ctx.send(f"There are no recently deleted messages in <#{cid}>")
+		self.onmessage = True
 
 
 	@commands.command(aliases=['esnipe'])
@@ -1701,6 +1748,7 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if cid:
 			channel = await self.bot.fetch_channel(cid)
 		else:
@@ -1716,6 +1764,7 @@ class Utilities(commands.Cog):
 			
 		except KeyError:
 			await ctx.send(f"There are no recently edited messages in <#{cid}>")
+		self.onmessage = True
 
 
 	# @commands.command()
@@ -1747,6 +1796,7 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		second = time() - self.start_time
 		minute, second = divmod(second, 60)
 		hour, minute = divmod(minute, 60)
@@ -1766,6 +1816,7 @@ class Utilities(commands.Cog):
 		await ctx.reply(("Bot has been alive ~~since the beginning of time~~ for " +
 					str(int(day)) + f" {dplur}, " + str(int(hour)) + f" {hplur}, " +
 					str(int(minute)) + f" {mplur} and %.2f {splur}" % second), mention_author=False)
+		self.onmessage = True
 
 
 	@commands.command(aliases=['pn'])
@@ -1785,6 +1836,7 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if ctx.guild:
 			p = db[str(ctx.guild.id)][1]
 		else:
@@ -1800,6 +1852,7 @@ class Utilities(commands.Cog):
 		**6.** Removed Herobrine.",
 						colour=discord.Color.dark_grey())
 		await ctx.send(embed=e)
+		self.onmessage = True
 
 	@commands.command()
 	@commands.cooldown(1, 30, commands.BucketType.user)
@@ -1819,6 +1872,7 @@ class Utilities(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		msg = await ctx.send("Select 1 if you're reporting a bug, 2 if you want to suggest a command to be added, 3 for other, or 4 to cancel")
 		await msg.add_reaction("1⃣")
 		await msg.add_reaction("2⃣")
@@ -1838,6 +1892,7 @@ class Utilities(commands.Cog):
 				await user.send(f"{ctx.author.name} from {ctx.guild.name} has something else to say")
 			else:
 				await ctx.send("Cancelled.")
+				self.onmessage = True
 				return
 			await ctx.send("Send your message")
 			def check2(message):
@@ -1853,6 +1908,7 @@ class Utilities(commands.Cog):
 				await ctx.send("Message sent to my master that you're stupid")	
 		except asyncio.TimeoutError:
 			await ctx.send("Message sent to my master that you're stupid")
+		self.onmessage = True
 
 def setup(bot):
 	bot.add_cog(Utilities(bot))

@@ -41,6 +41,7 @@ class Actions(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if choices is None:
 			await ctx.send(
 				"I choose the first option. Oh wait, there are no options.")
@@ -65,6 +66,7 @@ class Actions(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		apoora = discord.File('images/apoorafull.jpeg')
 		if q is None:
 			await ctx.send(
@@ -122,9 +124,11 @@ class Actions(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if phrase is None:
 			await ctx.reply("What do you want me to say, dumdum",
 							mention_author=False)
+			self.onmessage = True
 			return
 		if member is None:
 			member = ctx.author
@@ -133,10 +137,12 @@ class Actions(commands.Cog):
 				f"<:mikebruh:819137093850759169> Did you seriously just try and make me say that {ctx.author.mention}"
 			)
 			await ctx.message.delete()
+			self.onmessage = True
 			return
 		elif "batman" in phrase.lower():
 			batsy = discord.File("images/batsy.png")
 			await ctx.reply(file=batsy, mention_author=False)
+			self.onmessage = True
 			return
 		n = datetime.now()
 		mt = ""
@@ -144,6 +150,7 @@ class Actions(commands.Cog):
 			mt += "⠀"
 		await ctx.reply(f'"{phrase}"\n {mt} **-{member}, {n.year}**',
 						mention_author=False)
+		self.onmessage = True
 
 
 	@commands.command(aliases=['xkcd'])
@@ -164,6 +171,7 @@ class Actions(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		f = True
 		if num:
 			if num.isdigit():
@@ -180,6 +188,7 @@ class Actions(commands.Cog):
 				else:
 					f = False
 					link = "Valid arguments include a comic number, 'what if', or 'latest'"
+			self.onmessage = True
 		else:
 			num = random.randint(1, xkcd.getLatestComicNum())
 			link = xkcd.getComic(num).getImageLink()
@@ -206,6 +215,7 @@ class Actions(commands.Cog):
 					await ctx.send(xkcd.getComic(num).getExplanation())
 			except asyncio.TimeoutError:
 				await msg.delete()
+		self.onmessage = True
 
 
 	@commands.command()
@@ -225,10 +235,12 @@ class Actions(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		user = random.randint(1,200)
 		if user == 111:
 			await ctx.send(ctx.author.avatar_url)
-			await ctx.send("<:yeet:817301996256231444>")
+			await ctx.send("<:yeet:819137093476286496>")
+			self.onmessage = True
 			return
 		
 		URL = 'https://official-joke-api.appspot.com/random_joke'
@@ -236,6 +248,7 @@ class Actions(commands.Cog):
 		def check_valid_status_code(request):
 			if request.status_code == 200:
 				return request.json()
+			self.onmessage = True
 			return False
 
 		def get_joke():
@@ -248,6 +261,7 @@ class Actions(commands.Cog):
 			await ctx.send("Couldn't get joke from API. Try again later.")
 		else:
 			await ctx.send(joke['setup'] + '\n' + f"||{joke['punchline']}||")
+		self.onmessage = True
 
 
 	def download_file(self, url, destination):
@@ -302,6 +316,7 @@ class Actions(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		#	 await ctx.channel.trigger_typing()
 		if member is None:
 			member = ctx.author
@@ -313,6 +328,7 @@ class Actions(commands.Cog):
 		avatar.paste(triggered, position)
 		avatar.save("images/trigger.png")
 		await ctx.send(file=discord.File("images/trigger.png"))
+		self.onmessage = True
 
 
 	@commands.command(aliases=['bw', 'bnw', 'b&w'])
@@ -333,6 +349,7 @@ class Actions(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if user is None:
 			user = ctx.author
 		actions = self.bot.get_cog('Actions')
@@ -340,6 +357,7 @@ class Actions(commands.Cog):
 		avatar = Image.open("images/blackandwhite.png").convert("L")
 		avatar.save("images/blackandwhite.png")
 		await ctx.send(file=discord.File("images/blackandwhite.png"))
+		self.onmessage = True
 
 
 	@commands.command()
@@ -360,6 +378,7 @@ class Actions(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if user is None:
 			user = ctx.author
 		actions = self.bot.get_cog('Actions')
@@ -373,6 +392,7 @@ class Actions(commands.Cog):
 		cartoon = cv2.bitwise_and(color, color, mask=edges)
 		cv2.imwrite("images/cartoon.jpg", cartoon)
 		await ctx.send(file=discord.File("images/cartoon.jpg"))
+		self.onmessage = True
 
 
 	@commands.command(aliases=['sketch'])
@@ -393,6 +413,7 @@ class Actions(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if not user:
 			user = ctx.author
 		actions = self.bot.get_cog('Actions')
@@ -404,6 +425,7 @@ class Actions(commands.Cog):
 		r = actions.dodge(b, g)
 		cv2.imwrite('images/draw.png', r)
 		await ctx.send(file=discord.File("images/draw.png"))
+		self.onmessage = True
 
 
 	# @commands.command()
@@ -464,6 +486,7 @@ class Actions(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		user2 = (str(user).split("#"))[0]
 		if user2 == "asgardian88" or user2 == "Akshita":
 			e = discord.Embed(
@@ -471,6 +494,7 @@ class Actions(commands.Cog):
 				description="You want to fight Batman???? Hah good luck with that.",
 				colour=discord.Colour.from_rgb(0, 0, 0))
 			await ctx.send(embed=e)
+			self.onmessage = True
 		else:
 			if (user2 is None) or (user == ctx.author):
 				e = discord.Embed(title="Attack failed",\
@@ -503,6 +527,7 @@ class Actions(commands.Cog):
 				await ctx.send(embed=e)
 				if ch[0] == "Attack failed" and user2 == "SlaveBot":
 					await ctx.send("<:kekw:819137093514297365>")
+		self.onmessage = True
 
 
 	@commands.command(aliases=['poll'])
@@ -523,12 +548,14 @@ class Actions(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		def check(m):
 			return m.author == ctx.author and m.channel == ctx.message.channel
 
 		if question is None:
 			await ctx.send("You can't make a poll without a question now, can you?"
 						)
+			self.onmessage = True
 		else:
 			if ctx.guild:
 				await ctx.message.delete()
@@ -538,15 +565,18 @@ class Actions(commands.Cog):
 				options = str(msg.content).split(",")
 			except asyncio.TimeoutError:
 				await ctx.send("Poll closed due to inactivity.")
+				self.onmessage = True
 				return
 			await a.delete()
 			if ctx.guild:
 				await msg.delete()
 			if len(options) <= 1:
 				await ctx.send('You need more than one option to make a poll')
+				self.onmessage = True
 				return
 			if len(options) > 10:
 				await ctx.send('You cannot make a poll for more than 10 things!')
+				self.onmessage = True
 				return
 			if len(options) == 2 and (options[0].lower() == 'yes' or options[1].lower() == 'y')\
 			and (options[1].lower() == 'no' or options[1].lower() == 'n'):
@@ -568,6 +598,7 @@ class Actions(commands.Cog):
 			for reaction in reactions[:len(options)]:
 				await react_message.add_reaction(reaction)
 			await react_message.edit(embed=embed)
+		self.onmessage = True
 
 
 	@commands.command(aliases=['patpat'])
@@ -590,12 +621,14 @@ class Actions(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if members is None:
 			patted = "SkullBlazer"
 		elif ctx.author in members:
 			await ctx.send(
 				"Patting yourself is banned in 130 countries. Ask someone else to do it"
 			)
+			self.onmessage = True
 			return
 		else:
 			patted = ", ".join(x.name for x in members)
@@ -605,6 +638,7 @@ class Actions(commands.Cog):
 			await ctx.send("yay")
 		if patted == 'SkullBlazer':
 			await ctx.send(file=discord.File('images/patpat.jpeg'))
+		self.onmessage = True
 
 
 	@commands.command(aliases=['stabby', 'hauserify'])
@@ -627,14 +661,17 @@ class Actions(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if "@everyone" in reason or "@here" in reason:
 			await ctx.send("Excuse me this is a mass-murder free zone.")
+			self.onmessage = True
 			return
 		if members is None:
 			stabbed = "SlaveBot"
 		elif ctx.author in members:
 			fle = discord.File('images/scarn.gif')
 			await ctx.send(file=fle)
+			self.onmessage = True
 			return
 		else:
 			stabbed = ", ".join(x.name for x in members)
@@ -646,6 +683,7 @@ class Actions(commands.Cog):
 				await ctx.channel.trigger_typing()
 				await asyncio.sleep(1)
 				await ctx.send("owie")
+		self.onmessage = True
 
 
 	@commands.command(aliases=['vibecheck'])
@@ -669,6 +707,7 @@ class Actions(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if "@everyone" in reason or "@here" in reason:
 			await ctx.send(
 				"Bonking so many people at once is a great way to break your bonking bat."
@@ -676,10 +715,10 @@ class Actions(commands.Cog):
 			await ctx.send(
 				"~~\"Break your bonking bat\" sounds like a tongue twister. I wouldn't know, I don't have a tongue~~"
 			)
+			self.onmessage = True
 			return
 		if bonked is None:
 			bonked = ctx.guild.me
-		actions = self.bot.get_cog('Actions')
 
 	#		 bonked = ["SlaveBot", "Say 'Found the easter egg' if you read this line"]
 	#		 actions.download_file(ctx.guild.me.avatar_url, "bonky/bonk2.png")
@@ -692,10 +731,10 @@ class Actions(commands.Cog):
 			return
 		else:
 			#		 bonked = member.name
-			actions.download_file(actions.get_avatar(bonked, False), "bonky/bonk2.png")
+			a.download_file(a.get_avatar(bonked, False), "bonky/bonk2.png")
 			av2 = Image.open("bonky/bonk2.png")
 		base = Image.open("bonky/cheemsbonk.png")
-		actions.download_file(actions.get_avatar(bonker, False), "bonky/bonk1.png")
+		a.download_file(a.get_avatar(bonker, False), "bonky/bonk1.png")
 		av1 = Image.open("bonky/bonk1.png")
 		#	 txt = Image.new("RGBA", base.size, (255,255,255,0))
 		#	 fnt = ImageFont.truetype("/usr/share/fonts/truetype/msttcorefonts/Comic_Sans_MS_Bold.ttf", 40)
@@ -705,8 +744,8 @@ class Actions(commands.Cog):
 		#	 d.text((420,215), bonked[0], font=fnt, fill=(0,0,0,255))
 		#	 out = Image.alpha_composite(base, txt)
 		#	 out.save('bonky/edit.png')
-		rav1 = actions.rescale(av1, (190, 190))
-		rav2 = actions.rescale(av2, (190, 190))
+		rav1 = a.rescale(av1, (190, 190))
+		rav2 = a.rescale(av2, (190, 190))
 		rav1 = rav1.convert("RGBA")
 		rav2 = rav2.convert("RGBA")
 		base.paste(rav1, (149, 38), rav1)
@@ -722,6 +761,7 @@ class Actions(commands.Cog):
 			await ctx.channel.trigger_typing()
 			await asyncio.sleep(1)
 			await ctx.send("ouch indeed")
+		self.onmessage = True
 
 	@commands.command()
 	async def yeet(self, ctx, member:Optional[discord.Member], *, reason:str="why not"):
@@ -740,25 +780,27 @@ class Actions(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if "@everyone" in reason or "@here" in reason:
 			await ctx.send(
 				"You try to yeet a ton of people and break your arm. Great job!"
 			)
+			self.onmessage = True
 			return
 		if not member:
 			member = ctx.guild.me
 		if member == ctx.author:
 			fle = discord.File('images/scarn.gif')
 			await ctx.send(file=fle)
+			self.onmessage = True
 			return
-		actions = self.bot.get_cog('Actions')
-		actions.download_file(actions.get_avatar(member, False), "yeetus/yeet2.png")
+		a.download_file(a.get_avatar(member, False), "yeetus/yeet2.png")
 		av2 = Image.open("yeetus/yeet2.png")
 		base = Image.open("yeetus/yeet.png")
-		actions.download_file(actions.get_avatar(ctx.author, False), "yeetus/yeet1.png")
+		a.download_file(a.get_avatar(ctx.author, False), "yeetus/yeet1.png")
 		av1 = Image.open("yeetus/yeet1.png")
-		rav1 = actions.rescale(av1, (35, 35))
-		rav2 = actions.rescale(av2, (35, 35))
+		rav1 = a.rescale(av1, (35, 35))
+		rav2 = a.rescale(av2, (35, 35))
 		rav1 = rav1.convert("RGBA")
 		rav2 = rav2.convert("RGBA")
 		base.paste(rav1, (50, 30), rav1)
@@ -772,6 +814,7 @@ class Actions(commands.Cog):
 			await ctx.channel.trigger_typing()
 			await asyncio.sleep(1)
 			await ctx.send("AAAAAAAAAᴬᴬᴬᴬᴬᴬᴬᴬᴬᴬᴬᴬᵃᵃᵃᵃᵃᵃᵃᵃᵃᵃᵃᵃᵃᵃᵃᵃ")
+		self.onmessage = True
 
 	@commands.command(aliases=['wiki'])
 	@commands.cooldown(rate=1, per=5.0, type=commands.BucketType.user)
@@ -791,6 +834,7 @@ class Actions(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		wikipedia.set_lang("en")
 		if term is None:
 			await ctx.send("Searching for a random term...")
@@ -807,9 +851,11 @@ class Actions(commands.Cog):
 							colour=discord.Colour(0xff4500))
 			e.set_footer(icon_url=ctx.author.avatar_url,
 						text=f"Requested by: {ctx.author}")
+			self.onmessage = True
 			await ctx.send(embed=e)
 		elif term.lower() == "anime":
 			await ctx.send("Ew no")
+			self.onmessage = True
 		else:
 			p = wikipedia.page(term, auto_suggest=False)
 			results = wikipedia.summary(term, sentences=10, auto_suggest=False)
@@ -825,6 +871,7 @@ class Actions(commands.Cog):
 				e.set_footer(icon_url=ctx.author.avatar_url,
 							text=f"Requested by: {ctx.author}")
 				await ctx.send(embed=e)
+		self.onmessage = True
 
 	@commands.command()
 	@commands.cooldown(1, 5, commands.BucketType.user)
@@ -844,9 +891,11 @@ class Actions(commands.Cog):
 			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 			return await ctx.send(embed=e)
 
+		self.onmessage = False
 		if not city:
 			await ctx.send("Temperature: 0K \nHumidity: 101% \nDescription: Dry")
 			await ctx.send("That doesn't sound right? Oh maybe that's because you DIDN'T ENTER A CITY")
+			self.onmessage = True
 			return
 		api_key = os.environ['WEATHER_KEY']
 		base_url = "https://api.openweathermap.org/data/2.5/weather?"
@@ -889,5 +938,6 @@ class Actions(commands.Cog):
 			await ctx.reply(file=fle, embed=embed, mention_author=False)
 		else:
 			await ctx.reply("That city doesn't exist yet", mention_author=False)
+		self.onmessage = True
 def setup(bot):
 	bot.add_cog(Actions(bot))
