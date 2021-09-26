@@ -170,7 +170,7 @@ async def on_command_error(ctx, error):
 		return
 	elif (not isinstance(error, commands.CheckAnyFailure)):
 		e = discord.Embed(title=f'Error in {ctx.command.name}', description = f'[{error}]({ctx.message.jump_url})', timestamp=datetime.utcnow(), colour=discord.Color.red())
-		e.set_footer(text=ctx.author)
+		e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
 		await ctx.send(embed=e)
 
 @bot.command()
@@ -232,7 +232,7 @@ async def on_message(message):
 			if db[str(message.guild.id)][0] == "false":
 				await bot.process_commands(message)
 				return
-		something = await om.game_running(message.channel)
+		something = await om.cmd_running3(message.channel)
 		if not something:
 			await bot.process_commands(message)
 			return

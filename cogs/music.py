@@ -9,6 +9,7 @@ import random
 import math
 import itertools
 import functools
+from datetime import datetime
 
 # @bot.command(pass_context=True)
 # @commands.guild_only()
@@ -363,6 +364,11 @@ class Music(commands.Cog):
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 		self.voice_states = {}
+		self.onmessage = True
+
+	@commands.command()
+	async def cmd_running4(self, ctx):
+		return self.onmessage
 
 	def get_voice_state(self, ctx: commands.Context):
 		state = self.voice_states.get(ctx.guild.id)
@@ -387,7 +393,20 @@ class Music(commands.Cog):
 
 	@commands.command(name='join', invoke_without_subcommand=True)
 	async def _join(self, ctx: commands.Context):
-		"""Joins a voice channel."""
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
 
 		destination = ctx.author.voice.channel
 
@@ -401,7 +420,20 @@ class Music(commands.Cog):
 	@commands.command(name='leave', aliases=['disconnect'])
 	@commands.has_permissions(manage_guild=True)
 	async def _leave(self, ctx: commands.Context):
-		"""Clears the queue and leaves the voice channel."""
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
 
 		if not ctx.voice_state.voice:
 			return await ctx.send('Not connected to any voice channel.')
@@ -412,7 +444,20 @@ class Music(commands.Cog):
 
 	@commands.command(name='volume')
 	async def _volume(self, ctx: commands.Context, *, volume: int=50):
-		"""Sets the volume of the player."""
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
 
 		try:
 			ctx.author.voice.channel
@@ -430,7 +475,21 @@ class Music(commands.Cog):
 
 	@commands.command(name='now', aliases=['current', 'playing'])
 	async def _now(self, ctx: commands.Context):
-		"""Displays the currently playing song."""
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		if not ctx.voice_state.is_playing:
 			return await ctx.send('Nothing being played at the moment.')
 		await ctx.send(embed=ctx.voice_state.current.create_embed())
@@ -438,7 +497,20 @@ class Music(commands.Cog):
 	@commands.command(name='pause')
 	@commands.has_permissions(manage_guild=True)
 	async def _pause(self, ctx: commands.Context):
-		"""Pauses the currently playing song."""
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
 
 		try:
 			ctx.author.voice.channel
@@ -454,7 +526,20 @@ class Music(commands.Cog):
 	@commands.command(name='resume')
 	@commands.has_permissions(manage_guild=True)
 	async def _resume(self, ctx: commands.Context):
-		"""Resumes a currently paused song."""
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
 
 		try:
 			ctx.author.voice.channel
@@ -470,7 +555,20 @@ class Music(commands.Cog):
 	@commands.command(name='stop')
 	@commands.has_permissions(manage_guild=True)
 	async def _stop(self, ctx: commands.Context):
-		"""Stops playing song and clears the queue."""
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
 
 		try:
 			ctx.author.voice.channel
@@ -490,6 +588,20 @@ class Music(commands.Cog):
 		"""Vote to skip a song. The requester can automatically skip.
 		3 skip votes are needed for the song to be skipped.
 		"""
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
 
 		try:
 			ctx.author.voice.channel
@@ -519,10 +631,20 @@ class Music(commands.Cog):
 
 	@commands.command(aliases=['queue', 'q'])
 	async def _queue(self, ctx: commands.Context, *, page: int = 1):
-		"""Shows the player's queue.
-
-		You can optionally specify the page to show. Each page contains 10 elements.
-		"""
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
 
 		if len(ctx.voice_state.songs) == 0:
 			return await ctx.send('Empty queue.')
@@ -543,7 +665,20 @@ class Music(commands.Cog):
 
 	@commands.command(name='shuffle')
 	async def _shuffle(self, ctx: commands.Context):
-		"""Shuffles the queue."""
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
 
 		try:
 			ctx.author.voice.channel
@@ -558,7 +693,20 @@ class Music(commands.Cog):
 
 	@commands.command(name='remove')
 	async def _remove(self, ctx: commands.Context, index: int=None):
-		"""Removes a song from the queue at a given index."""
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
 
 		try:
 			ctx.author.voice.channel
@@ -576,10 +724,20 @@ class Music(commands.Cog):
 
 	@commands.command(name='loop')
 	async def _loop(self, ctx: commands.Context):
-		"""Loops the currently playing song.
-
-		Invoke this command again to unloop the song.
-		"""
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
 
 		try:
 			ctx.author.voice.channel
@@ -603,6 +761,20 @@ class Music(commands.Cog):
 		This command automatically searches from various sites if no URL is provided.
 		A list of these sites can be found here: https://rg3.github.io/youtube-dl/supportedsites.html
 		"""
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
 
 		if not ctx.voice_state.voice:
 			await ctx.invoke(self._join)

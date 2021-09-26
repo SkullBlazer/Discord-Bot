@@ -18,9 +18,29 @@ import xkcd
 class Actions(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
+		self.onmessage = True
 	
 	@commands.command()
+	async def cmd_running(self, ctx):
+		return self.onmessage
+
+	@commands.command()
 	async def choose(self, ctx, *, choices: str = None):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		if choices is None:
 			await ctx.send(
 				"I choose the first option. Oh wait, there are no options.")
@@ -30,6 +50,21 @@ class Actions(commands.Cog):
 
 	@commands.command(aliases=['8ball', 'eightball'])
 	async def ball8(self, ctx, *, q=None):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		apoora = discord.File('images/apoorafull.jpeg')
 		if q is None:
 			await ctx.send(
@@ -61,17 +96,32 @@ class Actions(commands.Cog):
 			else:
 				await ctx.reply(rples[ans], mention_author=False)
 				try:
-					msg = await self.bot.wait_for('message', timeout=20.0)
+					msg = await self.bot.wait_for('message', timeout=10.0)
 					if "bruh" in str(
 						msg.content).lower() or msg.content.startswith(
 							'no') or "kekw" in str(msg.content).lower():
-						await ctx.send("<:kekw:819137093514297365>")
+						await ctx.send("<:kekw:889720617316802561>")
 				except asyncio.TimeoutError:
 					return
 
 
 	@commands.command(name="say")
 	async def _say(self, ctx, member:Optional[discord.Member], *, phrase: str = None):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		if phrase is None:
 			await ctx.reply("What do you want me to say, dumdum",
 							mention_author=False)
@@ -99,6 +149,21 @@ class Actions(commands.Cog):
 	@commands.command(aliases=['xkcd'])
 	@commands.cooldown(1, 5, commands.BucketType.user)
 	async def xkcdcomic(self, ctx, num=None):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		f = True
 		if num:
 			if num.isdigit():
@@ -145,6 +210,21 @@ class Actions(commands.Cog):
 
 	@commands.command()
 	async def joke(self, ctx):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		user = random.randint(1,200)
 		if user == 111:
 			await ctx.send(ctx.author.avatar_url)
@@ -207,6 +287,21 @@ class Actions(commands.Cog):
 	@commands.command()
 	@commands.cooldown(1, 10, commands.BucketType.user)
 	async def trigger(self, ctx, *, member: discord.Member = None):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		#	 await ctx.channel.trigger_typing()
 		if member is None:
 			member = ctx.author
@@ -223,6 +318,21 @@ class Actions(commands.Cog):
 	@commands.command(aliases=['bw', 'bnw', 'b&w'])
 	@commands.cooldown(1, 10, commands.BucketType.user)
 	async def blackandwhite(self, ctx, user: discord.Member = None):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		if user is None:
 			user = ctx.author
 		actions = self.bot.get_cog('Actions')
@@ -235,6 +345,21 @@ class Actions(commands.Cog):
 	@commands.command()
 	@commands.cooldown(1, 10, commands.BucketType.user)
 	async def cartoon(self, ctx, user: discord.Member = None):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		if user is None:
 			user = ctx.author
 		actions = self.bot.get_cog('Actions')
@@ -253,6 +378,21 @@ class Actions(commands.Cog):
 	@commands.command(aliases=['sketch'])
 	@commands.cooldown(1, 10, commands.BucketType.user)
 	async def draw(self, ctx, user: discord.Member = None):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		if not user:
 			user = ctx.author
 		actions = self.bot.get_cog('Actions')
@@ -309,6 +449,21 @@ class Actions(commands.Cog):
 
 	@commands.command()
 	async def fight(self, ctx, user: discord.Member = None, *, weapon: str = None):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		user2 = (str(user).split("#"))[0]
 		if user2 == "asgardian88" or user2 == "Akshita":
 			e = discord.Embed(
@@ -353,6 +508,21 @@ class Actions(commands.Cog):
 	@commands.command(aliases=['poll'])
 	@commands.cooldown(1, 10, commands.BucketType.user)
 	async def quickpoll(self, ctx, *, question: str = None):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		def check(m):
 			return m.author == ctx.author and m.channel == ctx.message.channel
 
@@ -405,6 +575,21 @@ class Actions(commands.Cog):
 				members: commands.Greedy[discord.Member] = None,
 				*,
 				reason='for doing an excellent job'):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		if members is None:
 			patted = "SkullBlazer"
 		elif ctx.author in members:
@@ -427,6 +612,21 @@ class Actions(commands.Cog):
 				members: commands.Greedy[discord.Member] = None,
 				*,
 				reason='for no reason'):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		if "@everyone" in reason or "@here" in reason:
 			await ctx.send("Excuse me this is a mass-murder free zone.")
 			return
@@ -454,6 +654,21 @@ class Actions(commands.Cog):
 				bonker: Optional[discord.Member],
 				*,
 				reason: str = 'for no reason'):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		if "@everyone" in reason or "@here" in reason:
 			await ctx.send(
 				"Bonking so many people at once is a great way to break your bonking bat."
@@ -510,6 +725,21 @@ class Actions(commands.Cog):
 
 	@commands.command()
 	async def yeet(self, ctx, member:Optional[discord.Member], *, reason:str="why not"):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		if "@everyone" in reason or "@here" in reason:
 			await ctx.send(
 				"You try to yeet a ton of people and break your arm. Great job!"
@@ -546,6 +776,21 @@ class Actions(commands.Cog):
 	@commands.command(aliases=['wiki'])
 	@commands.cooldown(rate=1, per=5.0, type=commands.BucketType.user)
 	async def wikisearch(self, ctx, *, term: str = None):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		wikipedia.set_lang("en")
 		if term is None:
 			await ctx.send("Searching for a random term...")
@@ -584,6 +829,21 @@ class Actions(commands.Cog):
 	@commands.command()
 	@commands.cooldown(1, 5, commands.BucketType.user)
 	async def weather(self, ctx, *, city=None):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		if not city:
 			await ctx.send("Temperature: 0K \nHumidity: 101% \nDescription: Dry")
 			await ctx.send("That doesn't sound right? Oh maybe that's because you DIDN'T ENTER A CITY")

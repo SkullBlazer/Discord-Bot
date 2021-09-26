@@ -8,6 +8,11 @@ class Currency(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.shop = {"daily": 1000000000, "charm": 25000000, "supercharm": 15000000000}
+		self.onmessage = True
+
+	@commands.command()
+	async def cmd_running2(self, ctx):
+		return self.onmessage
 
 	@commands.command()
 	async def _save():
@@ -21,6 +26,21 @@ class Currency(commands.Cog):
 
 	@commands.command(pass_context=True, aliases=['bal'])
 	async def balance(self, ctx, member: Optional[discord.Member], mid: int = None):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		if ctx.guild:
 			p = db[str(ctx.guild.id)][1]
 		else:
@@ -158,6 +178,21 @@ class Currency(commands.Cog):
 
 	@commands.command(pass_context=True, aliases=['reg'])
 	async def register(self, ctx):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		mid = str(ctx.message.author.id)
 		if mid not in db:
 			db[mid] = [0, 100]
@@ -272,6 +307,21 @@ class Currency(commands.Cog):
 	@commands.command(pass_context=True)
 	@commands.cooldown(1, 10, commands.BucketType.user)
 	async def transfer(self, ctx, other: discord.Member = None, amount: str = None):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		if other is None:
 			await ctx.reply(
 				"Since no recipient was mentioned, all your money will go to ~~me~~ charity",
@@ -365,6 +415,21 @@ class Currency(commands.Cog):
 	@commands.command(aliases=['leaderboard', 'lb'])
 	@commands.cooldown(1, 10, commands.BucketType.user)
 	async def rich(self, ctx, term: str = None, glbal: str = None):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		count = 0
 		d = {}
 		s = ""
@@ -373,6 +438,7 @@ class Currency(commands.Cog):
 			"<:7th:836165757502095471>", "<:8th:836165757309550603>", "<:9th:836165757561602048>", \
 			"<:769010theqts:836165757926113290>"]
 		count = 0
+		p = db[str(ctx.guild.id)][1]
 		if not term and not glbal:
 			if not ctx.guild:
 				await ctx.send(
@@ -446,7 +512,7 @@ class Currency(commands.Cog):
 				if count > 10:
 					break
 				s += f"{L[count-1]} **<@!{i}>** - `{sorted_dict[i]:,}`\n"
-			e = discord.Embed(title=f"Global leaderboard for `>>daily`",
+			e = discord.Embed(title=f"Global leaderboard for `{p}daily`",
 							description=s)
 			e.timestamp = datetime.utcnow()
 			e.colour = discord.Colour.random()
@@ -456,6 +522,21 @@ class Currency(commands.Cog):
 	@commands.command(pass_context=True)
 	@commands.cooldown(1, 23*60*60, commands.BucketType.user)
 	async def daily(self, ctx):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		aid = str(ctx.message.author.id)
 		if aid not in db:
 			embed = discord.Embed(colour=discord.Colour.red(),
@@ -604,6 +685,21 @@ class Currency(commands.Cog):
 
 	@commands.command()
 	async def shop(self, ctx, page:str="1"):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		if ctx.guild:
 			p = db[str(ctx.guild.id)][1]
 		else:
@@ -612,7 +708,7 @@ class Currency(commands.Cog):
 			e = discord.Embed(title=f"Balance: ||{db[str(ctx.author.id)][1]:,}||", colour=discord.Colour.purple(), timestamp = datetime.utcnow())
 			e.add_field(name="Extra daily coins (`daily`)", value="Cost - 1,000,000,000 coins", inline=True)
 			e.add_field(name=f"Lucky charm for `{p}slots` (`charm`)", value="Cost - 25,000,000 coins", inline=True)
-			e.add_field(name=f"Super lucky charm for `{p}slots` (`supercharm`)", value="Cost - 1% of your balance or 15,000,000,000", inline=True)
+			e.add_field(name=f"Super lucky charm for `{p}slots` (`supercharm`)", value="Cost - 0.5% of your balance or 15,000,000,000", inline=True)
 			e.set_footer(text=f"Use {p}buy <itemname> to buy an item, and {p}shop <itemname> to get more info on that item")
 		elif page in self.shop:
 			e = discord.Embed(title=f"Info about {page}", colour=discord.Colour.dark_blue(), timestamp = datetime.utcnow())
@@ -631,6 +727,21 @@ class Currency(commands.Cog):
 
 	@commands.command()
 	async def buy(self, ctx, item:str=None, amt:int=1):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		if item is None:
 			await ctx.send("Congratulations! You just bought all the items from the shop!")
 			return
@@ -697,6 +808,21 @@ class Currency(commands.Cog):
 
 	@commands.command()
 	async def sell(self, ctx, item:str=None, amt:int=1):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		if item is None:
 			await ctx.send("Sold all of your items and your money")
 			return
@@ -728,6 +854,21 @@ class Currency(commands.Cog):
 
 	@commands.command(aliases=['inv'])
 	async def inventory(self, ctx, member: Optional[discord.Member], aid:int = None):
+		a = self.bot.get_cog("Actions")
+		c = self.bot.get_cog("Currency")
+		f = self.bot.get_cog("Fun")
+		m = self.bot.get_cog("Music")
+		u = self.bot.get_cog("Utilities")
+		ar = await a.cmd_running(ctx.channel)
+		cr = await c.cmd_running2(ctx.channel)
+		fr = await f.cmd_running3(ctx.channel)
+		mr = await m.cmd_running4(ctx.channel)
+		ur = await u.cmd_running5(ctx.channel)
+		if not (ar and cr and fr and mr and ur):
+			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
+			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+			return await ctx.send(embed=e)
+
 		if ctx.guild:
 			p = db[str(ctx.guild.id)][1]
 		else:
