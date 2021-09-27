@@ -232,7 +232,7 @@ async def on_message(message):
 			if db[str(message.guild.id)][0] == "false":
 				await bot.process_commands(message)
 				return
-		something = await om.cmd_running3(message.channel)
+		something = await om.cmd_running(message)
 		if not something:
 			await bot.process_commands(message)
 			return

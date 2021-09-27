@@ -15,26 +15,11 @@ class Fun(commands.Cog):
 		self.onmessage = True
 
 	@commands.command()
-	async def cmd_running3(self, ctx):
+	async def cmd_running(self, ctx):
 		return self.onmessage
 
 	@commands.command(aliases=['rockpaperscissors'])
 	async def rps(self, ctx, member: Optional[discord.Member], choice=None):
-		a = self.bot.get_cog("Actions")
-		c = self.bot.get_cog("Currency")
-		f = self.bot.get_cog("Fun")
-		m = self.bot.get_cog("Music")
-		u = self.bot.get_cog("Utilities")
-		ar = await a.cmd_running(ctx.channel)
-		cr = await c.cmd_running2(ctx.channel)
-		fr = await f.cmd_running3(ctx.channel)
-		mr = await m.cmd_running4(ctx.channel)
-		ur = await u.cmd_running5(ctx.channel)
-		if not (ar and cr and fr and mr and ur):
-			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
-			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
-			return await ctx.send(embed=e)
-
 		self.onmessage = False
 		if choice is None and member is None:
 			await ctx.reply(
@@ -180,6 +165,12 @@ class Fun(commands.Cog):
 				self.onmessage = True
 
 		else:
+			if ctx.channel.id in self.gaem:
+				await ctx.send(
+					"Another game is going on in this channel, please wait or play in a different channel"
+				)
+				return
+			self.gaem.append(ctx.channel.id)
 			options = ['rock', 'paper', 'scissors']
 			options2 = ['rock', 'paper', 'scissors']
 			if choice in options:
@@ -216,21 +207,6 @@ class Fun(commands.Cog):
 
 	@commands.command(aliases=['bs'])
 	async def battleships(self, ctx):
-		a = self.bot.get_cog("Actions")
-		c = self.bot.get_cog("Currency")
-		f = self.bot.get_cog("Fun")
-		m = self.bot.get_cog("Music")
-		u = self.bot.get_cog("Utilities")
-		ar = await a.cmd_running(ctx.channel)
-		cr = await c.cmd_running2(ctx.channel)
-		fr = await f.cmd_running3(ctx.channel)
-		mr = await m.cmd_running4(ctx.channel)
-		ur = await u.cmd_running5(ctx.channel)
-		if not (ar and cr and fr and mr and ur):
-			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
-			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
-			return await ctx.send(embed=e)
-
 		if ctx.channel.id in self.gaem:
 			await ctx.send(
 				"Another game is going on in this channel, please wait or play in a different channel"
@@ -334,21 +310,6 @@ class Fun(commands.Cog):
 
 	@commands.command(aliases=['guess', 'ng'])
 	async def numguess(self, ctx):
-		a = self.bot.get_cog("Actions")
-		c = self.bot.get_cog("Currency")
-		f = self.bot.get_cog("Fun")
-		m = self.bot.get_cog("Music")
-		u = self.bot.get_cog("Utilities")
-		ar = await a.cmd_running(ctx.channel)
-		cr = await c.cmd_running2(ctx.channel)
-		fr = await f.cmd_running3(ctx.channel)
-		mr = await m.cmd_running4(ctx.channel)
-		ur = await u.cmd_running5(ctx.channel)
-		if not (ar and cr and fr and mr and ur):
-			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
-			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
-			return await ctx.send(embed=e)
-
 		if ctx.channel.id in self.gaem:
 			await ctx.send(
 				"Another game is going on in this channel, please wait or play in a different channel"
@@ -512,21 +473,6 @@ class Fun(commands.Cog):
 
 	@commands.command(aliases=['toss', 'ct'])
 	async def cointoss(self, ctx):
-		a = self.bot.get_cog("Actions")
-		c = self.bot.get_cog("Currency")
-		f = self.bot.get_cog("Fun")
-		m = self.bot.get_cog("Music")
-		u = self.bot.get_cog("Utilities")
-		ar = await a.cmd_running(ctx.channel)
-		cr = await c.cmd_running2(ctx.channel)
-		fr = await f.cmd_running3(ctx.channel)
-		mr = await m.cmd_running4(ctx.channel)
-		ur = await u.cmd_running5(ctx.channel)
-		if not (ar and cr and fr and mr and ur):
-			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
-			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
-			return await ctx.send(embed=e)
-
 		self.onmessage = False
 		if ctx.guild:
 			p = db[str(ctx.guild.id)][1]
@@ -559,21 +505,6 @@ class Fun(commands.Cog):
 
 	@commands.command()
 	async def hangman(self, ctx, topic: str = None):
-		a = self.bot.get_cog("Actions")
-		c = self.bot.get_cog("Currency")
-		f = self.bot.get_cog("Fun")
-		m = self.bot.get_cog("Music")
-		u = self.bot.get_cog("Utilities")
-		ar = await a.cmd_running(ctx.channel)
-		cr = await c.cmd_running2(ctx.channel)
-		fr = await f.cmd_running3(ctx.channel)
-		mr = await m.cmd_running4(ctx.channel)
-		ur = await u.cmd_running5(ctx.channel)
-		if not (ar and cr and fr and mr and ur):
-			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
-			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
-			return await ctx.send(embed=e)
-
 		if ctx.channel.id in self.gaem:
 			await ctx.send(
 				"Another game is going on in this channel, please wait or play in a different channel"
@@ -815,21 +746,6 @@ class Fun(commands.Cog):
 	@commands.command()
 	@commands.cooldown(rate=1, per=5.0, type=commands.BucketType.user)
 	async def slots(self, ctx, amount: str = None):
-		a = self.bot.get_cog("Actions")
-		c = self.bot.get_cog("Currency")
-		f = self.bot.get_cog("Fun")
-		m = self.bot.get_cog("Music")
-		u = self.bot.get_cog("Utilities")
-		ar = await a.cmd_running(ctx.channel)
-		cr = await c.cmd_running2(ctx.channel)
-		fr = await f.cmd_running3(ctx.channel)
-		mr = await m.cmd_running4(ctx.channel)
-		ur = await u.cmd_running5(ctx.channel)
-		if not (ar and cr and fr and mr and ur):
-			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
-			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
-			return await ctx.send(embed=e)
-
 		if ctx.channel.id in self.gaem:
 			await ctx.send(
 				"Another game is going on in this channel, please wait or play in a different channel"
@@ -867,9 +783,17 @@ class Fun(commands.Cog):
 					amount = int(amt2) * 1000000000000000000
 			elif amount.lower() == "table":
 				e = discord.Embed(title="Slots table",
-								description="**3 in a row (Jackpot):**\n \
-	🍇, 🍓, 🍒: 100,000 × <amount> \n🍎, 🍍, 🍉: 10,000 × <amount> \n🍊, 🍐: 1,000 × <amount> \n \n \
-	**2 in a row:** \n2 × <amount>")
+								description="**3 in a row (Jackpot)**\n")
+	#🍇, 🍓, 🍒: 100,000 × <amount> \n🍎, 🍍, 🍉: 10,000 × <amount> \n🍊, 🍐: 1,000 × <amount> \n \n \
+	#**2 in a row:** \n2 × <amount>
+				e.add_field(name="🍇, 🍓, 🍒", value = "100,000 × <amount>")
+				e.add_field(name="Probabilities", value="Normal: 0.1%\n With charm: 1.6%\n With supercharm: 2.6%", inline=True)
+				e.add_field(name="🍎, 🍍, 🍉", value = "10,000 × <amount>", inline=False)
+				e.add_field(name="Probabilities", value="Normal: 0.25%\n With charm: 1.75%\n With supercharm: 2.75%", inline=True)
+				e.add_field(name="🍊, 🍐", value = "1,000 × <amount>", inline=False)
+				e.add_field(name="Probabilities", value="Normal: 0.5%\n With charm: 2%\n With supercharm: 3%", inline=True)
+				e.add_field(name="2 in a row", value = "100,000 × <amount>", inline=False)
+				e.add_field(name="Probabilities", value="Normal: 2%\n With charm: 8%\n With supercharm: 12%", inline=True)
 				e.colour = discord.Colour.random()
 				e.timestamp = datetime.utcnow()
 				e.set_footer(
@@ -1079,21 +1003,6 @@ class Fun(commands.Cog):
 
 	@commands.command()
 	async def roll(self, ctx, guess=None):
-		a = self.bot.get_cog("Actions")
-		c = self.bot.get_cog("Currency")
-		f = self.bot.get_cog("Fun")
-		m = self.bot.get_cog("Music")
-		u = self.bot.get_cog("Utilities")
-		ar = await a.cmd_running(ctx.channel)
-		cr = await c.cmd_running2(ctx.channel)
-		fr = await f.cmd_running3(ctx.channel)
-		mr = await m.cmd_running4(ctx.channel)
-		ur = await u.cmd_running5(ctx.channel)
-		if not (ar and cr and fr and mr and ur):
-			e = discord.Embed(title = f"Error in {ctx.command.name}", description=f"[You tried to execute another command while a previous one was already running, hence this command will not be executed.]({ctx.message.jump_url})", timestamp = datetime.utcnow(), colour=discord.Colour.red())
-			e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
-			return await ctx.send(embed=e)
-
 		self.onmessage = False
 		dieroll = random.randint(1, 6)
 		if guess is None:
