@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional
 from replit import db
 
@@ -33,21 +33,24 @@ class Currency(commands.Cog):
 					if "69" in str(db[aid][1]):
 						e = discord.Embed(
 							description=
-							f"You have {db[aid][1]:,} in the bank\n\n nice",
+							f"You have {db[aid][1]:,} in the bank",
 							colour=discord.Colour.green(),
 							timestamp=datetime.utcnow())
+						e.set_footer(text="nice")
 					elif str(db[aid][1]) == "0":
 						e = discord.Embed(
 							description=
-							f"You have {db[aid][1]:,} in the bank\n\n sucks to be you",
+							f"You have {db[aid][1]:,} in the bank",
 							colour=discord.Colour.green(),
 							timestamp=datetime.utcnow())
+						e.set_footer(text="sucks to be you")
 					elif str(db[aid][1]).startswith("-"):
 						e = discord.Embed(
 							description=
-							f"You have {db[aid][1]:,} in the bank\n\n how the hell did you manage to do that",
+							f"You have {db[aid][1]:,} in the bank",
 							colour=discord.Colour.green(),
 							timestamp=datetime.utcnow())
+						e.set_footer(text="how the hell did you manage to do that")
 					else:
 						e = discord.Embed(
 							description=f"You have {db[aid][1]:,} in the bank",
@@ -64,21 +67,24 @@ class Currency(commands.Cog):
 					if "69" in str(db[aid][1]):
 						e = discord.Embed(
 							description=
-							f"{member.mention} has {db[aid][1]:,} in their bank\n\n nice",
+							f"{member.mention} has {db[aid][1]:,} in their bank",
 							colour=discord.Colour.green(),
 							timestamp=datetime.utcnow())
+						e.set_footer(text="nice")
 					elif str(db[aid][1]) == "0":
 						e = discord.Embed(
 							description=
-							f"{member.mention} has {db[aid][1]:,} in their bank\n\n sucks to be them",
+							f"{member.mention} has {db[aid][1]:,} in their bank",
 							colour=discord.Colour.green(),
 							timestamp=datetime.utcnow())
+						e.set_footer(text="sucks to be them")
 					elif str(db[aid][1]).startswith("-"):
 						e = discord.Embed(
 							description=
-							f"{member.mention} has {db[aid][1]:,} in their bank\n\n how the hell did they manage to do that",
+							f"{member.mention} has {db[aid][1]:,} in their bank",
 							colour=discord.Colour.green(),
 							timestamp=datetime.utcnow())
+						e.set_footer(text="how the hell did they manage to do that")
 					else:
 						e = discord.Embed(
 							description=
@@ -99,21 +105,24 @@ class Currency(commands.Cog):
 				if "69" in str(db[aid][1]):
 					e = discord.Embed(
 						description=
-						f"You have {db[aid][1]:,} in your bank\n\n nice",
+						f"You have {db[aid][1]:,} in your bank",
 						colour=discord.Colour.green(),
 						timestamp=datetime.utcnow())
+					e.set_footer(text="nice")
 				elif str(db[aid][1]) == "0":
 					e = discord.Embed(
 						description=
-						f"You have {db[aid][1]:,} in your bank\n\n sucks to be you",
+						f"You have {db[aid][1]:,} in your bank",
 						colour=discord.Colour.green(),
 						timestamp=datetime.utcnow())
+					e.set_footer(text="sucks to be you")
 				elif str(db[aid][1]).startswith("-"):
 					e = discord.Embed(
 						description=
-						f"You have {db[aid][1]:,} in your bank\n\n how the hell did you manage to do that",
+						f"You have {db[aid][1]:,} in your bank",
 						colour=discord.Colour.green(),
 						timestamp=datetime.utcnow())
+					e.set_footer(text="how the hell did you manage to do that")
 				else:
 					e = discord.Embed(
 						description=
@@ -127,21 +136,24 @@ class Currency(commands.Cog):
 				if "69" in str(db[aid][1]):
 					e = discord.Embed(
 						description=
-						f"<@!{aid}> has {db[aid][1]:,} in their bank\n\n nice",
+						f"<@!{aid}> has {db[aid][1]:,} in their bank",
 						colour=discord.Colour.green(),
 						timestamp=datetime.utcnow())
+					e.set_footer(text="nice")
 				elif str(db[aid][1]) == "0":
 					e = discord.Embed(
 						description=
-						f"<@!{aid}> has {db[aid][1]:,} in their bank\n\n sucks to be them",
+						f"<@!{aid}> has {db[aid][1]:,} in their bank",
 						colour=discord.Colour.green(),
 						timestamp=datetime.utcnow())
+					e.set_footer(text="sucks to be them")
 				elif str(db[aid][1]).startswith("-"):
 						e = discord.Embed(
 							description=
-							f"<@!{aid}> has {db[aid][1]:,} in their bank\n\n how the hell did they manage to do that",
+							f"<@!{aid}> has {db[aid][1]:,} in their bank",
 							colour=discord.Colour.green(),
 							timestamp=datetime.utcnow())
+						e.set_footer(text="how the hell did they manage to do that")
 				else:
 					e = discord.Embed(
 						description=f"<@!{aid}> has {db[aid][1]:,} in their bank",
@@ -154,7 +166,6 @@ class Currency(commands.Cog):
 				embed = discord.Embed(colour = discord.Colour.red(), title = "Error",\
 									description = f"The mentioned user does not have an account, tell them to make one using `{p}register`", timestamp=datetime.utcnow())
 				await ctx.reply(embed=embed, mention_author=False)
-		
 
 
 	@commands.command(pass_context=True, aliases=['reg'])
@@ -190,23 +201,61 @@ class Currency(commands.Cog):
 			mesg = await self.bot.wait_for("message", check=check)
 			emojis = ["✅", "❎"]
 			amt = str(mesg.content)
-			if amt[0] == "+":
-				e = discord.Embed(title="Addition confirmation", description = f"Are you sure you want to add {int(amt[1:]):,} to {member.mention}'s account?",\
+			amt = amt.replace(",", "")
+			if amt[-1] == "s":
+				if amt[0] == "+":
+					e = discord.Embed(title="Addition confirmation", description = f"Are you sure you want to add {int(amt[1:-1]):,} supercharms to {member.mention}'s inventory?",\
 									colour = discord.Colour.random(), timestamp=datetime.utcnow())
-			elif amt[0] == "-":
-				if int(amt[1:]) > db[mid][1]:
-					await ctx.send(
-						f"{member.name} has only ||{db[mid][1]:,}|| in their account"
-					)
+				elif amt[0] == "-":
+					if int(amt[1:-1]) > db[mid][2]["supercharm"]:
+						await ctx.send(
+							f"{member.name} has only ||{db[mid][2]['supercharm']:,}|| in their inventory"
+						)
+						return
+					e = discord.Embed(title="Subtraction confirmation", description = f"Are you sure you want to subtract {int(amt[1:-1]):,} supercharms from {member.mention}'s inventory?",\
+										colour = discord.Colour.random(), timestamp=datetime.utcnow())
+				elif amt[0] == "=":
+					e = discord.Embed(title="Eval confirmation", description = f"Are you sure you want to change {member.mention}'s supercharms to {int(amt[1:-1]):,}?",\
+										colour = discord.Colour.random(), timestamp=datetime.utcnow())
+				else:
+					await ctx.reply("Transaction error 3913", mention_author=False)
 					return
-				e = discord.Embed(title="Subtraction confirmation", description = f"Are you sure you want to subtract {int(amt[1:]):,} from {member.mention}'s account?",\
+			elif amt[-1] == "c":
+				if amt[0] == "+":
+					e = discord.Embed(title="Addition confirmation", description = f"Are you sure you want to add {int(amt[1:-1]):,} charms to {member.mention}'s inventory?",\
 									colour = discord.Colour.random(), timestamp=datetime.utcnow())
-			elif amt[0] == "=":
-				e = discord.Embed(title="Eval confirmation", description = f"Are you sure you want to change {member.mention}'s balance to {int(amt[1:]):,}?",\
-									colour = discord.Colour.random(), timestamp=datetime.utcnow())
+				elif amt[0] == "-":
+					if int(amt[1:-1]) > db[mid][2]["charm"]:
+						await ctx.send(
+							f"{member.name} has only ||{db[mid][2]['charm']:,}|| in their inventory"
+						)
+						return
+					e = discord.Embed(title="Subtraction confirmation", description = f"Are you sure you want to subtract {int(amt[1:-1]):,} charms from {member.mention}'s inventory?",\
+										colour = discord.Colour.random(), timestamp=datetime.utcnow())
+				elif amt[0] == "=":
+					e = discord.Embed(title="Eval confirmation", description = f"Are you sure you want to change {member.mention}'s charms to {int(amt[1:-1]):,}?",\
+										colour = discord.Colour.random(), timestamp=datetime.utcnow())
+				else:
+					await ctx.reply("Transaction error 3913", mention_author=False)
+					return
 			else:
-				await ctx.reply("Transaction error 3913", mention_author=False)
-				return
+				if amt[0] == "+":
+					e = discord.Embed(title="Addition confirmation", description = f"Are you sure you want to add {int(amt[1:]):,} to {member.mention}'s account?",\
+										colour = discord.Colour.random(), timestamp=datetime.utcnow())
+				elif amt[0] == "-":
+					if int(amt[1:]) > db[mid][1]:
+						await ctx.send(
+							f"{member.name} has only ||{db[mid][1]:,}|| in their account"
+						)
+						return
+					e = discord.Embed(title="Subtraction confirmation", description = f"Are you sure you want to subtract {int(amt[1:]):,} from {member.mention}'s account?",\
+										colour = discord.Colour.random(), timestamp=datetime.utcnow())
+				elif amt[0] == "=":
+					e = discord.Embed(title="Eval confirmation", description = f"Are you sure you want to change {member.mention}'s balance to {int(amt[1:]):,}?",\
+										colour = discord.Colour.random(), timestamp=datetime.utcnow())
+				else:
+					await ctx.reply("Transaction error 3913", mention_author=False)
+					return
 		else:
 			mid = str(aid)
 			if mid not in db:
@@ -217,22 +266,58 @@ class Currency(commands.Cog):
 			mesg = await self.bot.wait_for("message", check=check)
 			emojis = ["✅", "❎"]
 			amt = str(mesg.content)
-			if amt[0] == "+":
-				e = discord.Embed(title="Addition confirmation", description = f"Are you sure you want to add {int(amt[1:]):,} to <@!{aid}>'s account?",\
-									colour = discord.Colour.random(), timestamp=datetime.utcnow())
-			elif amt[0] == "-":
-				if int(amt[1:]) > db[mid][1]:
-					await ctx.send(
-						f"<@!{aid}> has only ||{db[mid][1]:,}|| in their account")
+			amt = amt.replace(",", "")
+			if amt[-1] == "s":
+				if amt[0] == "+":
+					e = discord.Embed(title="Addition confirmation", description = f"Are you sure you want to add {int(amt[1:-1]):,} supercharms to <@!{aid}>'s inventory?",\
+										colour = discord.Colour.random(), timestamp=datetime.utcnow())
+				elif amt[0] == "-":
+					if int(amt[1:]) > db[mid][2]["supercharm"]:
+						await ctx.send(
+							f"<@!{aid}> has only ||{db[mid][2]['supercharm']:,}|| in their inventory")
+						return
+					e = discord.Embed(title="Subtraction confirmation", description = f"Are you sure you want to subtract {int(amt[1:-1]):,} supercharms from <@!{aid}>'s inventory?",\
+										colour = discord.Colour.random(), timestamp=datetime.utcnow())
+				elif amt[0] == "=":
+					e = discord.Embed(title="Eval confirmation", description = f"Are you sure you want to change <@!{aid}>'s supercharms to {int(amt[1:-1]):,}?",\
+										colour = discord.Colour.random(), timestamp=datetime.utcnow())
+				else:
+					await ctx.reply("Transaction error 3913", mention_author=False)
 					return
-				e = discord.Embed(title="Subtraction confirmation", description = f"Are you sure you want to subtract {int(amt[1:]):,} from <@!{aid}>'s account?",\
-									colour = discord.Colour.random(), timestamp=datetime.utcnow())
-			elif amt[0] == "=":
-				e = discord.Embed(title="Eval confirmation", description = f"Are you sure you want to change <@!{aid}>'s balance to {int(amt[1:]):,}?",\
-									colour = discord.Colour.random(), timestamp=datetime.utcnow())
+			elif amt[-1] == "c":
+				if amt[0] == "+":
+					e = discord.Embed(title="Addition confirmation", description = f"Are you sure you want to add {int(amt[1:-1]):,} charms to <@!{aid}>'s inventory?",\
+										colour = discord.Colour.random(), timestamp=datetime.utcnow())
+				elif amt[0] == "-":
+					if int(amt[1:]) > db[mid][2]["charm"]:
+						await ctx.send(
+							f"<@!{aid}> has only ||{db[mid][2]['charm']:,}|| in their inventory")
+						return
+					e = discord.Embed(title="Subtraction confirmation", description = f"Are you sure you want to subtract {int(amt[1:-1]):,} charms from <@!{aid}>'s inventory?",\
+										colour = discord.Colour.random(), timestamp=datetime.utcnow())
+				elif amt[0] == "=":
+					e = discord.Embed(title="Eval confirmation", description = f"Are you sure you want to change <@!{aid}>'s charms to {int(amt[1:-1]):,}?",\
+										colour = discord.Colour.random(), timestamp=datetime.utcnow())
+				else:
+					await ctx.reply("Transaction error 3913", mention_author=False)
+					return
 			else:
-				await ctx.reply("Transaction error 3913", mention_author=False)
-				return
+				if amt[0] == "+":
+					e = discord.Embed(title="Addition confirmation", description = f"Are you sure you want to add {int(amt[1:]):,} to <@!{aid}>'s account?",\
+										colour = discord.Colour.random(), timestamp=datetime.utcnow())
+				elif amt[0] == "-":
+					if int(amt[1:]) > db[mid][1]:
+						await ctx.send(
+							f"<@!{aid}> has only ||{db[mid][1]:,}|| in their account")
+						return
+					e = discord.Embed(title="Subtraction confirmation", description = f"Are you sure you want to subtract {int(amt[1:]):,} from <@!{aid}>'s account?",\
+										colour = discord.Colour.random(), timestamp=datetime.utcnow())
+				elif amt[0] == "=":
+					e = discord.Embed(title="Eval confirmation", description = f"Are you sure you want to change <@!{aid}>'s balance to {int(amt[1:]):,}?",\
+										colour = discord.Colour.random(), timestamp=datetime.utcnow())
+				else:
+					await ctx.reply("Transaction error 3913", mention_author=False)
+					return
 		msg = await ctx.send(embed=e)
 		await msg.add_reaction(emojis[0])
 		await msg.add_reaction(emojis[1])
@@ -246,13 +331,28 @@ class Currency(commands.Cog):
 		await msg.delete()
 		if str(reaction.emoji) == "✅":
 			if amt[0] == "+":
-				db[mid][1] += int(amt[1:])
+				if amt[-1] == "s":
+					db[mid][2]["supercharm"] += int(amt[1:-1])
+				elif amt[-1] == "c":
+					db[mid][2]["charm"] += int(amt[1:-1])
+				else:
+					db[mid][1] += int(amt[1:])
 				await ctx.reply("Added", mention_author=False)
 			elif amt[0] == "-":
-				db[mid][1] -= int(amt[1:])
+				if amt[-1] == "s":
+					db[mid][2]["supercharm"] -= int(amt[1:-1])
+				elif amt[-1] == "c":
+					db[mid][2]["charm"] -= int(amt[1:-1])
+				else:
+					db[mid][1] -= int(amt[1:])
 				await ctx.reply("Subtracted", mention_author=False)
 			elif amt[0] == "=":
-				db[mid][1] = int(amt[1:])
+				if amt[-1] == "s":
+					db[mid][2]["supercharm"] = int(amt[1:-1])
+				elif amt[-1] == "c":
+					db[mid][2]["charm"] = int(amt[1:-1])
+				else:
+					db[mid][1] = int(amt[1:])
 				await ctx.reply("Changed", mention_author=False)
 		else:
 			await ctx.send("Well that saved me a bunch of time and processing")
@@ -273,7 +373,7 @@ class Currency(commands.Cog):
 
 	@commands.command(pass_context=True)
 	@commands.cooldown(1, 10, commands.BucketType.user)
-	async def transfer(self, ctx, other: discord.Member = None, amount: str = None):
+	async def transfer(self, ctx, other: discord.Member = None, *, amount: str = None):
 		if other is None:
 			await ctx.reply(
 				"Since no recipient was mentioned, all your money will go to ~~me~~ charity",
@@ -285,6 +385,8 @@ class Currency(commands.Cog):
 				mention_author=False)
 			
 		else:
+			val = False
+			amount = amount.replace(",", "")
 			if amount[-1].lower() == 'k':
 				amount = int(amount[:-1]) * 1000
 			elif amount[-1].lower() == 'm':
@@ -295,67 +397,136 @@ class Currency(commands.Cog):
 				amount = int(amount[:-1]) * 1000000000000
 			elif amount[-1].lower() == 'q':
 				amount = int(amount[:-1]) * 1000000000000000
+			elif amount[:1] == "sc" or amount[0] == "s":
+				amount = amount.split(" ")
+				if len(amount) != 2:
+					return await ctx.send("So you're just going to transfer anything you want?")
+				val = True
+			elif amount[0] == "c":
+				amount = amount.split(" ")
+				if len(amount) != 2:
+					return await ctx.send("So you're just going to transfer anything you want?")
+				val = True
 			else:
 				amount = int(amount)
-			primary_id = str(ctx.message.author.id)
-			other_id = str(other.id)
-			if primary_id == other_id:
-				await ctx.send("What are you even doing")
-				
-			elif amount <= 0:
-				await ctx.send("Trying to fool me, eh?")
-				
-			elif primary_id not in db:
-				embed = discord.Embed(colour=discord.Colour.red(),
-									title="Error",
-									description="You do not have an account",
-									timestamp=datetime.utcnow())
-				await ctx.send(embed=embed)
-			elif other_id not in db:
-				embed = discord.Embed(
-					colour=discord.Colour.red(),
-					title="Error",
-					description="The other party does not have an account",
-					timestamp=datetime.utcnow())
-				await ctx.send(embed=embed)
-			elif db[primary_id][1] < amount:
-				embed = discord.Embed(
-					colour=discord.Colour.red(),
-					title="Error",
-					description="You cannot afford this transaction",
-					timestamp=datetime.utcnow())
-				await ctx.send(embed=embed)
-			else:
-				emojis = ["✅", "❎"]
-				e = discord.Embed(title="Transfer confirmation", description = f"Are you sure you want to transfer {amount:,} to {other.mention}?",\
-								colour = discord.Colour.random(), timestamp=datetime.utcnow())
-				msg = await ctx.send(embed=e)
-				await msg.add_reaction(emojis[0])
-				await msg.add_reaction(emojis[1])
-
-				def check2(reaction, user):
-					return str(
-						reaction.emoji
-					) in emojis and user == ctx.author and reaction.message == msg
-
-				reaction, user = await self.bot.wait_for('reaction_add', check=check2)
-				await msg.delete()
-
-				if str(reaction) == "✅":
-					e = discord.Embed(title="Success!",
-									description="Transaction complete",
-									colour=discord.Colour.gold(),
-									timestamp=datetime.utcnow())
-					e.add_field(name="Receipt",
-								value=f"Transferred {amount:,} to {other.mention}")
-					await ctx.reply(embed=e, mention_author=False)
-					db[primary_id][1] -= amount
-					db[other_id][1] += amount
+			if not val:
+				primary_id = str(ctx.message.author.id)
+				other_id = str(other.id)
+				if primary_id == other_id:
+					await ctx.send("What are you even doing")
+					
+				elif amount <= 0:
+					await ctx.send("Trying to fool me, eh?")
+					
+				elif primary_id not in db:
+					embed = discord.Embed(colour=discord.Colour.red(),
+										title="Error",
+										description="You do not have an account",
+										timestamp=datetime.utcnow())
+					await ctx.send(embed=embed)
+				elif other_id not in db:
+					embed = discord.Embed(
+						colour=discord.Colour.red(),
+						title="Error",
+						description="The other party does not have an account",
+						timestamp=datetime.utcnow())
+					await ctx.send(embed=embed)
+				elif db[primary_id][1] < amount:
+					embed = discord.Embed(
+						colour=discord.Colour.red(),
+						title="Error",
+						description="You cannot afford this transaction",
+						timestamp=datetime.utcnow())
+					await ctx.send(embed=embed)
 				else:
-					await ctx.send(
-						f"Sorry {other.mention}, it's not your lucky day")
-		
+					emojis = ["✅", "❎"]
+					e = discord.Embed(title="Transfer confirmation", description = f"Are you sure you want to transfer {amount:,} to {other.mention}?",\
+									colour = discord.Colour.random(), timestamp=datetime.utcnow())
+					msg = await ctx.send(embed=e)
+					await msg.add_reaction(emojis[0])
+					await msg.add_reaction(emojis[1])
 
+					def check2(reaction, user):
+						return str(
+							reaction.emoji
+						) in emojis and user == ctx.author and reaction.message == msg
+
+					reaction, user = await self.bot.wait_for('reaction_add', check=check2)
+					await msg.delete()
+
+					if str(reaction) == "✅":
+						e = discord.Embed(title="Success!",
+										description="Transaction complete",
+										colour=discord.Colour.gold(),
+										timestamp=datetime.utcnow())
+						e.add_field(name="Receipt",
+									value=f"Transferred {amount:,} to {other.mention}")
+						await ctx.reply(embed=e, mention_author=False)
+						db[primary_id][1] -= amount
+						db[other_id][1] += amount
+					else:
+						await ctx.send(
+							f"Sorry {other.mention}, it's not your lucky day")
+			else:
+				primary_id = str(ctx.message.author.id)
+				other_id = str(other.id)
+				num = int(amount[1])
+				if amount[0] == "c":
+					s = "charm"
+				else:
+					s = "supercharm"
+				if primary_id == other_id:
+					await ctx.send("What are you even doing")
+					
+				elif primary_id not in db:
+					embed = discord.Embed(colour=discord.Colour.red(),
+										title="Error",
+										description="You do not have an account",
+										timestamp=datetime.utcnow())
+					await ctx.send(embed=embed)
+				elif other_id not in db:
+					embed = discord.Embed(
+						colour=discord.Colour.red(),
+						title="Error",
+						description="The other party does not have an account",
+						timestamp=datetime.utcnow())
+					await ctx.send(embed=embed)
+				elif db[primary_id][2][s] < num:
+					embed = discord.Embed(
+						colour=discord.Colour.red(),
+						title="Error",
+						description="You cannot afford this transaction",
+						timestamp=datetime.utcnow())
+					await ctx.send(embed=embed)
+				else:
+					emojis = ["✅", "❎"]
+					e = discord.Embed(title="Transfer confirmation", description = f"Are you sure you want to transfer {num:,} {s} to {other.mention}?",\
+									colour = discord.Colour.random(), timestamp=datetime.utcnow())
+					msg = await ctx.send(embed=e)
+					await msg.add_reaction(emojis[0])
+					await msg.add_reaction(emojis[1])
+
+					def check2(reaction, user):
+						return str(
+							reaction.emoji
+						) in emojis and user == ctx.author and reaction.message == msg
+
+					reaction, user = await self.bot.wait_for('reaction_add', check=check2)
+					await msg.delete()
+
+					if str(reaction) == "✅":
+						e = discord.Embed(title="Success!",
+										description="Transaction complete",
+										colour=discord.Colour.gold(),
+										timestamp=datetime.utcnow())
+						e.add_field(name="Receipt",
+									value=f"Transferred {num:,} to {other.mention}")
+						await ctx.reply(embed=e, mention_author=False)
+						db[primary_id][2][s] -= num
+						db[other_id][2][s] += num
+					else:
+						await ctx.send(
+							f"Sorry {other.mention}, it's not your lucky day")
 
 	@transfer.error
 	async def transfer_error(self, ctx, error):
@@ -382,92 +553,94 @@ class Currency(commands.Cog):
 		count = 0
 		p = db[str(ctx.guild.id)][1]
 		if not term and not glbal:
-			if not ctx.guild:
-				await ctx.send(
-					"This command is not available in DMs. But if I had to guess, I'm the richest. Unless you're Mars."
-				)
-				
-				return
-			guild = ctx.guild
-			for member in guild.members:
-				mid = str(member.id)
-				if mid in db:
-					d[member] = db[mid][1]
-			sorted_dict = dict(
-				sorted(d.items(), key=lambda item: item[1], reverse=True))
-			for i in sorted_dict:
-				count += 1
-				s += f"{L[count-1]} **{i}** - `{sorted_dict[i]:,}`\n"
-			e = discord.Embed(title=f"Richest people in {guild.name}",
-							description=s)
-			e.timestamp = datetime.utcnow()
-			e.colour = discord.Colour.random()
-			await ctx.send(embed=e)
+			async with ctx.typing():
+				if not ctx.guild:
+					await ctx.send(
+						"This command is not available in DMs. But if I had to guess, I'm the richest. Unless you're Mars."
+					)
+					
+					return
+				guild = ctx.guild
+				for member in guild.members:
+					mid = str(member.id)
+					if mid in db:
+						d[member] = db[mid][1]
+				sorted_dict = dict(
+					sorted(d.items(), key=lambda item: item[1], reverse=True))
+				for i in sorted_dict:
+					count += 1
+					s += f"{L[count-1]} **{i}** - `{sorted_dict[i]:,}`\n"
+				e = discord.Embed(title=f"Richest people in {guild.name}",
+								description=s)
+				e.timestamp = datetime.utcnow()
+				e.colour = discord.Colour.random()
+				await ctx.send(embed=e)
 
 		elif term.lower() == "g" or term.lower() == "global" and not glbal:
-			for i in db:
-				if type(db[i][1]) == int or type(db[i][1]) == float:
-					d[i] = str(await self.bot.fetch_user(db[i][1]))
-			sorted_dict = dict(
-				sorted(d.items(), key=lambda item: item[1], reverse=True))
-			for i in sorted_dict:
-				count += 1
-				if count > 10:
-					break
-				s += f"{L[count-1]} **{i}** - `{sorted_dict[i]:,}`\n"
-			e = discord.Embed(title=f"Global leaderboard", description=s)
-			e.timestamp = datetime.utcnow()
-			e.colour = discord.Colour.random()
-			await ctx.send(embed=e)
+			async with ctx.typing():
+				for i in db:
+					if type(db[i][1]) == int or type(db[i][1]) == float:
+						d[await self.bot.fetch_user(i)] = db[i][1]
+				sorted_dict = dict(
+					sorted(d.items(), key=lambda item: item[1], reverse=True))
+				for i in sorted_dict:
+					count += 1
+					if count > 10:
+						break
+					s += f"{L[count-1]} **{i}** - `{sorted_dict[i]:,}`\n"
+				e = discord.Embed(title=f"Global leaderboard", description=s)
+				e.timestamp = datetime.utcnow()
+				e.colour = discord.Colour.random()
+				await ctx.send(embed=e)
 
 		elif (term.lower() == "d" or term.lower() == "daily") and not glbal:
-			if not ctx.guild:
-				await ctx.send("This command is not available in DMs.")
-				
-				return
-			guild = ctx.guild
-			# with open('datafiles/daily.txt') as fle:
-				# streak = json.load(fle)
-			for member in guild.members:
-				mid = str(member.id)
-				if mid in db:
-					d[member] = db[mid][0]
-			sorted_dict = dict(
-				sorted(d.items(), key=lambda item: item[1], reverse=True))
-			for i in sorted_dict:
-				count += 1
-				s += f"{L[count-1]} **{i}** - `{sorted_dict[i]:,}`\n"
-			e = discord.Embed(
-				title=
-				f"Members with ~~no life~~ most dailies collected in {guild.name}",
-				description=s)
-			e.timestamp = datetime.utcnow()
-			e.colour = discord.Colour.random()
-			await ctx.send(embed=e)
+			async with ctx.typing():
+				if not ctx.guild:
+					await ctx.send("This command is not available in DMs.")
+					
+					return
+				guild = ctx.guild
+				# with open('datafiles/daily.txt') as fle:
+					# streak = json.load(fle)
+				for member in guild.members:
+					mid = str(member.id)
+					if mid in db:
+						d[member] = db[mid][0]
+				sorted_dict = dict(
+					sorted(d.items(), key=lambda item: item[1], reverse=True))
+				for i in sorted_dict:
+					count += 1
+					s += f"{L[count-1]} **{i}** - `{sorted_dict[i]:,}`\n"
+				e = discord.Embed(
+					title=
+					f"Members with ~~no life~~ most dailies collected in {guild.name}",
+					description=s)
+				e.timestamp = datetime.utcnow()
+				e.colour = discord.Colour.random()
+				await ctx.send(embed=e)
 		elif (term.lower() == "d" or term.lower()
 			== "daily") and (glbal.lower() == "g" or glbal.lower() == "global"):
-			for i in db:
-				if type(db[i][1]) == int or type(db[i][1]) == float:
-					d[i] = db[i][0]
-			sorted_dict = dict(
-				sorted(d.items(), key=lambda item: item[1], reverse=True))
-			for i in sorted_dict:
-				count += 1
-				if count > 10:
-					break
-				s += f"{L[count-1]} **<@!{i}>** - `{sorted_dict[i]:,}`\n"
-			e = discord.Embed(title=f"Global leaderboard for `{p}daily`",
-							description=s)
-			e.timestamp = datetime.utcnow()
-			e.colour = discord.Colour.random()
-			await ctx.send(embed=e)
-		
-
+			async with ctx.typing():
+				for i in db:
+					if type(db[i][1]) == int or type(db[i][1]) == float:
+						d[await self.bot.fetch_user(i)] = db[i][0]
+				sorted_dict = dict(
+					sorted(d.items(), key=lambda item: item[1], reverse=True))
+				for i in sorted_dict:
+					count += 1
+					if count > 10:
+						break
+					s += f"{L[count-1]} **{i}** - `{sorted_dict[i]:,}`\n"
+				e = discord.Embed(title=f"Global leaderboard for `{p}daily`",
+								description=s)
+				e.timestamp = datetime.utcnow()
+				e.colour = discord.Colour.random()
+				await ctx.send(embed=e)
 
 	@commands.command(pass_context=True)
 	@commands.cooldown(1, 23*60*60, commands.BucketType.user)
 	async def daily(self, ctx):
-		aid = str(ctx.message.author.id)
+		aid = str(ctx.author.id)
 		if aid not in db:
 			embed = discord.Embed(colour=discord.Colour.red(),
 								title="Error",
@@ -476,10 +649,10 @@ class Currency(commands.Cog):
 			await ctx.reply(embed=embed, mention_author=False)
 		else:
 			try:
-				db[str(ctx.author.id)][0] += 1
-				s = db[str(ctx.author.id)][0]
+				db[aid][0] += 1
+				s = db[aid][0]
 			except KeyError:
-				db[str(ctx.author.id)][0] = 0
+				db[aid][0] = 0
 				s = 0
 			# if str(ctx.author.id) in streak:
 			# 	s = streak[str(ctx.author.id)]
@@ -495,6 +668,16 @@ class Currency(commands.Cog):
 			# 	with open('datafiles/daily.txt', 'w') as fle3:
 			# 		json.dump(streak, fle3, indent=4)
 			# 	s = 0
+			if date.today() == date(2021, 10, 12):
+				e = discord.Embed(
+					description=f"Added 1,000,000,000 credits to bank.",
+					colour=discord.Colour.green(),
+					timestamp=datetime.utcnow())
+				e.set_author(name="Success!", icon_url=ctx.author.avatar_url)
+				e.set_footer(text=f"Daily streak of {s} days")
+				await ctx.reply(embed=e, mention_author=False)
+				db[aid][1] += 1000000000
+				return
 			if db[str(ctx.author.id)][0] == 70:
 				e1 = discord.Embed(
 					description="You will lose your 69 day streak, do you wish to continue?",
@@ -515,7 +698,6 @@ class Currency(commands.Cog):
 					pass
 				else:
 					db[str(ctx.author.id)][0] -= 1
-					
 					return
 			if db[str(ctx.author.id)][2]["daily"]:
 				e = discord.Embed(
@@ -648,15 +830,12 @@ class Currency(commands.Cog):
 	async def buy(self, ctx, item:str=None, amt:int=1):
 		if item is None:
 			await ctx.send("Congratulations! You just bought all the items from the shop!")
-			
 			return
 		if amt > 50:
 			await ctx.send("Whoa there, calm down! Don't buy the entire store sheesh")
-			
 			return
 		if amt < 1:
 			await ctx.send("-_-")
-			
 			return
 		if item in self.shop:
 			bal = db[str(ctx.author.id)][1]
@@ -679,14 +858,16 @@ class Currency(commands.Cog):
 					count += 1
 			if price > bal:
 				await ctx.send(f"You do not have sufficient funds to purchase that item, you can only buy {count-1} of those.")
-				
 				return
 			if bal < 0:
 				await ctx.send("You do not have sufficient funds to purchase that item.")
-				
+				return
+			if item == "daily" and db[str(ctx.author.id)][2]["daily"]:
+				await ctx.send("You already have purchased a daily, how much more money do you want?")
 				return
 			else:
 				e = discord.Embed(title="Confirmation", description = f"Are you sure you want to buy {amt} {item} for {price:,}?", timestamp = datetime.utcnow(), colour = discord.Colour.green())
+				e.set_footer(text=f"Your balance will be {bal:,}")
 			msg = await ctx.send(embed = e)
 			await msg.add_reaction("✅")
 			await msg.add_reaction("❎")
@@ -701,11 +882,7 @@ class Currency(commands.Cog):
 				if item == "supercharm":
 					db[str(ctx.author.id)][2]["supercharm"] += 3 * amt
 				elif item == "daily":
-					if not db[str(ctx.author.id)][2]["daily"]:
-						db[str(ctx.author.id)][2]["daily"] = True
-					else:
-						await ctx.send("You already have purchased a daily, how much more money do you want?")
-						db[str(ctx.author.id)][1] += price
+					db[str(ctx.author.id)][2]["daily"] = True
 				elif item == "charm":
 					db[str(ctx.author.id)][2]["charm"] += 5 * amt
 				await ctx.send(f"{item} purchased and in effect!")
@@ -713,7 +890,6 @@ class Currency(commands.Cog):
 				await ctx.send("Order cancelled")
 		else:
 			await ctx.send("That item code doesn't exist :/")
-			
 			return
 		
 
@@ -721,19 +897,15 @@ class Currency(commands.Cog):
 	async def sell(self, ctx, item:str=None, amt:int=1):
 		if item is None:
 			await ctx.send("Sold all of your items and your money")
-			
 			return
 		if item not in self.shop:
 			await ctx.send("Do I look like a scrap dealer that you can sell anything to")
-			
 			return
 		if amt > db[str(ctx.author.id)][2][item]:
 			await ctx.send("Why are you trying to sell more things than you have")
-			
 			return
 		if amt < 1:
 			await ctx.send("Either you're bug hunting or you're just plain stupid")
-			
 			return
 		e = discord.Embed(title="Confirmation", description = f"Are you sure you want to sell {amt} {item} for {(amt * self.shop[item]//50):,}?", timestamp = datetime.utcnow(), colour = discord.Colour.dark_gold())
 		msg = await ctx.send(embed = e)
@@ -763,33 +935,39 @@ class Currency(commands.Cog):
 			member = await self.bot.fetch_user(aid)
 		if member:
 			aid = str(member.id)
+			if aid not in db:
+				await ctx.send("That person doesn't even have an account, let alone items")
+				return
 			if db[aid][2]["daily"] == False and db[aid][2]["supercharm"] == 0 and db[aid][2]["charm"] == 0:
 				await ctx.send(f"{member.name} has no items in their inventory.")
-				
 				return
 			e = discord.Embed(colour=discord.Colour.random(), timestamp=datetime.utcnow())
 			if db[aid][2]["daily"]:
-				e.add_field(name="Daily", value=db[aid][2]["daily"], inline=True)
+				e.add_field(name="Daily bonus", value=db[aid][2]["daily"], inline=True)
 			if db[aid][2]["supercharm"]:
 				e.add_field(name="Supercharm", value=db[aid][2]["supercharm"], inline=True)
 			if db[aid][2]["charm"]:
 				e.add_field(name="Charm", value=db[aid][2]["charm"], inline=True)
 			e.set_author(name=f"{member.name}'s inventory", icon_url=member.avatar_url)
+			e.set_footer(text=f"Buy stuff from {p}shop")
 			await ctx.send(embed=e)
 		else:
 			aid = str(ctx.author.id)
+			if aid not in db:
+				await ctx.send("Make an account using `>>reg` first, then we'll talk about inventory")
+				return
 			if db[aid][2]["daily"] == False and db[aid][2]["supercharm"] == 0 and db[aid][2]["charm"] == 0:
 				await ctx.send(f"You have no items in your inventory. Go buy some from `{p}shop` smh")
-				
 				return
 			e = discord.Embed(colour=discord.Colour.random(), timestamp=datetime.utcnow())
 			if db[aid][2]["daily"]:
-				e.add_field(name="Daily", value="1", inline=True)
+				e.add_field(name="Daily bonus", value=db[aid][2]["daily"], inline=True)
 			if db[aid][2]["supercharm"]:
 				e.add_field(name="Supercharm", value=db[aid][2]["supercharm"], inline=True)
 			if db[aid][2]["charm"]:
 				e.add_field(name="Charm", value=db[aid][2]["charm"], inline=True)
 			e.set_author(name=f"{ctx.author.name}'s inventory", icon_url=ctx.author.avatar_url)
+			e.set_footer(text=f"Buy stuff from {p}shop")
 			await ctx.send(embed=e)
 
 def setup(bot):

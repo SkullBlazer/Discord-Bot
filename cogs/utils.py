@@ -5,6 +5,8 @@ import random
 from datetime import datetime
 from time import time, perf_counter
 from typing import Optional
+import contextlib
+import io
 from replit import db
 
 class Utilities(commands.Cog):
@@ -60,10 +62,11 @@ class Utilities(commands.Cog):
 				self.d_author = {}
 				self.d_content = {}
 
-
 	@commands.Cog.listener()
 	async def on_message_edit(self, message_before, message_after):
 		if not (message_before.author.bot):
+			if message_before.content != message_after.content:
+				await self.bot.process_commands(message_after)
 			self.e_author[message_before.channel.id] = message_before.author
 			self.e_content1[message_before.channel.id] = message_before.content
 			self.e_content2[message_after.channel.id] = message_after.content
@@ -163,7 +166,7 @@ class Utilities(commands.Cog):
 			`{p}register` \n > Register for a life of fun (and some ~~fake~~ dolla bills)\n \
 			`{p}daily` \n > Get that dough as you pass Go, every 23 hours (Hey that rhymed)\n \
 			`{p}balance [@person]` \n > Check how rich you are\n \
-			`{p}transfer <@person> <amount>` \n > Feeling like a Good Samaritan? Donate! (5% of the money transferred goes to ~~me~~ taxes)\n \
+			`{p}transfer <@person> [s|c] <amount>` \n > Feeling like a Good Samaritan? Donate! (5% of the money transferred goes to ~~me~~ taxes)\n \
 			`{p}save` \n > Save your progress \n \
 			`{p}rich` \n > See the richest people in the server (Don't ask how I got 100 decillion, 10^35 for the nerds out here)",
 				f"**Side note: Commands in `<brackets>` are required, commands in `[brackets]` are optional,\
@@ -609,8 +612,8 @@ class Utilities(commands.Cog):
 			e.add_field(name="Syntax", value=f"`{p}balance|bal [@user]`")
 		elif page == "transfer":
 			e = discord.Embed(title=f"Help on `{p}transfer`",
-							description="Transfer money to someone")
-			e.add_field(name="Syntax", value=f"`{p}transfer <@user> <amount>`")
+							description="Transfer money, charms, or supercharms to someone")
+			e.add_field(name="Syntax", value=f"`{p}transfer <@user> [s|c] <amount>`")
 		elif page == "save":
 			e = discord.Embed(title=f"Help on `{p}save`",
 							description="Save your progress")
@@ -618,7 +621,7 @@ class Utilities(commands.Cog):
 		elif page == "rich":
 			e = discord.Embed(title=f"Help on `{p}rich`",
 							description="See the richest people in the server")
-			e.add_field(name="Syntax", value=f"`{p}rich [d|g]`")
+			e.add_field(name="Syntax", value=f"`{p}rich [d|g|d g]`")
 		elif page == "poll":
 			e = discord.Embed(
 				title=f"Help on `{p}poll`",
@@ -743,9 +746,21 @@ class Utilities(commands.Cog):
 
 	@commands.command(name='eval')
 	@commands.check_any(commands.is_owner(), is_owner())#, is_mod())
-	async def _eval(self, ctx):
-		await ctx.message.add_reaction("👀")
-
+	async def _eval(self, ctx, *, code=None):
+		if code is None:
+			await ctx.message.add_reaction("👀")
+		else:
+			if code[:4] == "```py" and code[-3:] == "```":
+				code = code[4:-3]
+			elif code[:2] == "```" and code[-3:] == "```":
+				code = code[2:-3]
+			str_obj = io.StringIO() #Retrieves a stream of data
+			try:
+				with contextlib.redirect_stdout(str_obj):
+					exec(code)
+			except Exception as e:
+				return await ctx.send(f"```{e.__class__.__name__}: {e}```")
+			await ctx.send(f'```{str_obj.getvalue()}```')
 
 	# @self.bot.check
 	# async def check_bot(self, ctx):
@@ -762,7 +777,6 @@ class Utilities(commands.Cog):
 		]
 		choose = random.randint(0, 4)
 		await ctx.send(replies[choose])
-		
 
 
 	#	 gid = ctx.guild.id
@@ -801,7 +815,6 @@ class Utilities(commands.Cog):
 				embed = discord.Embed(colour = discord.Colour.red(), title = "Error",\
 									description = f"{role.name} does not exist. Do `{p}help colourchange` to see available colours")
 				await message.edit(embed=embed)
-				
 				return
 			elif role in member.roles:
 				if ctx.author == member:
@@ -906,8 +919,6 @@ class Utilities(commands.Cog):
 				await asyncio.sleep(2)
 				await message.delete()
 				await ctx.message.delete()
-		
-
 
 	# @colourchange.error
 	# async def cc_error(self, ctx, error):
@@ -928,8 +939,6 @@ class Utilities(commands.Cog):
 			timestamp=datetime.utcnow(),
 			color=0x00ebff)
 		await ctx.reply(embed=e, mention_author=False)
-		
-
 
 	@commands.command(aliases=['ui', 'uinfo'])
 	@commands.guild_only()
@@ -993,7 +1002,6 @@ class Utilities(commands.Cog):
 							value=user.premium_since.strftime(date_format),
 							inline=False)
 		await ctx.send(embed=embed)
-		
 
 
 	@commands.command(aliases=['si', 'sinfo'])
@@ -1035,8 +1043,6 @@ class Utilities(commands.Cog):
 		embed.add_field(name="Emojis", value=len(guild.emojis))
 		embed.set_footer(text='ID: ' + str(guild.id))
 		await ctx.send(embed=embed)
-		
-
 
 	@commands.command()
 	async def encrypt(self, ctx, *, s: str):
@@ -1071,8 +1077,6 @@ class Utilities(commands.Cog):
 			reaction, user = await self.bot.wait_for("reaction_add", check=check)
 			await message.delete()
 			await ctx.message.delete()
-		
-
 
 	@commands.command()
 	async def decrypt(self, ctx, *, s2: str):
@@ -1110,8 +1114,6 @@ class Utilities(commands.Cog):
 			reaction2, user2 = await self.bot.wait_for("reaction_add", check=check)
 			await message2.delete()
 			await ctx.message.delete()
-		
-
 
 	@commands.command(name="kick", pass_context=True)
 	@commands.guild_only()
@@ -1141,15 +1143,12 @@ class Utilities(commands.Cog):
 									colour = discord.Colour.dark_red(), timestamp=datetime.utcnow())
 			await ctx.reply(embed=e, mention_author=False)
 			await member.kick(reason=reason)
-		
-
 
 	@_kick.error
 	async def kick_error(self, ctx, error):
 		if isinstance(error, commands.MissingPermissions):
 			await ctx.reply("I'm sorry but peasants are not allowed to kick",
 							mention_author=False)
-
 
 	@commands.command(name="ban", pass_context=True)
 	@commands.guild_only()
@@ -1234,8 +1233,6 @@ class Utilities(commands.Cog):
 				await ctx.send(
 					"Dang what did you do to convince the supreme master not to ban you"
 				)
-		
-
 
 	@_ban.error
 	async def ban_error(self, ctx, error):
@@ -1416,8 +1413,6 @@ class Utilities(commands.Cog):
 			else:
 				await ctx.reply("Stalker mode is already True.",
 								mention_author=False)
-		
-
 
 	@commands.command()
 	async def snipe(self, ctx, cid: int = None):
@@ -1467,8 +1462,6 @@ class Utilities(commands.Cog):
 			await ctx.send(embed=em)
 		except KeyError:
 			await ctx.send(f"There are no recently deleted messages in <#{cid}>")
-		
-
 
 	@commands.command(aliases=['esnipe'])
 	async def editsnipe(self, ctx, cid: int = None):
@@ -1523,8 +1516,6 @@ class Utilities(commands.Cog):
 		await ctx.reply(("Bot has been alive ~~since the beginning of time~~ for " +
 					str(int(day)) + f" {dplur}, " + str(int(hour)) + f" {hplur}, " +
 					str(int(minute)) + f" {mplur} and %.2f {splur}" % second), mention_author=False)
-		
-
 
 	@commands.command(aliases=['pn'])
 	async def patchnotes(self, ctx):

@@ -354,13 +354,13 @@ class Fun(commands.Cog):
 				if guess > 250:
 					if count > 1:
 						await ctx.reply(
-							"I asked for a number between 1 and 250, not your mom's weight",
+							"Enter a number < 250",
 							mention_author=False)
 						continue
 				elif guess < 1:
 					if count > 1:
 						await ctx.reply(
-							"I asked for a number between 1 and 250, not your IQ",
+							"Enter a number > 1",
 							mention_author=False)
 						continue
 				elif (num - guess) == 1 or (guess - num) == 1:
@@ -742,7 +742,6 @@ class Fun(commands.Cog):
 					return
 			count -= 1
 
-
 	@commands.command()
 	@commands.cooldown(rate=1, per=5.0, type=commands.BucketType.user)
 	async def slots(self, ctx, amount: str = None):
@@ -758,12 +757,13 @@ class Fun(commands.Cog):
 		b = random.choice(emojis)
 		c = random.choice(emojis)
 		aid = str(ctx.author.id)
-		if amount is None:
+		if not amount:
 			await ctx.reply("You need to bet some money first",
 							mention_author=False)
 			self.gaem.remove(ctx.channel.id)
 			self.onmessage = True
 			return
+		amount = amount.replace(",", "")
 		if not amount.isdigit():
 			if amount[-1].lower() in ["k", "m", "b", "t", "q", "i"
 									] and amount[:-1].isdigit():

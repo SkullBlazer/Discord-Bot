@@ -613,7 +613,7 @@ class Actions(commands.Cog):
 				fle = discord.File("weather/haze.png", filename="image.png")
 			elif desc == "clear sky":
 				fle = discord.File("weather/sunny.png", filename="image.png")
-			elif desc == "light rain":
+			elif desc == "light rain" or desc == "light intensity drizzle":
 				fle = discord.File("weather/light_rain.png", filename="image.png")
 			elif desc == "moderate rain":
 				fle = discord.File("weather/heavy_rain.png", filename="image.png")
