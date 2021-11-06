@@ -24,7 +24,7 @@ class Actions(commands.Cog):
 		if choices is None:
 			await ctx.send(
 				"I choose the first option. Oh wait, there are no options.")
-		options = choices.split()
+		options = choices.split(",")
 		await ctx.reply(random.choice(options), mention_author=False)
 
 
@@ -122,23 +122,25 @@ class Actions(commands.Cog):
 		if f:
 			await asyncio.sleep(3)
 			msg = await ctx.send(
-				"```Click on 📎 for the link, or ❓ for explanation```")
+				"```Click on 📎 for the link, ❓ for explanation, or ❌ to cancel```")
 			await msg.add_reaction("📎")
 			await msg.add_reaction("❓")
+			await msg.add_reaction("❌")
 
 			def check(reaction, user):
-				return user == ctx.author and str(reaction.emoji) in ("📎", "❓")
+				return user == ctx.author and str(reaction.emoji) in ("📎", "❓", "❌")
 
 			try:
 				reaction, user = await self.bot.wait_for('reaction_add',
-													timeout=40,
+													timeout=20,
 													check=check)
-				if ctx.guild:
-					await msg.clear_reactions()
-				if reaction == "📎":
+				await msg.delete()
+				if str(reaction) == "📎":
 					await ctx.send(f"```{link}```")
-				else:
+				elif str(reaction) == "❓":
 					await ctx.send(xkcd.getComic(num).getExplanation())
+				else:
+					return
 			except asyncio.TimeoutError:
 				await msg.delete()
 

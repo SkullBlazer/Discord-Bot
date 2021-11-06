@@ -837,37 +837,42 @@ class Currency(commands.Cog):
 		if amt < 1:
 			await ctx.send("-_-")
 			return
-		if item in self.shop:
+		if item.lower() == "sc" or item.lower() == "s":
+			item = "supercharm"
+		if item.lower() == "c":
+			item = "charm"
+		if item.lower() in self.shop:
 			bal = db[str(ctx.author.id)][1]
+			bal2 = bal
 			price = 0
 			count = 0
 			for i in range(amt):
-				if price > bal:
+				if price > bal2:
 					break
-				if item == "supercharm":
-					if bal//200 >= 15000000000:
-						price += bal//200
-						bal -= bal//200
+				if item.lower() == "supercharm":
+					if bal2//200 >= 15000000000:
+						price += bal2//200
+						bal2 -= bal2//200
 						count += 1
 					else:
 						price += 15000000000
-						bal -= 15000000000
+						bal2 -= 15000000000
 						count += 1
 				else:
-					price += self.shop[item]
+					price += self.shop[item.lower()]
 					count += 1
-			if price > bal:
+			if price > bal2:
 				await ctx.send(f"You do not have sufficient funds to purchase that item, you can only buy {count-1} of those.")
 				return
-			if bal < 0:
+			if bal2 < 0:
 				await ctx.send("You do not have sufficient funds to purchase that item.")
 				return
-			if item == "daily" and db[str(ctx.author.id)][2]["daily"]:
+			if item.lower() == "daily" and db[str(ctx.author.id)][2]["daily"]:
 				await ctx.send("You already have purchased a daily, how much more money do you want?")
 				return
 			else:
 				e = discord.Embed(title="Confirmation", description = f"Are you sure you want to buy {amt} {item} for {price:,}?", timestamp = datetime.utcnow(), colour = discord.Colour.green())
-				e.set_footer(text=f"Your balance will be {bal:,}")
+				e.set_footer(text=f"Your balance will be {bal2:,}")
 			msg = await ctx.send(embed = e)
 			await msg.add_reaction("✅")
 			await msg.add_reaction("❎")
@@ -879,11 +884,11 @@ class Currency(commands.Cog):
 			await msg.clear_reactions()
 			if str(reaction.emoji) == "✅":
 				db[str(ctx.author.id)][1] -= price
-				if item == "supercharm":
+				if item.lower() == "supercharm":
 					db[str(ctx.author.id)][2]["supercharm"] += 3 * amt
-				elif item == "daily":
+				elif item.lower() == "daily":
 					db[str(ctx.author.id)][2]["daily"] = True
-				elif item == "charm":
+				elif item.lower() == "charm":
 					db[str(ctx.author.id)][2]["charm"] += 5 * amt
 				await ctx.send(f"{item} purchased and in effect!")
 			else:
@@ -898,16 +903,16 @@ class Currency(commands.Cog):
 		if item is None:
 			await ctx.send("Sold all of your items and your money")
 			return
-		if item not in self.shop:
+		if item.lower() not in self.shop:
 			await ctx.send("Do I look like a scrap dealer that you can sell anything to")
 			return
-		if amt > db[str(ctx.author.id)][2][item]:
+		if amt > db[str(ctx.author.id)][2][item.lower()]:
 			await ctx.send("Why are you trying to sell more things than you have")
 			return
 		if amt < 1:
 			await ctx.send("Either you're bug hunting or you're just plain stupid")
 			return
-		e = discord.Embed(title="Confirmation", description = f"Are you sure you want to sell {amt} {item} for {(amt * self.shop[item]//50):,}?", timestamp = datetime.utcnow(), colour = discord.Colour.dark_gold())
+		e = discord.Embed(title="Confirmation", description = f"Are you sure you want to sell {amt} {item} for {(amt * self.shop[item.lower()]//50):,}?", timestamp = datetime.utcnow(), colour = discord.Colour.dark_gold())
 		msg = await ctx.send(embed = e)
 		await msg.add_reaction("✅")
 		await msg.add_reaction("❎")
@@ -918,9 +923,9 @@ class Currency(commands.Cog):
 		reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=69)
 		await msg.clear_reactions()
 		if str(reaction.emoji) == "✅":
-			db[str(ctx.author.id)][2][item] -= amt
-			db[str(ctx.author.id)][1] += amt * self.shop[item]//50
-			await ctx.send(f"Sold {amt} {item} for {amt * self.shop[item]//50}")
+			db[str(ctx.author.id)][2][item.lower()] -= amt
+			db[str(ctx.author.id)][1] += amt * self.shop[item.lower()]//50
+			await ctx.send(f"Sold {amt} {item} for {amt * self.shop[item.lower()]//50}")
 		else:
 			await ctx.send("Selling cancelled")
 		

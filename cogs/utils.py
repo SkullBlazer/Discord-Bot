@@ -750,10 +750,10 @@ class Utilities(commands.Cog):
 		if code is None:
 			await ctx.message.add_reaction("👀")
 		else:
-			if code[:4] == "```py" and code[-3:] == "```":
-				code = code[4:-3]
-			elif code[:2] == "```" and code[-3:] == "```":
-				code = code[2:-3]
+			if code[:5] == "```py" and code[-3:] == "```":
+				code = code[5:-3]
+			elif code[:3] == "```" and code[-3:] == "```":
+				code = code[3:-3]
 			str_obj = io.StringIO() #Retrieves a stream of data
 			try:
 				with contextlib.redirect_stdout(str_obj):
@@ -1452,7 +1452,6 @@ class Utilities(commands.Cog):
 					em.set_author(name=self.d_content[cid]['name'])
 				em.set_footer(text=f"Author: {self.d_author[cid]}")
 				await ctx.send(embed=em)
-				
 				return
 			else:
 				em = discord.Embed(title=f"Last deleted image in {channel.name}")

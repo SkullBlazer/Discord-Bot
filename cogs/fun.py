@@ -565,7 +565,7 @@ class Fun(commands.Cog):
 				'Spider-Man: Into the Spider-Verse', 'The Dark Knight Rises', 'Avengers: Endgame',\
 				'American Beauty', 'Braveheart', 'Toy Story', 'Inglourious Basterds', 'Good Will Hunting',\
 				'2001: A Space Odyssey', 'Requiem for a Dream' 'Eternal Sunshine of the Spotless Mind',\
-				'Citizen Kane', 'Escape Room']
+				'Citizen Kane', 'Escape Room', 'No Time To Die']
 
 
 		wordmovies = ['Argo', 'Maleficent', 'Planes', 'Jumanji', 'Frozen', "Brave", 'Pinocchio','Gravity', 'Scream',\
@@ -786,19 +786,23 @@ class Fun(commands.Cog):
 								description="**3 in a row (Jackpot)**\n")
 	#🍇, 🍓, 🍒: 100,000 × <amount> \n🍎, 🍍, 🍉: 10,000 × <amount> \n🍊, 🍐: 1,000 × <amount> \n \n \
 	#**2 in a row:** \n2 × <amount>
-				e.add_field(name="🍇, 🍓, 🍒", value = "100,000 × <amount>")
+				e.add_field(name="🍇, 🍓, 🍒", value = "Reward: 100,000 × amount")
 				e.add_field(name="Probabilities", value="Normal: 0.1%\n With charm: 1.6%\n With supercharm: 2.6%", inline=True)
-				e.add_field(name="🍎, 🍍, 🍉", value = "10,000 × <amount>", inline=False)
+				e.add_field(name='\u200b', value='\u200b', inline=True)
+				e.add_field(name="🍎, 🍍, 🍉", value = "Reward: 10,000 × amount", inline=True)
 				e.add_field(name="Probabilities", value="Normal: 0.25%\n With charm: 1.75%\n With supercharm: 2.75%", inline=True)
-				e.add_field(name="🍊, 🍐", value = "1,000 × <amount>", inline=False)
+				e.add_field(name='\u200b', value='\u200b', inline=True)
+				e.add_field(name="🍊, 🍐", value = "Reward: 1,000 × amount", inline=True)
 				e.add_field(name="Probabilities", value="Normal: 0.5%\n With charm: 2%\n With supercharm: 3%", inline=True)
-				e.add_field(name="2 in a row", value = "100,000 × <amount>", inline=False)
+				e.add_field(name='\u200b', value='\u200b', inline=True)
+				e.add_field(name="2 in a row", value = "Reward: 2 × amount", inline=True)
 				e.add_field(name="Probabilities", value="Normal: 2%\n With charm: 8%\n With supercharm: 12%", inline=True)
+				e.add_field(name='\u200b', value='\u200b', inline=True)
 				e.colour = discord.Colour.random()
 				e.timestamp = datetime.utcnow()
 				e.set_footer(
 					text=
-					"All winnings listed here are before subtracting the amount bet"
+					"All winnings listed are before subtracting the amount bet"
 				)
 				await ctx.send(embed=e)
 				self.gaem.remove(ctx.channel.id)
@@ -836,7 +840,7 @@ class Fun(commands.Cog):
 		slotmachine = f"**{ctx.author.name}'s ~~gambling addiction~~ slots game** \n[ {a} {b} {c} ]"
 		msg = await ctx.send(slotmachine)
 		if db[str(ctx.author.id)][2]['supercharm']:
-			await ctx.send("Supercharm active")
+			await ctx.send(f"Supercharm active ({db[str(ctx.author.id)][2]['supercharm'] - 1} left)")
 			for i in range(4):
 				a = random.choice(emojis)
 				b = random.choice(emojis)
@@ -876,7 +880,7 @@ class Fun(commands.Cog):
 					await msg.edit(content=slotmachine)
 			db[str(ctx.author.id)][2]['supercharm'] -= 1
 		elif db[str(ctx.author.id)][2]['charm']:
-			await ctx.send("Charm active")
+			await ctx.send(f"Charm active ({db[str(ctx.author.id)][2]['charm'] - 1} left)")
 			for i in range(4):
 				a = random.choice(emojis)
 				b = random.choice(emojis)
