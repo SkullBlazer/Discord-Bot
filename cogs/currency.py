@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+import asyncio
 from datetime import datetime, date
 from typing import Optional
 from replit import db
@@ -198,7 +199,7 @@ class Currency(commands.Cog):
 								mention_author=False)
 				return
 			await ctx.send("Operator and amount")
-			mesg = await self.bot.wait_for("message", check=check)
+			mesg = await self.bot.wait_for("message", check=check, timeout=20)
 			emojis = ["✅", "❎"]
 			amt = str(mesg.content)
 			amt = amt.replace(",", "")
@@ -263,7 +264,7 @@ class Currency(commands.Cog):
 								mention_author=False)
 				return
 			await ctx.send("Operator and amount")
-			mesg = await self.bot.wait_for("message", check=check)
+			mesg = await self.bot.wait_for("message", check=check, timeout=30)
 			emojis = ["✅", "❎"]
 			amt = str(mesg.content)
 			amt = amt.replace(",", "")
@@ -327,7 +328,7 @@ class Currency(commands.Cog):
 				reaction.emoji
 			) in emojis and user == ctx.author and reaction.message == msg
 
-		reaction, user = await self.bot.wait_for('reaction_add', check=check2)
+		reaction, user = await self.bot.wait_for('reaction_add', check=check2, timeout=30)
 		await msg.delete()
 		if str(reaction.emoji) == "✅":
 			if amt[0] == "+":
@@ -451,7 +452,7 @@ class Currency(commands.Cog):
 							reaction.emoji
 						) in emojis and user == ctx.author and reaction.message == msg
 
-					reaction, user = await self.bot.wait_for('reaction_add', check=check2)
+					reaction, user = await self.bot.wait_for('reaction_add', check=check2, timeout=30)
 					await msg.delete()
 
 					if str(reaction) == "✅":
@@ -511,7 +512,7 @@ class Currency(commands.Cog):
 							reaction.emoji
 						) in emojis and user == ctx.author and reaction.message == msg
 
-					reaction, user = await self.bot.wait_for('reaction_add', check=check2)
+					reaction, user = await self.bot.wait_for('reaction_add', check=check2, timeout=30)
 					await msg.delete()
 
 					if str(reaction) == "✅":
@@ -590,6 +591,7 @@ class Currency(commands.Cog):
 					s += f"{L[count-1]} **{i}** - `{sorted_dict[i]:,}`\n"
 				e = discord.Embed(title=f"Global leaderboard", description=s)
 				e.timestamp = datetime.utcnow()
+				e.set_footer(text="Oh Mars is first? Who woulda expected that")
 				e.colour = discord.Colour.random()
 				await ctx.send(embed=e)
 
@@ -692,13 +694,16 @@ class Currency(commands.Cog):
 					return str(reaction.emoji) in [
 					"✅", "❎"
 				] and user == ctx.author and reaction.message == msg
-				reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=69)
-				await msg.delete()
-				if str(reaction.emoji) == "✅":
-					pass
-				else:
-					db[str(ctx.author.id)][0] -= 1
-					return
+				try:
+					reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=69)
+					await msg.delete()
+					if str(reaction.emoji) == "✅":
+						pass
+					else:
+						db[str(ctx.author.id)][0] -= 1
+						return
+				except asyncio.TimeoutError:
+					await ctx.reply("Easter egg heheh", mention_author=False)
 			if db[str(ctx.author.id)][2]["daily"]:
 				e = discord.Embed(
 					description=f"Added {10000+(1750*s):,} credits to bank.",
@@ -804,7 +809,10 @@ class Currency(commands.Cog):
 		else:
 			p = ">>"
 		if page == "1":
-			e = discord.Embed(title=f"Balance: ||{db[str(ctx.author.id)][1]:,}||", colour=discord.Colour.purple(), timestamp = datetime.utcnow())
+			if str(ctx.author.id) != "348257666193293314":
+				e = discord.Embed(title=f"Balance: ||{db[str(ctx.author.id)][1]:,}||", colour=discord.Colour.purple(), timestamp = datetime.utcnow())
+			else:
+				e = discord.Embed(title=f"Balance: A lot.", colour=discord.Colour.purple(), timestamp = datetime.utcnow())
 			e.add_field(name="Extra daily coins (`daily`)", value="Cost - 1,000,000,000 coins", inline=True)
 			e.add_field(name=f"Lucky charm for `{p}slots` (`charm`)", value="Cost - 25,000,000 coins", inline=True)
 			e.add_field(name=f"Super lucky charm for `{p}slots` (`supercharm`)", value="Cost - 0.5% of your balance or 15,000,000,000", inline=True)
@@ -814,13 +822,12 @@ class Currency(commands.Cog):
 			if page == "daily":
 				e.description = f"Increases your amount gained in `{p}daily` by a substantial amount. Lasts forever."
 			elif page == "supercharm":
-				e.description = f"Increases your chances of winning in `{p}slots` by 2.5% for 3 fruits, and 10% for 2, for 3 games"
+				e.description = f"Increases your chances of winning in `{p}slots` by 2.75% for 3 fruits, and 13% for 2 fruits, for 3 games"
 			elif page == "charm":
-				e.description = f"Increases your chances of winning in `{p}slots` by 1.5% for 3 fruits, and 6% for 2, for 5 games"
+				e.description = f"Increases your chances of winning in `{p}slots` by 1.25% for 3 fruits, and 5.5% for 2 fruits, for 5 games"
 			e.set_footer(text=f"Price: {self.shop[page]:,}")
 		else:
 			await ctx.send("That's not a valid item")
-			
 			return
 		e.set_author(name="Shop", icon_url=ctx.author.avatar_url)
 		await ctx.send(embed=e)
@@ -830,6 +837,9 @@ class Currency(commands.Cog):
 	async def buy(self, ctx, item:str=None, amt:int=1):
 		if item is None:
 			await ctx.send("Congratulations! You just bought all the items from the shop!")
+			return
+		if item.startswith("<@") and item[-1] == ">":
+			await ctx.send("Wh- why would you wanna buy a person?")
 			return
 		if amt > 50:
 			await ctx.send("Whoa there, calm down! Don't buy the entire store sheesh")
@@ -846,6 +856,8 @@ class Currency(commands.Cog):
 			bal2 = bal
 			price = 0
 			count = 0
+			if item.lower() != "supercharm":
+				bal2 -= amt*self.shop[item.lower()]
 			for i in range(amt):
 				if price > bal2:
 					break
@@ -880,19 +892,22 @@ class Currency(commands.Cog):
 				return str(reaction.emoji) in [
 				"✅", "❎"
 			] and user == ctx.author and reaction.message == msg
-			reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=69)
-			await msg.clear_reactions()
-			if str(reaction.emoji) == "✅":
-				db[str(ctx.author.id)][1] -= price
-				if item.lower() == "supercharm":
-					db[str(ctx.author.id)][2]["supercharm"] += 3 * amt
-				elif item.lower() == "daily":
-					db[str(ctx.author.id)][2]["daily"] = True
-				elif item.lower() == "charm":
-					db[str(ctx.author.id)][2]["charm"] += 5 * amt
-				await ctx.send(f"{item} purchased and in effect!")
-			else:
-				await ctx.send("Order cancelled")
+			try:
+				reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=69)
+				await msg.clear_reactions()
+				if str(reaction.emoji) == "✅":
+					db[str(ctx.author.id)][1] -= price
+					if item.lower() == "supercharm":
+						db[str(ctx.author.id)][2]["supercharm"] += 3 * amt
+					elif item.lower() == "daily":
+						db[str(ctx.author.id)][2]["daily"] = True
+					elif item.lower() == "charm":
+						db[str(ctx.author.id)][2]["charm"] += 5 * amt
+					await ctx.send(f"{item} purchased and in effect!")
+				else:
+					await ctx.send("Order cancelled")
+			except asyncio.TimeoutError:
+				await ctx.reply("I'm cancelling the deal, I've got other customers waiting.", mention_author=False)
 		else:
 			await ctx.send("That item code doesn't exist :/")
 			return
@@ -920,15 +935,17 @@ class Currency(commands.Cog):
 			return str(reaction.emoji) in [
 			"✅", "❎"
 		] and user == ctx.author and reaction.message == msg
-		reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=69)
-		await msg.clear_reactions()
-		if str(reaction.emoji) == "✅":
-			db[str(ctx.author.id)][2][item.lower()] -= amt
-			db[str(ctx.author.id)][1] += amt * self.shop[item.lower()]//50
-			await ctx.send(f"Sold {amt} {item} for {amt * self.shop[item.lower()]//50}")
-		else:
-			await ctx.send("Selling cancelled")
-		
+		try:
+			reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=69)
+			await msg.clear_reactions()
+			if str(reaction.emoji) == "✅":
+				db[str(ctx.author.id)][2][item.lower()] -= amt
+				db[str(ctx.author.id)][1] += amt * self.shop[item.lower()]//50
+				await ctx.send(f"Sold {amt} {item} for {amt * self.shop[item.lower()]//50}")
+			else:
+				await ctx.send("Selling cancelled")
+		except asyncio.TimeoutError:
+				await ctx.reply(f"If you're too attached to your {item}s, you could just say so. Why waste my time?", mention_author=False)
 
 	@commands.command(aliases=['inv'])
 	async def inventory(self, ctx, member: Optional[discord.Member], aid:int = None):

@@ -1074,9 +1074,12 @@ class Utilities(commands.Cog):
 				return user == ctx.author and str(
 					reaction.emoji) == "🗑️" and reaction.message == message
 
-			reaction, user = await self.bot.wait_for("reaction_add", check=check)
-			await message.delete()
-			await ctx.message.delete()
+			try:
+				reaction, user = await self.bot.wait_for("reaction_add", check=check,timeout=30)
+				await message.delete()
+				await ctx.message.delete()
+			except asyncio.TimeoutError:
+				await ctx.message.delete()
 
 	@commands.command()
 	async def decrypt(self, ctx, *, s2: str):
@@ -1111,9 +1114,12 @@ class Utilities(commands.Cog):
 				return user == ctx.author and str(
 					reaction.emoji) == "🗑️" and reaction.message == message2
 
-			reaction2, user2 = await self.bot.wait_for("reaction_add", check=check)
-			await message2.delete()
-			await ctx.message.delete()
+			try:
+				reaction2, user2 = await self.bot.wait_for("reaction_add", check=check,timeout=30)
+				await message2.delete()
+				await ctx.message.delete()
+			except asyncio.TimeoutError:
+				await ctx.message.delete()
 
 	@commands.command(name="kick", pass_context=True)
 	@commands.guild_only()
@@ -1189,16 +1195,19 @@ class Utilities(commands.Cog):
 					reaction.emoji
 				) in emojis and user == ctx.author and reaction.message == msg
 
-			reaction, user = await self.bot.wait_for('reaction_add', check=check2)
+			try:
+				reaction, user = await self.bot.wait_for('reaction_add', check=check2, timeout=30)
 
-			await msg.delete()
-			if str(reaction) == "✅":
-				e = discord.Embed(title=f"{member} has been banned", description = f"{ctx.author.mention} banned {member} for the following reason: ```{reason}```",\
-							colour = discord.Colour.dark_red(), timestamp=datetime.utcnow())
-				await member.ban(reason=reason)
-				await ctx.reply(embed=e)
-			else:
-				await ctx.reply("Hmmmmm seems sus", mention_author=False)
+				await msg.delete()
+				if str(reaction) == "✅":
+					e = discord.Embed(title=f"{member} has been banned", description = f"{ctx.author.mention} banned {member} for the following reason: ```{reason}```",\
+								colour = discord.Colour.dark_red(), timestamp=datetime.utcnow())
+					await member.ban(reason=reason)
+					await ctx.reply(embed=e)
+				else:
+					await ctx.reply("Hmmmmm seems sus", mention_author=False)
+			except asyncio.TimeoutError:
+				await ctx.reply("You're taking so long, kinda tempted to ban YOU", mention_author=False)
 		else:
 			emojis = ["✅", "❎"]
 			e = discord.Embed(title="Ban confirmation", description = f"Are you sure you want to ban {member.mention}?",\
@@ -1212,27 +1221,30 @@ class Utilities(commands.Cog):
 					reaction.emoji
 				) in emojis and user == ctx.author and reaction.message == msg
 
-			reaction, user = await self.bot.wait_for('reaction_add', check=check2)
+			try:
+				reaction, user = await self.bot.wait_for('reaction_add', check=check2, timeout=30)
 
-			await msg.delete()
-			if str(reaction.emoji) == "✅":
-				if str(member) == "SkullBlazer#9339":
-					await ctx.reply("Bro what are you doing", mention_author=False)
-				elif str(member) == "SlaveBot#1382":
-					await ctx.reply(
-						"Hah I cannot be banned, even by the master himself",
-						mention_author=False)
-					
-					return
+				await msg.delete()
+				if str(reaction.emoji) == "✅":
+					if str(member) == "SkullBlazer#9339":
+						await ctx.reply("Bro what are you doing", mention_author=False)
+					elif str(member) == "SlaveBot#1382":
+						await ctx.reply(
+							"Hah I cannot be banned, even by the master himself",
+							mention_author=False)
+						
+						return
+					else:
+						e = discord.Embed(title=f"{member} has been banned", description = f"The master himself has struck the banhammer on {member} due to the following reason:```{reason}```",\
+										colour = discord.Colour.dark_red(), timestamp=datetime.utcnow())
+						await member.ban(reason=reason)
+						await ctx.reply(embed=e)
 				else:
-					e = discord.Embed(title=f"{member} has been banned", description = f"The master himself has struck the banhammer on {member} due to the following reason:```{reason}```",\
-									colour = discord.Colour.dark_red(), timestamp=datetime.utcnow())
-					await member.ban(reason=reason)
-					await ctx.reply(embed=e)
-			else:
-				await ctx.send(
-					"Dang what did you do to convince the supreme master not to ban you"
-				)
+					await ctx.send(
+						"Dang what did you do to convince the supreme master not to ban you"
+					)
+			except asyncio.TimeoutError:
+				await ctx.reply("You're taking so long, kinda tempted to ban YOU", mention_author=False)
 
 	@_ban.error
 	async def ban_error(self, ctx, error):
@@ -1365,13 +1377,16 @@ class Utilities(commands.Cog):
 						reaction.emoji
 					) in emojis and user == ctx.author and reaction.message == msg
 
-				reaction, user = await self.bot.wait_for('reaction_add', check=check2)
+				try:
+					reaction, user = await self.bot.wait_for('reaction_add', check=check2, timeout=30)
 
-				await msg.clear_reactions()
-				if str(reaction) == "✅":
-					db[str(ctx.guild.id)][1] = prefx
-					await ctx.reply(f"Prefix changed to {prefx}",
-									mention_author=False)
+					await msg.clear_reactions()
+					if str(reaction) == "✅":
+						db[str(ctx.guild.id)][1] = prefx
+						await ctx.reply(f"Prefix changed to {prefx}",
+										mention_author=False)
+				except asyncio.TimeoutError:
+					await ctx.reply("Time's up, I got bored so now the new prefix is askdmkmlksdfsfnkjlsldkfmaksdaoewqejd", mention_author=False)
 			else:
 				db[str(ctx.guild.id)][1] = prefx
 				await ctx.reply(f"Prefix changed to {prefx}", mention_author=False)
@@ -1512,9 +1527,10 @@ class Utilities(commands.Cog):
 			mplur = "minute"
 		if float(second) == 1.0:
 			splur = "second"
-		await ctx.reply(("Bot has been alive ~~since the beginning of time~~ for " +
+		e = discord.Embed(title="Uptime", description=("Bot has been alive ~~since the beginning of time~~ for " +
 					str(int(day)) + f" {dplur}, " + str(int(hour)) + f" {hplur}, " +
-					str(int(minute)) + f" {mplur} and %.2f {splur}" % second), mention_author=False)
+					str(int(minute)) + f" {mplur} and %.2f {splur}" % second))
+		await ctx.reply(embed=e, mention_author=False)
 
 	@commands.command(aliases=['pn'])
 	async def patchnotes(self, ctx):

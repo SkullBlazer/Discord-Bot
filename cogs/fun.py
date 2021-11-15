@@ -50,120 +50,122 @@ class Fun(commands.Cog):
 					"✅", "❎"
 				] and user == member and reaction.message == msg
 
-			reaction, user = await self.bot.wait_for('reaction_add', check=check)
-			await msg.delete()
-			if reaction.emoji == "✅":
-				await ctx.send("Check DMs")
-				c1 = await ctx.author.create_dm()
-				c2 = await member.create_dm()
-				m1 = await c1.send(
-					"Select 🪨 for rock, 📄 for paper, or ✂️ for scissors")
-				m2 = await c2.send(
-					"Select 🪨 for rock, 📄 for paper, or ✂️ for scissors")
-				await m1.add_reaction("🪨")
-				await m2.add_reaction("🪨")
-				await m1.add_reaction("📄")
-				await m2.add_reaction("📄")
-				await m1.add_reaction("✂️")
-				await m2.add_reaction("✂️")
+			try:
+				reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=30)
+				await msg.delete()
+				if reaction.emoji == "✅":
+					await ctx.send("Check DMs")
+					c1 = await ctx.author.create_dm()
+					c2 = await member.create_dm()
+					m1 = await c1.send(
+						"Select 🪨 for rock, 📄 for paper, or ✂️ for scissors")
+					m2 = await c2.send(
+						"Select 🪨 for rock, 📄 for paper, or ✂️ for scissors")
+					await m1.add_reaction("🪨")
+					await m2.add_reaction("🪨")
+					await m1.add_reaction("📄")
+					await m2.add_reaction("📄")
+					await m1.add_reaction("✂️")
+					await m2.add_reaction("✂️")
 
-				def check1(reaction, user):
-					return str(reaction.emoji) in [
-						"🪨", "📄", "✂️"
-					] and (reaction.message in [m1, m2])
+					def check1(reaction, user):
+						return str(reaction.emoji) in [
+							"🪨", "📄", "✂️"
+						] and (reaction.message in [m1, m2])
 
-				def check2(reaction, user):
-					if reaction1.message == m1:
-						m = m2
-					else:
-						m = m1
-					return str(reaction.emoji) in ["🪨", "📄", "✂️"
-												] and (reaction.message == m)
+					def check2(reaction, user):
+						if reaction1.message == m1:
+							m = m2
+						else:
+							m = m1
+						return str(reaction.emoji) in ["🪨", "📄", "✂️"
+													] and (reaction.message == m)
 
-				try:
-					reaction1, user1 = await self.bot.wait_for('reaction_add',
-														check=check1,
-														timeout=30)
-					reaction2, user2 = await self.bot.wait_for('reaction_add',
-														check=check2,
-														timeout=30)
-					if user1 == member:
-						reaction1, reaction2 = reaction2, reaction1
-						c1, c2 = c2, c1
-					if str(reaction1.emoji) == str(reaction2.emoji):
-						w = 0
-					elif str(reaction1.emoji) == "🪨" and str(
-						reaction2.emoji) == "📄":
-						w = c2
-						l = c1
-					elif str(reaction1.emoji) == "🪨" and str(
-						reaction2.emoji) == "✂️":
-						w = c1
-						l = c2
-					elif str(reaction1.emoji) == "📄" and str(
-						reaction2.emoji) == "🪨":
-						w = c1
-						l = c2
-					elif str(reaction1.emoji) == "📄" and str(
-						reaction2.emoji) == "✂️":
-						w = c2
-						l = c1
-					elif str(reaction1.emoji) == "✂️" and str(
-						reaction2.emoji) == "🪨":
-						w = c2
-						l = c1
-					elif str(reaction1.emoji) == "✂️" and str(
-						reaction2.emoji) == "📄":
-						w = c1
-						l = c2
-					else:
-						await ctx.send(reaction1.emoji)
-						await ctx.send(reaction2.emoji)
-					if w == c1:
-						await c1.send(f"You won! {member.name} picked {reaction2}!"
-									)
-						await c2.send(
-							f"You lose. {ctx.author.name} picked {reaction1}")
-						l = [
-							f"Game ended. {ctx.author.name} won",
-							f"Game ended. {ctx.author.name} won and gets to keep {member.name}'s kidneys",
-							f"Game ended. {ctx.author.name} won and has the right to own {member.name}'s soul"
-						]
-						await ctx.send(random.choice(l))
-					elif w == c2:
-						await c2.send(
-							f"You won! {ctx.author.name} picked {reaction1}!")
-						await c1.send(f"You lose. {member.name} picked {reaction2}"
-									)
-						l = [
-							f"Game ended. {member.name} won",
-							f"Game ended. {member.name} won and gets to keep {ctx.author.name}'s kidneys",
-							f"Game ended. {member.name} won and has the right to own{ctx.author.name}'s soul"
-						]
-						await ctx.send(random.choice(l))
-					else:
-						await c1.send(f"Both picked {reaction1}, it's a tie!")
-						await c2.send(f"Both picked {reaction2}, it's a tie!")
-						l = [
-							f"Game ended. It was a tie",
-							f"Game ended. I get to keep both of your kidneys.",
-							f"Game ended. Wasted so much time for it to be a tie."
-						]
-						await ctx.send(random.choice(l))
-					self.onmessage = True
-				except asyncio.TimeoutError:
-					await m1.delete()
-					await m2.delete()
+					try:
+						reaction1, user1 = await self.bot.wait_for('reaction_add',
+															check=check1,
+															timeout=30)
+						reaction2, user2 = await self.bot.wait_for('reaction_add',
+															check=check2,
+															timeout=30)
+						if user1 == member:
+							reaction1, reaction2 = reaction2, reaction1
+							c1, c2 = c2, c1
+						if str(reaction1.emoji) == str(reaction2.emoji):
+							w = 0
+						elif str(reaction1.emoji) == "🪨" and str(
+							reaction2.emoji) == "📄":
+							w = c2
+							l = c1
+						elif str(reaction1.emoji) == "🪨" and str(
+							reaction2.emoji) == "✂️":
+							w = c1
+							l = c2
+						elif str(reaction1.emoji) == "📄" and str(
+							reaction2.emoji) == "🪨":
+							w = c1
+							l = c2
+						elif str(reaction1.emoji) == "📄" and str(
+							reaction2.emoji) == "✂️":
+							w = c2
+							l = c1
+						elif str(reaction1.emoji) == "✂️" and str(
+							reaction2.emoji) == "🪨":
+							w = c2
+							l = c1
+						elif str(reaction1.emoji) == "✂️" and str(
+							reaction2.emoji) == "📄":
+							w = c1
+							l = c2
+						else:
+							await ctx.send(reaction1.emoji)
+							await ctx.send(reaction2.emoji)
+						if w == c1:
+							await c1.send(f"You won! {member.name} picked {reaction2}!"
+										)
+							await c2.send(
+								f"You lose. {ctx.author.name} picked {reaction1}")
+							l = [
+								f"Game ended. {ctx.author.name} won",
+								f"Game ended. {ctx.author.name} won and gets to keep {member.name}'s kidneys",
+								f"Game ended. {ctx.author.name} won and has the right to own {member.name}'s soul"
+							]
+							await ctx.send(random.choice(l))
+						elif w == c2:
+							await c2.send(
+								f"You won! {ctx.author.name} picked {reaction1}!")
+							await c1.send(f"You lose. {member.name} picked {reaction2}"
+										)
+							l = [
+								f"Game ended. {member.name} won",
+								f"Game ended. {member.name} won and gets to keep {ctx.author.name}'s kidneys",
+								f"Game ended. {member.name} won and has the right to own{ctx.author.name}'s soul"
+							]
+							await ctx.send(random.choice(l))
+						else:
+							await c1.send(f"Both picked {reaction1}, it's a tie!")
+							await c2.send(f"Both picked {reaction2}, it's a tie!")
+							l = [
+								f"Game ended. It was a tie",
+								f"Game ended. I get to keep both of your kidneys.",
+								f"Game ended. Wasted so much time for it to be a tie."
+							]
+							await ctx.send(random.choice(l))
+						self.onmessage = True
+					except asyncio.TimeoutError:
+						await m1.delete()
+						await m2.delete()
+						await ctx.send(
+							"Someone didn't respond, and my master doesn't know how to check who was it, so you two figure it out amongst yourselves"
+						)
+						self.onmessage = True
+				else:
 					await ctx.send(
-						"Someone didn't respond, and my master doesn't know how to check who was it, so you two figure it out amongst yourselves"
+						f"oof looks like {member.name} is either busy or hates your guts. No other reason to reject a simple game of rock, paper, scissors"
 					)
 					self.onmessage = True
-			else:
-				await ctx.send(
-					f"oof looks like {member.name} is either busy or hates your guts. No other reason to reject a simple game of rock, paper, scissors"
-				)
-				self.onmessage = True
-
+			except asyncio.TimeoutError:
+				await ctx.reply(f"oof looks like {member.name} can't be bothered with such peasant things", mention_author=False)
 		else:
 			if ctx.channel.id in self.gaem:
 				await ctx.send(
@@ -245,7 +247,7 @@ class Fun(commands.Cog):
 		ship_col = random_col(board)
 		while turn < 8:
 			try:
-				message = await self.bot.wait_for('message', check=check, timeout=60.0)
+				message = await self.bot.wait_for('message', check=check, timeout=30.0)
 				if str(message.content) == "end":
 					await ctx.send("wimp")
 					await ctx.send(f"My ship was at ({ship_col+1},{ship_row+1})")
@@ -330,7 +332,7 @@ class Fun(commands.Cog):
 
 		while count > 0:
 			try:
-				message = await self.bot.wait_for('message', check=check, timeout=60.0)
+				message = await self.bot.wait_for('message', check=check, timeout=30.0)
 				if str(message.content) == "end":
 					await ctx.send("wimp")
 					await ctx.send(f"Number was {num}")
@@ -596,7 +598,7 @@ class Fun(commands.Cog):
 		) == "films" or topic.lower() == "m":
 			word = random.choice(movies).lower()
 		elif topic.lower() == "onewordmovie" or topic.lower(
-		) == "onewordmovies" or topic.lower() == "owm":
+		) == "onewordmovies" or topic.lower() == "owm" or topic.lower() == "o":
 			word = random.choice(wordmovies).lower()
 		elif topic.lower() == "pokemon" or topic.lower(
 		) == "pokémon" or topic.lower() == "p":
@@ -656,7 +658,7 @@ class Fun(commands.Cog):
 				second += 1
 
 			try:
-				msg = await self.bot.wait_for('message', check=check, timeout=60.0)
+				msg = await self.bot.wait_for('message', check=check, timeout=30.0)
 				guess = str(msg.content).lower()
 				if guess == 'end':
 					await ctx.send("You quit :clown:")
@@ -787,16 +789,16 @@ class Fun(commands.Cog):
 	#🍇, 🍓, 🍒: 100,000 × <amount> \n🍎, 🍍, 🍉: 10,000 × <amount> \n🍊, 🍐: 1,000 × <amount> \n \n \
 	#**2 in a row:** \n2 × <amount>
 				e.add_field(name="🍇, 🍓, 🍒", value = "Reward: 100,000 × amount")
-				e.add_field(name="Probabilities", value="Normal: 0.1%\n With charm: 1.6%\n With supercharm: 2.6%", inline=True)
+				e.add_field(name="Probabilities", value="Normal: 0.1%\n With charm: 1.35%\n With supercharm: 2.85%", inline=True)
 				e.add_field(name='\u200b', value='\u200b', inline=True)
 				e.add_field(name="🍎, 🍍, 🍉", value = "Reward: 10,000 × amount", inline=True)
-				e.add_field(name="Probabilities", value="Normal: 0.25%\n With charm: 1.75%\n With supercharm: 2.75%", inline=True)
+				e.add_field(name="Probabilities", value="Normal: 0.25%\n With charm: 1.5%\n With supercharm: 3%", inline=True)
 				e.add_field(name='\u200b', value='\u200b', inline=True)
 				e.add_field(name="🍊, 🍐", value = "Reward: 1,000 × amount", inline=True)
-				e.add_field(name="Probabilities", value="Normal: 0.5%\n With charm: 2%\n With supercharm: 3%", inline=True)
+				e.add_field(name="Probabilities", value="Normal: 0.5%\n With charm: 1.75%\n With supercharm: 3.25%", inline=True)
 				e.add_field(name='\u200b', value='\u200b', inline=True)
 				e.add_field(name="2 in a row", value = "Reward: 2 × amount", inline=True)
-				e.add_field(name="Probabilities", value="Normal: 2%\n With charm: 8%\n With supercharm: 12%", inline=True)
+				e.add_field(name="Probabilities", value="Normal: 2%\n With charm: 7.5%\n With supercharm: 15%", inline=True)
 				e.add_field(name='\u200b', value='\u200b', inline=True)
 				e.colour = discord.Colour.random()
 				e.timestamp = datetime.utcnow()
@@ -850,31 +852,25 @@ class Fun(commands.Cog):
 				await msg.edit(content=slotmachine)
 				if i == 3:
 					hax = random.randint(1, 10000)
-					if hax in ([x for x in range(1,301)]):
+					if hax in ([x for x in range(1,326)]):
 						fruits = ["🍊", "🍐"]
 						a = random.choice(fruits)
 						a = b = c
-					elif hax in ([x for x in range(350, 625)]):
+					elif hax in ([x for x in range(350, 651)]):
 						fruits = ["🍎", "🍍", "🍉"]
 						a = random.choice(fruits)
 						a = b = c
-					elif hax in ([x for x in range(650, 910)]):
+					elif hax in ([x for x in range(700, 986)]):
 						fruits = ["🍇", '🍓', "🍒"]
 						a = random.choice(fruits)
 						a = b = c
-					elif hax in ([x for x in range(1000, 2200)]):
+					elif hax in ([x for x in range(1000, 2501)]):
 						if a != b:
 							a = b
-							if b == c:
-								c = random.choice(emojis)
 						elif b != c:
 							b = c
-							if a == c:
-								a = random.choice(emojis)
 						elif c != a:
 							a = c
-							if b == c:
-								b = random.choice(emojis)
 					await asyncio.sleep(1.1)
 					slotmachine = f"**{ctx.author.name}'s ~~gambling addiction~~ slots game** \n[ {a} {b} {c} ]"
 					await msg.edit(content=slotmachine)
@@ -890,19 +886,19 @@ class Fun(commands.Cog):
 				await msg.edit(content=slotmachine)
 				if i == 3:
 					hax = random.randint(1, 10000)
-					if hax in ([x for x in range(1,201)]):
+					if hax in ([x for x in range(1,176)]):
 						fruits = ["🍊", "🍐"]
 						a = random.choice(fruits)
 						a = b = c
-					elif hax in ([x for x in range(250, 425)]):
+					elif hax in ([x for x in range(200, 351)]):
 						fruits = ["🍎", "🍍", "🍉"]
 						a = random.choice(fruits)
 						a = b = c
-					elif hax in ([x for x in range(450, 610)]):
+					elif hax in ([x for x in range(400, 536)]):
 						fruits = ["🍇", '🍓', "🍒"]
 						a = random.choice(fruits)
 						a = b = c
-					elif hax in ([x for x in range(700, 1500)]):
+					elif hax in ([x for x in range(550, 1301)]):
 						if a != b:
 							a = b
 							if b == c:
@@ -933,15 +929,15 @@ class Fun(commands.Cog):
 						fruits = ["🍊", "🍐"]
 						a = random.choice(fruits)
 						a = b = c
-					elif hax in ([x for x in range(100, 125)]):
+					elif hax in ([x for x in range(100, 126)]):
 						fruits = ["🍎", "🍍", "🍉"]
 						a = random.choice(fruits)
 						a = b = c
-					elif hax in ([x for x in range(150, 160)]):
+					elif hax in ([x for x in range(150, 161)]):
 						fruits = ["🍇", '🍓', "🍒"]
 						a = random.choice(fruits)
 						a = b = c
-					elif hax in ([x for x in range(200, 400)]):
+					elif hax in ([x for x in range(200, 401)]):
 						if a != b:
 							a = b
 							if b == c:

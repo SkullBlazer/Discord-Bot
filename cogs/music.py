@@ -5,6 +5,9 @@ import youtube_dl
 from discord.ext import commands
 #from discord_slash import SlashCommand, SlashContext
 #from discord_slash.utils.manage_commands import create_option
+import lavalink
+import os
+import ksoftapi
 import random
 import math
 import itertools
@@ -79,38 +82,6 @@ import functools
 # 		voice.play(discord.FFmpegPCMAudio("song/song.mp3"))
 # 		voice.volume = 100
 # 		voice.is_playing()
-
-#@bot.command(name='lyrics')
-#@commands.guild_only()
-#async def get_lyrics(ctx, *, query: str=""):
-#	if not query:
-#		player = lavalink.PlayerManager.get(ctx.guild.id)
-#	if not player.is_playing:
-#		return await ctx.reply("I'm not currently playing anything", mention_author=False)
-#	query = player.current.title
-
-#	try:
-#		async with ctx.typing():
-#			results = await kclient.music.lyrics(query, limit=1)
-#		results.close()
-#	except ksoftapi.NoResults:
-#		await ctx.reply(f'No lyrics found for `{query}`', mention_author=False)
-#	else:
-#		lyrics = results[0].lyrics
-#		result = results[0]
-#		embed = discord.Embed(title=f'{result.name} - {result.artist}', color=discord.Color(0xCCFF00), description=lyrics[:2048])
-#		embed.set_thumbnail(url=result.album_art)
-#		embed.set_author(name="Lyrics:")
-#		lyrics = lyrics[2048:]
-#		embeds = [embed]
-#		while len(lyrics) > 0 and len(embeds) < 10:
-#			embed = discord.Embed(color=discord.Color(0xCCFF00), description=lyrics[:2048])
-#		lyrics = lyrics[len(embeds)*2048:]
-#		embeds.append(embed)
-#		embeds[-1].set_footer(text="Source: KSoft.Si")
-#		for embed in embeds:
-#			await ctx.send(embed=embed)
-#	kclient.close()
 
 youtube_dl.utils.bug_reports_message = lambda: ''
 
@@ -363,6 +334,7 @@ class Music(commands.Cog):
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 		self.voice_states = {}
+		self.kclient = ksoftapi.Client(os.environ['KSOFTAPI_TOKEN'])
 
 	def get_voice_state(self, ctx: commands.Context):
 		state = self.voice_states.get(ctx.guild.id)
@@ -624,6 +596,38 @@ class Music(commands.Cog):
 
 				await ctx.voice_state.songs.put(song)
 				await ctx.send('Enqueued {}'.format(str(source)))
+
+	@commands.command(name='lyrics')
+	@commands.guild_only()
+	async def get_lyrics(self, ctx, *, query: str=""):
+		if not query:
+			player = lavalink.PlayerManager.get(ctx.guild.id)
+		if not player.is_playing:
+			return await ctx.reply("I'm not currently playing anything", mention_author=False)
+		query = player.current.title
+
+		try:
+			async with ctx.typing():
+				results = await self.kclient.music.lyrics(query, limit=1)
+			results.close()
+		except ksoftapi.NoResults:
+			await ctx.reply(f'No lyrics found for `{query}`', mention_author=False)
+		else:
+			lyrics = results[0].lyrics
+			result = results[0]
+			embed = discord.Embed(title=f'{result.name} - {result.artist}', color=discord.Color(0xCCFF00), description=lyrics[:2048])
+			embed.set_thumbnail(url=result.album_art)
+			embed.set_author(name="Lyrics:")
+			lyrics = lyrics[2048:]
+			embeds = [embed]
+			while len(lyrics) > 0 and len(embeds) < 10:
+				embed = discord.Embed(color=discord.Color(0xCCFF00), description=lyrics[:2048])
+			lyrics = lyrics[len(embeds)*2048:]
+			embeds.append(embed)
+			embeds[-1].set_footer(text="Source: KSoft.Si")
+			for embed in embeds:
+				await ctx.send(embed=embed)
+		self.kclient.close()
 		
 
 	@_join.before_invoke

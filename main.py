@@ -30,8 +30,8 @@ import requests
 #import itertools
 #import functools
 #import wikipedia
-##import ksoftapi
-##import lavalink
+#import ksoftapi
+#import lavalink
 #import pycountry
 #import xkcd
 #import pypokedex
