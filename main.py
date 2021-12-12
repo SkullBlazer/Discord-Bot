@@ -84,7 +84,7 @@ async def on_ready():
 	await bot.wait_until_ready()
 	# await bot.change_presence(activity=discord.Activity(
 	# 	type=discord.ActivityType.watching, name="Avadhoot's birthday"))
-	await bot.change_presence(activity=discord.Game(name="Second Year ;-;"))
+	await bot.change_presence(activity=discord.Game(name="Final exams ;-;"))
 	# await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="my master panik about exams"))
 	# await bot.change_presence(status=discord.Status.dnd)
 	# await bot.change_presence(activity=discord.Streaming(name="the exam answers", url="https://youtu.be/dQw4w9WgXcQ"))
@@ -110,7 +110,8 @@ async def on_guild_join(guild):
 	await user.send(link)
 	# with open('datafiles/prefixes.json') as fle:
 		# prefixes = json.load(fle)
-	db[str(guild.id)] = ['false', '>>']
+	if str(guild.id) not in db:
+		db[str(guild.id)] = ['false', '>>']
 	# with open('datafiles/prefixes.json', 'w') as fle:
 	# 	json.dump(prefixes, fle, indent=4)
 	# with open('datafiles/onmessage.json', 'w') as fle:
@@ -122,7 +123,7 @@ async def on_guild_join(guild):
 			if isinstance(channel, discord.abc.PrivateChannel):
 				i += 1
 				continue
-			await channel.send("Hi! I'm SlaveBot, a bot made by SkullBlazer#9339. My prefix is `>>`, but you can customize it using `>>prefix newPrefix`.\n Do `>>help` to get a list of all commands.")
+			await channel.send(f"Hi! I'm SlaveBot, a bot made by SkullBlazer#9339. My prefix is `{db[str(guild.id)][1]}`, but you can customize it using `{db[str(guild.id)][1]}prefix newPrefix`.\n Do `{db[str(guild.id)][1]}help` to get a list of all commands.")
 			break
 		except:
 			i += 1
@@ -142,9 +143,9 @@ async def on_guild_join(guild):
 	await guild.create_role(name="White", colour=discord.Colour(0xffffff))
 	await guild.create_role(name="Black", colour=discord.Colour(0x000001))
 
-@bot.event
-async def on_guild_remove(guild):
-	del db[str(guild.id)]
+# @bot.event
+# async def on_guild_remove(guild):
+# 	del db[str(guild.id)]
 
 @bot.event
 async def on_command_error(ctx, error):

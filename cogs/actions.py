@@ -606,9 +606,9 @@ class Actions(commands.Cog):
 								color=discord.Colour.random(),
 								timestamp=ctx.message.created_at)
 			embed.add_field(name="Description", value=f"**{desc.capitalize()}**", inline=False)
-			embed.add_field(name="Temperature(°C)", value=f"**{current_temperature_celsius}°C**", inline=False)
-			embed.add_field(name="Humidity(%)", value=f"**{current_humidity}%**", inline=False)
-			embed.add_field(name="Atmospheric Pressure(atm)", value=f"**{round(current_pressure,3)}atm**", inline=False)
+			embed.add_field(name="Temperature", value=f"**{current_temperature_celsius}°C**", inline=False)
+			embed.add_field(name="Humidity", value=f"**{current_humidity}%**", inline=False)
+			embed.add_field(name="Atmospheric Pressure", value=f"**{round(current_pressure,3)}atm**", inline=False)
 			if "clouds" in desc:
 				fle = discord.File("weather/cloudy.png", filename="image.png")
 			elif desc == "haze" or desc == "smoke":
@@ -617,7 +617,7 @@ class Actions(commands.Cog):
 				fle = discord.File("weather/sunny.png", filename="image.png")
 			elif desc == "light rain" or desc == "light intensity drizzle":
 				fle = discord.File("weather/light_rain.png", filename="image.png")
-			elif desc == "moderate rain":
+			elif desc == "moderate rain" or desc == "heavy intensity rain":
 				fle = discord.File("weather/heavy_rain.png", filename="image.png")
 			elif desc == "light snow":
 				fle = discord.File("weather/snowy.png", filename="image.png")

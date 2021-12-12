@@ -1527,10 +1527,9 @@ class Utilities(commands.Cog):
 			mplur = "minute"
 		if float(second) == 1.0:
 			splur = "second"
-		e = discord.Embed(title="Uptime", description=("Bot has been alive ~~since the beginning of time~~ for " +
+		await ctx.reply(("Bot has been alive ~~since the beginning of time~~ for " +
 					str(int(day)) + f" {dplur}, " + str(int(hour)) + f" {hplur}, " +
-					str(int(minute)) + f" {mplur} and %.2f {splur}" % second))
-		await ctx.reply(embed=e, mention_author=False)
+					str(int(minute)) + f" {mplur} and %.2f {splur}" % second), mention_author=False)
 
 	@commands.command(aliases=['pn'])
 	async def patchnotes(self, ctx):

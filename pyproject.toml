@@ -27,6 +27,7 @@ typing-extensions = "^3.10.0"
 "discord.py" = "^1.7.3"
 lavalink = "^3.1.4"
 ksoftapi = "^0.4.1"
+spotipy = "^2.19.0"
 
 [tool.poetry.dev-dependencies]
 

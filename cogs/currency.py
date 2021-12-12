@@ -31,32 +31,16 @@ class Currency(commands.Cog):
 			aid = str(member.id)
 			if member == ctx.message.author:
 				if str(aid) in db:
-					if "69" in str(db[aid][1]):
-						e = discord.Embed(
-							description=
-							f"You have {db[aid][1]:,} in the bank",
-							colour=discord.Colour.green(),
-							timestamp=datetime.utcnow())
-						e.set_footer(text="nice")
-					elif str(db[aid][1]) == "0":
-						e = discord.Embed(
-							description=
-							f"You have {db[aid][1]:,} in the bank",
-							colour=discord.Colour.green(),
-							timestamp=datetime.utcnow())
-						e.set_footer(text="sucks to be you")
-					elif str(db[aid][1]).startswith("-"):
-						e = discord.Embed(
-							description=
-							f"You have {db[aid][1]:,} in the bank",
-							colour=discord.Colour.green(),
-							timestamp=datetime.utcnow())
-						e.set_footer(text="how the hell did you manage to do that")
-					else:
-						e = discord.Embed(
+					e = discord.Embed(
 							description=f"You have {db[aid][1]:,} in the bank",
 							colour=discord.Colour.green(),
 							timestamp=datetime.utcnow())
+					if "69" in str(db[aid][1]):
+						e.set_footer(text="nice")
+					elif str(db[aid][1]) == "0":
+						e.set_footer(text="sucks to be you")
+					elif str(db[aid][1]).startswith("-"):
+						e.set_footer(text="how the hell did you manage to do that")
 					e.set_author(name="Balance", icon_url=member.avatar_url)
 					await ctx.reply(embed=e, mention_author=False)
 				else:
@@ -576,6 +560,7 @@ class Currency(commands.Cog):
 				e.timestamp = datetime.utcnow()
 				e.colour = discord.Colour.random()
 				await ctx.send(embed=e)
+			return
 
 		elif term.lower() == "g" or term.lower() == "global" and not glbal:
 			async with ctx.typing():
@@ -594,6 +579,7 @@ class Currency(commands.Cog):
 				e.set_footer(text="Oh Mars is first? Who woulda expected that")
 				e.colour = discord.Colour.random()
 				await ctx.send(embed=e)
+			return
 
 		elif (term.lower() == "d" or term.lower() == "daily") and not glbal:
 			async with ctx.typing():
@@ -620,6 +606,7 @@ class Currency(commands.Cog):
 				e.timestamp = datetime.utcnow()
 				e.colour = discord.Colour.random()
 				await ctx.send(embed=e)
+			return
 		elif (term.lower() == "d" or term.lower()
 			== "daily") and (glbal.lower() == "g" or glbal.lower() == "global"):
 			async with ctx.typing():
@@ -638,6 +625,7 @@ class Currency(commands.Cog):
 				e.timestamp = datetime.utcnow()
 				e.colour = discord.Colour.random()
 				await ctx.send(embed=e)
+			return
 
 	@commands.command(pass_context=True)
 	@commands.cooldown(1, 23*60*60, commands.BucketType.user)
@@ -703,10 +691,10 @@ class Currency(commands.Cog):
 						db[str(ctx.author.id)][0] -= 1
 						return
 				except asyncio.TimeoutError:
-					await ctx.reply("Easter egg heheh", mention_author=False)
+					await ctx.reply("Easter egg heheh \n also here's a ping for no reason")
 			if db[str(ctx.author.id)][2]["daily"]:
 				e = discord.Embed(
-					description=f"Added {10000+(1750*s):,} credits to bank.",
+					description=f"Added {10000+(2000*s):,} credits to bank.",
 					colour=discord.Colour.green(),
 					timestamp=datetime.utcnow())
 				e.set_author(name="Success!", icon_url=ctx.author.avatar_url)
@@ -739,7 +727,7 @@ class Currency(commands.Cog):
 					)
 					db[aid][1] -= 666666
 			if db[str(ctx.author.id)][2]["daily"]:
-				db[aid][1] += 10000 + (1750 * s)
+				db[aid][1] += 10000 + (2000 * s)
 			else:
 				db[aid][1] += 1000 + (250 * s)
 			if s % 50 == 0 and s != 0:

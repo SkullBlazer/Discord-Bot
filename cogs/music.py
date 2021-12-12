@@ -5,13 +5,16 @@ import youtube_dl
 from discord.ext import commands
 #from discord_slash import SlashCommand, SlashContext
 #from discord_slash.utils.manage_commands import create_option
-import lavalink
-import os
-import ksoftapi
+#import lavalink
+import configparser
+import aiohttp
 import random
 import math
 import itertools
+from datetime import datetime
 import functools
+import spotipy
+import spotipy.util as util
 
 # @bot.command(pass_context=True)
 # @commands.guild_only()
@@ -334,7 +337,6 @@ class Music(commands.Cog):
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 		self.voice_states = {}
-		self.kclient = ksoftapi.Client(os.environ['KSOFTAPI_TOKEN'])
 
 	def get_voice_state(self, ctx: commands.Context):
 		state = self.voice_states.get(ctx.guild.id)
@@ -387,15 +389,12 @@ class Music(commands.Cog):
 		try:
 			ctx.author.voice.channel
 		except AttributeError:
-			
 			return await ctx.send("You're not in a voice channel.")
 
 		if not ctx.voice_state.is_playing:
-			
 			return await ctx.send('Nothing being played at the moment.')
 
-		if 0 > volume > 100:
-			
+		if 0 > volume or volume > 100:
 			return await ctx.send('Volume must be between 0 and 100')
 
 		ctx.voice_state.volume = volume / 100
@@ -597,38 +596,97 @@ class Music(commands.Cog):
 				await ctx.voice_state.songs.put(song)
 				await ctx.send('Enqueued {}'.format(str(source)))
 
+	@commands.command()
+	async def cmd_spotify(self, ctx, URL):
+		# redirect_uri = os.environ['SPOTIPY_REDIRECT_URI']
+		config = configparser.ConfigParser()
+		config.read('.gitignore/config.cfg')
+		username = 'xzxtecn4384hqvazcdhvjeoij'
+		client_id = config.get('SPOTIFY', 'SPOTIPY_CLIENT_ID')
+		client_secret = config.get('SPOTIFY', 'SPOTIPY_CLIENT_SECRET')
+		scope = 'playlist-modify-public'
+		if not URL.startswith("https://open.spotify.com/"):
+			return await ctx.send("Invalid spotify link")
+		# auth = oauth2.SpotifyClientCredentials(
+		# 	client_id=client_id,
+		# 	client_secret=client_secret
+		# )
+
+		# token = auth.get_access_token()
+		token = util.prompt_for_user_token(username=username, scope=scope, redirect_uri='https://example.com', client_id=client_id, client_secret=client_secret)
+		print(token)
+		sp = spotipy.Spotify(auth=token,auth_manager=spotipy.oauth2.SpotifyOAuth(username=username, scope=scope,\
+        					redirect_uri='http://example.com', client_id=client_id, client_secret=client_secret))
+		if "playlist" in URL:
+			playlist = URL.split("/")[-1]
+			res = sp.user_playlist_tracks(username, playlist)
+			await ctx.send(res)
+			for items in res["items"]:
+				song = items["track"]["name"]
+				artist = items["track"]["artists"][0]["name"]
+				songToPlay = str(song) + " by " + str(artist) + " Lyrics"
+				await self._play(songToPlay)
+		elif "track" in URL:
+			track = URL.split("/")[-1]
+			res = sp.track(track)
+			song = res['name']
+			artist = res['artists'][0]['name']
+			songToPlay = str(song) + " by " + str(artist) + " Lyrics"
+			await self._play(songToPlay)
+		elif "album" in URL:
+			album = URL.split("/")[-1]
+			res = sp.album_tracks(album)
+			for items in res["items"]:
+				song = items["name"]
+				artist = items["artists"][0]["name"]
+				songToPlay = str(song) + " by " + str(artist) + " Lyrics"
+				await self._play(songToPlay)
+
 	@commands.command(name='lyrics')
 	@commands.guild_only()
+	@commands.cooldown(1, 15, commands.BucketType.user)
 	async def get_lyrics(self, ctx, *, query: str=""):
+		LYRICS_URL = "https://some-random-api.ml/lyrics?title="
 		if not query:
-			player = lavalink.PlayerManager.get(ctx.guild.id)
-		if not player.is_playing:
-			return await ctx.reply("I'm not currently playing anything", mention_author=False)
-		query = player.current.title
+			# music = lavalink.Client(self.bot.user.id)
+			# player = music.player_manager.get(ctx.guild.id)
+			songs = ctx.voice_state.current
+			if songs:
+				query = songs.source.title
+			else:
+				return await ctx.reply("I'm not currently playing anything", mention_author=False)
+		# if not player.is_playing():
+		# 	return await ctx.reply("I'm not currently playing anything", mention_author=False)
+		async with ctx.typing():
+			async with aiohttp.request("GET", LYRICS_URL + query, headers={}) as r:
+				if not 200 <= r.status <= 299:
+					return await ctx.send("I couldn't find that song!")
 
-		try:
-			async with ctx.typing():
-				results = await self.kclient.music.lyrics(query, limit=1)
-			results.close()
-		except ksoftapi.NoResults:
-			await ctx.reply(f'No lyrics found for `{query}`', mention_author=False)
-		else:
-			lyrics = results[0].lyrics
-			result = results[0]
-			embed = discord.Embed(title=f'{result.name} - {result.artist}', color=discord.Color(0xCCFF00), description=lyrics[:2048])
-			embed.set_thumbnail(url=result.album_art)
-			embed.set_author(name="Lyrics:")
-			lyrics = lyrics[2048:]
-			embeds = [embed]
-			while len(lyrics) > 0 and len(embeds) < 10:
-				embed = discord.Embed(color=discord.Color(0xCCFF00), description=lyrics[:2048])
-			lyrics = lyrics[len(embeds)*2048:]
-			embeds.append(embed)
-			embeds[-1].set_footer(text="Source: KSoft.Si")
-			for embed in embeds:
+				data = await r.json()
+				if len(data["lyrics"]) > 2047:
+					stop = data["lyrics"][::-1].find("\n")
+					embed = discord.Embed(
+					title=data["title"],
+					description=(data["lyrics"][:2048-stop] + "..."),
+					colour=discord.Colour.random(),
+					timestamp=datetime.utcnow(),
+					)
+					embed.set_thumbnail(url=data["thumbnail"]["genius"])
+					embed.set_author(name=data["author"])
+					embed.set_footer(text=f"Full lyrics at {data['links']['genius']}")
+					return await ctx.send(embed=embed)
+
+				embed = discord.Embed(
+					title=data["title"],
+					description=data["lyrics"],
+					colour=discord.Colour.random(),
+					timestamp=datetime.utcnow(),
+				)
+				embed.set_thumbnail(url=data["thumbnail"]["genius"])
+				embed.set_author(name=data["author"])
+				embed.set_footer(text=f"Requested by {ctx.author}")
 				await ctx.send(embed=embed)
-		self.kclient.close()
-		
+			r.close()
 
 	@_join.before_invoke
 	@_play.before_invoke
