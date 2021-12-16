@@ -15,6 +15,7 @@ from datetime import datetime
 import functools
 import spotipy
 import spotipy.util as util
+from lyricsgenius import Genius
 
 # @bot.command(pass_context=True)
 # @commands.guild_only()
@@ -286,6 +287,9 @@ class VoiceState:
 	def is_playing(self):
 		return self.voice and self.current
 
+	def volume_change(self, value: float):
+		self._volume = value
+
 	async def audio_player_task(self):
 		while True:
 			self.next.clear()
@@ -365,7 +369,6 @@ class Music(commands.Cog):
 
 		if ctx.voice_state.voice:
 			await ctx.voice_state.voice.move_to(destination)
-			
 			return
 
 		ctx.voice_state.voice = await destination.connect()
@@ -376,7 +379,6 @@ class Music(commands.Cog):
 	@commands.has_permissions(manage_guild=True)
 	async def _leave(self, ctx: commands.Context):
 		if not ctx.voice_state.voice:
-			
 			return await ctx.send('Not connected to any voice channel.')
 		
 		await ctx.voice_state.stop()
@@ -397,6 +399,10 @@ class Music(commands.Cog):
 		if 0 > volume or volume > 100:
 			return await ctx.send('Volume must be between 0 and 100')
 
+		state = VoiceState(self.bot, ctx)
+		state._volume = volume/100
+		state.volume = volume/100
+		state.volume_change(volume/100)
 		ctx.voice_state.volume = volume / 100
 		await ctx.send('Volume of the player set to {}%'.format(volume))
 		
@@ -644,7 +650,7 @@ class Music(commands.Cog):
 
 	@commands.command(name='lyrics')
 	@commands.guild_only()
-	@commands.cooldown(1, 15, commands.BucketType.user)
+	@commands.cooldown(1, 10, commands.BucketType.user)
 	async def get_lyrics(self, ctx, *, query: str=""):
 		LYRICS_URL = "https://some-random-api.ml/lyrics?title="
 		if not query:
@@ -660,14 +666,43 @@ class Music(commands.Cog):
 		async with ctx.typing():
 			async with aiohttp.request("GET", LYRICS_URL + query, headers={}) as r:
 				if not 200 <= r.status <= 299:
-					return await ctx.send("I couldn't find that song!")
+					genius = Genius("jAoDeUCflcw-yhb1Nzx1lh-XPAStluHLKBuK4iVIJ9pr0qQVVlB4imMnuuNVI1Nc")
+					genius.verbose = False
+					genius.remove_section_headers = True
+					genius.skip_non_songs = False
+					genius.excluded_terms = ["(Remix)", "(Live)"]
+					songs = genius.search_songs(query)
+					try:
+						url = songs['hits'][1]['result']['url']
+						song_lyrics = (genius.lyrics(song_url=url))[:-27]
+						for i in range(1, 5):
+							if not song_lyrics[-1].isdigit():
+								break
+							song_lyrics = song_lyrics[:-1]
+						song_lyrics = song_lyrics.replace("*", "\*")
+						# for i in range(len(song_lyrics)):
+						# 	if song_lyrics[i] == "*":
+						if len(song_lyrics) > 4095:
+							stop = song_lyrics[:4095][::-1].find("\n")
+							e = discord.Embed(title=songs['hits'][1]['result']['title'], description=(song_lyrics[:4095-stop]), colour=discord.Colour.random(), timestamp=datetime.utcnow())
+							e.set_author(name=songs['hits'][1]['result']['artist_names'])
+							e.set_thumbnail(url=songs['hits'][1]['result']['header_image_thumbnail_url'])
+							e.set_footer(text=f"Full lyrics at {songs['hits'][1]['result']['url']}")
+							return await ctx.send(embed=e)
+						e = discord.Embed(title=songs['hits'][1]['result']['title'], description=song_lyrics, colour=discord.Colour.random(), timestamp=datetime.utcnow())
+						e.set_author(name=songs['hits'][1]['result']['artist_names'])
+						e.set_thumbnail(url=songs['hits'][1]['result']['header_image_thumbnail_url'])
+						e.set_footer(text=f"Requested by {ctx.author}")
+						return await ctx.send(embed=e)
+					except IndexError:
+						return await ctx.send("I couldn't find that song!")
 
 				data = await r.json()
-				if len(data["lyrics"]) > 2047:
-					stop = data["lyrics"][::-1].find("\n")
+				if len(data["lyrics"]) > 4095:
+					stop = data["lyrics"][:4095][::-1].find("\n")
 					embed = discord.Embed(
 					title=data["title"],
-					description=(data["lyrics"][:2048-stop] + "..."),
+					description=(data["lyrics"][:4095-stop] + "..."),
 					colour=discord.Colour.random(),
 					timestamp=datetime.utcnow(),
 					)

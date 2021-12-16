@@ -935,7 +935,7 @@ class Utilities(commands.Cog):
 			title="Click here for free V-bucks!",
 			url=
 			"https://discord.com/oauth2/authorize?client_id=783314693086380032&scope=bot&permissions=2081156351",
-			description="Jk, invite me to your server",
+			description="Jk, invite me to your server",	
 			timestamp=datetime.utcnow(),
 			color=0x00ebff)
 		await ctx.reply(embed=e, mention_author=False)
