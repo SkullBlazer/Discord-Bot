@@ -6,6 +6,7 @@ from discord.ext import commands
 #from discord_slash import SlashCommand, SlashContext
 #from discord_slash.utils.manage_commands import create_option
 #import lavalink
+import os
 import configparser
 import aiohttp
 import random
@@ -16,6 +17,7 @@ import functools
 import spotipy
 import spotipy.util as util
 from lyricsgenius import Genius
+from dotenv import load_dotenv
 
 # @bot.command(pass_context=True)
 # @commands.guild_only()
@@ -88,6 +90,7 @@ from lyricsgenius import Genius
 # 		voice.is_playing()
 
 youtube_dl.utils.bug_reports_message = lambda: ''
+load_dotenv()
 
 class VoiceError(Exception):
 	pass
@@ -608,8 +611,9 @@ class Music(commands.Cog):
 		config = configparser.ConfigParser()
 		config.read('.gitignore/config.cfg')
 		username = 'xzxtecn4384hqvazcdhvjeoij'
-		client_id = config.get('SPOTIFY', 'SPOTIPY_CLIENT_ID')
-		client_secret = config.get('SPOTIFY', 'SPOTIPY_CLIENT_SECRET')
+		client_id = os.environ['SPOTIPY_CLIENT_ID']
+		client_secret = os.environ['SPOTIPY_CLIENT_SECRET']
+		redirect_uri = os.environ['SPOTIPY_REDIRECT_URI']
 		scope = 'playlist-modify-public'
 		if not URL.startswith("https://open.spotify.com/"):
 			return await ctx.send("Invalid spotify link")
@@ -622,7 +626,7 @@ class Music(commands.Cog):
 		token = util.prompt_for_user_token(username=username, scope=scope, redirect_uri='https://example.com', client_id=client_id, client_secret=client_secret)
 		print(token)
 		sp = spotipy.Spotify(auth=token,auth_manager=spotipy.oauth2.SpotifyOAuth(username=username, scope=scope,\
-        					redirect_uri='http://example.com', client_id=client_id, client_secret=client_secret))
+        					redirect_uri=redirect_uri, client_id=client_id, client_secret=client_secret))
 		if "playlist" in URL:
 			playlist = URL.split("/")[-1]
 			res = sp.user_playlist_tracks(username, playlist)
@@ -666,7 +670,8 @@ class Music(commands.Cog):
 		async with ctx.typing():
 			async with aiohttp.request("GET", LYRICS_URL + query, headers={}) as r:
 				if not 200 <= r.status <= 299:
-					genius = Genius("jAoDeUCflcw-yhb1Nzx1lh-XPAStluHLKBuK4iVIJ9pr0qQVVlB4imMnuuNVI1Nc")
+					g_api = os.environ['GENIUS_API']
+					genius = Genius(g_api)
 					genius.verbose = False
 					genius.remove_section_headers = True
 					genius.skip_non_songs = False
@@ -686,7 +691,7 @@ class Music(commands.Cog):
 							stop = song_lyrics[:4095][::-1].find("\n")
 							e = discord.Embed(title=songs['hits'][1]['result']['title'], description=(song_lyrics[:4095-stop]), colour=discord.Colour.random(), timestamp=datetime.utcnow())
 							e.set_author(name=songs['hits'][1]['result']['artist_names'])
-							e.set_thumbnail(url=songs['hits'][1]['result']['header_image_thumbnail_url'])
+							e.set_thumbnail(url=songs['hits'][1]['result']['song_art_image_url'])
 							e.set_footer(text=f"Full lyrics at {songs['hits'][1]['result']['url']}")
 							return await ctx.send(embed=e)
 						e = discord.Embed(title=songs['hits'][1]['result']['title'], description=song_lyrics, colour=discord.Colour.random(), timestamp=datetime.utcnow())
