@@ -652,7 +652,7 @@ class Utilities(commands.Cog):
 		elif page == "play":
 			e = discord.Embed(
 				title=f"Help on `{p}play`",
-				description="Play the url or search the song on Youtube")
+				description="Play the url or search the song on Youtube. Now also accepts Spotify playlists, tracks, and albums.")
 			e.add_field(name="Syntax", value=f"`{p}play <URL|song name>`")
 		elif page == "pause":
 			e = discord.Embed(title=f"Help on `{p}pause`",
@@ -674,12 +674,12 @@ class Utilities(commands.Cog):
 		elif page == "lyrics":
 			e = discord.Embed(
 				title=f"Help on `{p}lyrics`",
-				description="Get the lyrics to a song, credits to KSoft.Si API. Note: Doesn't work as of now, I've applied for the API key for the lyrics for like 4 months now.")
+				description="Get the lyrics to a song.")
 			e.add_field(name="Syntax", value=f"`{p}lyrics <song name>`")
 		elif page == "volume":
 			e = discord.Embed(
 				title=f"Help on `{p}volume`",
-				description="Change the volume of the bot, from 0 to 100.")
+				description="Change the volume of the bot, from 0 to 100. DOESN'T WORK.")
 			e.add_field(name="Syntax", value=f"`{p}volume [value]`")
 		elif page == "now":
 			e = discord.Embed(
@@ -1537,11 +1537,10 @@ class Utilities(commands.Cog):
 			p = db[str(ctx.guild.id)][1]
 		else:
 			p = ">>"
-		e = discord.Embed(title="Updates for SlaveBot v2.1.2",
+		e = discord.Embed(title="Updates for SlaveBot v3.1.2",
 						description=f"\
-		**1. IMPORTANT ANNOUNCEMENT**: CHANGED PROBABILITIES OF JACKPOT!\n \
-		Getting the `100,000x` multiplier has a `0.1%` chance, `10,000x` is `0.25%`, and `1,000x` is `0.5%`.\n \
-		**2.** Added {p}shop, {p}buy, {p}sell, {p}inventory\n \
+		**1. IMPORTANT ANNOUNCEMENT**: Music commands now work (for the most part). SPOTIFY PLAYLISTS, TRACKS, AND ALBUMS CAN ALSO BE PLAYED. Also very buggy. \n \
+		**2.** `{p}lyrics` works now, KSoft shut down their music and image gen API so I had to pursue more violent methods \n \
 		**3.** Added more music commands, `{p}volume`, `{p}now`, `{p}skip`, `{p}queue`, `{p}shuffle`, `{p}remove`, `{p}loop`\n \
 		**4.** Added an **Action**, `{p}yeet`\n \
 		**5.** Major backend changes, i.e. lots of bugs. Same deal as before, real bugs found get prizes.\n \

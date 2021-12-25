@@ -826,7 +826,7 @@ class Currency(commands.Cog):
 		if item is None:
 			await ctx.send("Congratulations! You just bought all the items from the shop!")
 			return
-		if item.startswith("<@") and item[-1] == ">":
+		if item.startswith("<@") and item[-1] == ">" and item[2:-1].isdigit():
 			await ctx.send("Wh- why would you wanna buy a person?")
 			return
 		if amt > 50:

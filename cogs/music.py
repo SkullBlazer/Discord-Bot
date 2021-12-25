@@ -7,7 +7,6 @@ from discord.ext import commands
 #from discord_slash.utils.manage_commands import create_option
 #import lavalink
 import os
-import configparser
 import aiohttp
 import random
 import math
@@ -17,7 +16,7 @@ import functools
 import spotipy
 import spotipy.util as util
 from lyricsgenius import Genius
-from dotenv import load_dotenv
+import subprocess
 
 # @bot.command(pass_context=True)
 # @commands.guild_only()
@@ -90,7 +89,6 @@ from dotenv import load_dotenv
 # 		voice.is_playing()
 
 youtube_dl.utils.bug_reports_message = lambda: ''
-load_dotenv()
 
 class VoiceError(Exception):
 	pass
@@ -221,6 +219,7 @@ class Song:
 				.add_field(name='Duration', value=self.source.duration)
 				.add_field(name='Requested by', value=self.requester.mention)
 				.add_field(name='Uploader', value='[{0.source.uploader}]({0.source.uploader_url})'.format(self))
+				.add_field(name='Uploaded on', value=self.source.upload_date)
 				.add_field(name='URL', value='[Click]({0.source.url})'.format(self))
 				.set_thumbnail(url=self.source.thumbnail))
 
@@ -290,6 +289,9 @@ class VoiceState:
 	def is_playing(self):
 		return self.voice and self.current
 
+	def stop_playing_you_idiot(self):
+		self.current = None
+
 	def volume_change(self, value: float):
 		self._volume = value
 
@@ -313,6 +315,7 @@ class VoiceState:
 
 				self.current.source.volume = self._volume
 				self.voice.play(self.current.source, after=self.play_next_song)
+				self.skip_votes = set()
 				await self.current.source.channel.send(embed=self.current.create_embed())
 
 			elif self.loop:
@@ -383,6 +386,10 @@ class Music(commands.Cog):
 	async def _leave(self, ctx: commands.Context):
 		if not ctx.voice_state.voice:
 			return await ctx.send('Not connected to any voice channel.')
+		try:
+			ctx.author.voice.channel
+		except AttributeError:
+			return await ctx.send("You're not in a voice channel.")
 		
 		await ctx.voice_state.stop()
 		del self.voice_states[ctx.guild.id]
@@ -465,6 +472,7 @@ class Music(commands.Cog):
 
 		if ctx.voice_state.is_playing:
 			ctx.voice_state.voice.stop()
+			ctx.voice_state.stop_playing_you_idiot()
 			await ctx.message.add_reaction('⏹')
 		else:
 			
@@ -479,11 +487,9 @@ class Music(commands.Cog):
 		try:
 			ctx.author.voice.channel
 		except AttributeError:
-			
 			return await ctx.send("You're not in a voice channel.")
 
 		if not ctx.voice_state.is_playing:
-			
 			return await ctx.send('Not playing any music right now...')
 
 		voter = ctx.message.author
@@ -508,7 +514,6 @@ class Music(commands.Cog):
 	@commands.command(aliases=['queue', 'q'])
 	async def _queue(self, ctx: commands.Context, *, page: int = 1):
 		if len(ctx.voice_state.songs) == 0:
-			
 			return await ctx.send('Empty queue.')
 
 		items_per_page = 10
@@ -547,15 +552,12 @@ class Music(commands.Cog):
 		try:
 			ctx.author.voice.channel
 		except AttributeError:
-			
 			return await ctx.send("You're not in a voice channel.")
 
 		if not index:
-			
 			return await ctx.send("Since no song index was specified, all songs will be removed <:yeet:817301996256231444>")
 
 		if len(ctx.voice_state.songs) == 0:
-			
 			return await ctx.send('Empty queue.')
 
 		ctx.voice_state.songs.remove(index - 1)
@@ -567,11 +569,9 @@ class Music(commands.Cog):
 		try:
 			ctx.author.voice.channel
 		except AttributeError:
-			
 			return await ctx.send("You're not in a voice channel.")
 
 		if not ctx.voice_state.is_playing:
-			
 			return await ctx.send('Nothing being played at the moment.')
 
 		# Inverse boolean value to loop and unloop.
@@ -580,6 +580,7 @@ class Music(commands.Cog):
 		
 
 	@commands.command(name='play')
+	@commands.guild_only()
 	async def _play(self, ctx: commands.Context, *, search: str):
 		"""Plays a song.
 
@@ -592,65 +593,126 @@ class Music(commands.Cog):
 		if not ctx.voice_state.voice:
 			await ctx.invoke(self._join)
 
+		ctx.voice_state.skip_votes = set()
+
+		if not search.startswith("https://open.spotify.com/"):
+			async with ctx.typing():
+				try:
+					source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
+				except YTDLError as e:
+					await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
+				else:
+					song = Song(source)
+
+					await ctx.voice_state.songs.put(song)
+					await ctx.send('Enqueued {}'.format(str(source)))
+		else:
+			# redirect_uri = os.environ['SPOTIPY_REDIRECT_URI']
+			username = 'xzxtecn4384hqvazcdhvjeoij'
+			client_id = os.environ['SPOTIPY_CLIENT_ID']
+			client_secret = os.environ['SPOTIPY_CLIENT_SECRET']
+			redirect_uri = os.environ['SPOTIPY_REDIRECT_URI']
+			scope = 'playlist-modify-public'
+			# auth = oauth2.SpotifyClientCredentials(
+			# 	client_id=client_id,
+			# 	client_secret=client_secret
+			# )
+
+			# token = auth.get_access_token()
+			manager=spotipy.oauth2.SpotifyOAuth(username=username, scope=scope,\
+								redirect_uri=redirect_uri, client_id=client_id, client_secret=client_secret)
+			# cc = self.bot.get_channel(853643406329118740)
+			# await cc.send(manager.get_authorize_url())
+			token = util.prompt_for_user_token(username=username, scope=scope, redirect_uri=redirect_uri, client_id=client_id, client_secret=client_secret)
+			sp = spotipy.Spotify(auth=token,auth_manager=manager)
+			if "playlist" in search:
+				playlist = search.split("/")[-1]
+				playlist = playlist.split("?")[0]
+				try:
+					res = sp.user_playlist_tracks(username, playlist)
+				except spotipy.SpotifyException:
+					return await ctx.send("That playlist does not exist.")
+				for items in res["items"]:
+					song = items["track"]["name"]
+					artist = items["track"]["artists"][0]["name"]
+					songToPlay = str(song) + " " + str(artist)
+					if "--lyrics" in search:
+						songToPlay += " lyrics"
+					subprocess.check_call(["youtube-dl", "--rm-cache-dir"])
+					try:
+						await self.spotify_play(ctx, search=songToPlay)
+					except YTDLError:
+						songToPlay = str(song)
+						try:
+							await self.spotify_play(ctx, search=songToPlay)
+						except YTDLError:
+							songToPlay = str(song) + " lyrics"
+							await self.spotify_play(ctx, search=songToPlay)
+				for i in range(math.ceil(len(ctx.voice_state.songs) / 10)):
+					await self._queue(ctx, page=i+1)
+			elif "track" in search:
+				track = search.split("/")[-1]
+				try:
+					res = sp.track(track)
+				except spotipy.SpotifyException:
+					return await ctx.send("That track does not exist.")
+				song = res['name']
+				artist = res['artists'][0]['name']
+				songToPlay = str(song) + " " + str(artist)
+				if "--lyrics" in search:
+						songToPlay += " lyrics"
+				subprocess.check_call(["youtube-dl", "--rm-cache-dir"])
+				try:
+					await self._play(ctx, search=songToPlay)
+				except YTDLError:
+						songToPlay = str(song)
+						try:
+							await self.spotify_play(ctx, search=songToPlay)
+						except YTDLError:
+							songToPlay = str(song) + " lyrics"
+							await self.spotify_play(ctx, search=songToPlay)
+			elif "album" in search:
+				album = search.split("/")[-1]
+				album = album.split("?")[0]
+				try:
+					res = sp.album_tracks(album)
+				except spotipy.SpotifyException:
+					return await ctx.send("That album does not exist.")
+				for items in res["items"]:
+					song = items["name"]
+					artist = items["artists"][0]["name"]
+					songToPlay = str(song) + " " + str(artist)
+					if "--lyrics" in search:
+						songToPlay += " lyrics"
+					subprocess.check_call(["youtube-dl", "--rm-cache-dir"])
+					try:
+						await self.spotify_play(ctx, search=songToPlay)
+					except YTDLError:
+						songToPlay = str(song)
+						try:
+							await self.spotify_play(ctx, search=songToPlay)
+						except YTDLError:
+							songToPlay = str(song) + " lyrics"
+							await self.spotify_play(ctx, search=songToPlay)
+				for i in range(math.ceil(len(ctx.voice_state.songs) / 10)):
+					await self._queue(ctx, page=i+1)
+
+	@commands.command(aliases=['splay'])
+	@commands.guild_only()
+	@commands.check_any(commands.is_owner())
+	async def spotify_play(self, ctx, *, search:str):
+
+		ctx.voice_state.skip_votes = set()
+
 		async with ctx.typing():
 			try:
 				source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
 			except YTDLError as e:
 				await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
 			else:
-				if not ctx.voice_state.voice:
-					await ctx.invoke(self._join)
 				song = Song(source)
 
 				await ctx.voice_state.songs.put(song)
-				await ctx.send('Enqueued {}'.format(str(source)))
-
-	@commands.command()
-	async def cmd_spotify(self, ctx, URL):
-		# redirect_uri = os.environ['SPOTIPY_REDIRECT_URI']
-		config = configparser.ConfigParser()
-		config.read('.gitignore/config.cfg')
-		username = 'xzxtecn4384hqvazcdhvjeoij'
-		client_id = os.environ['SPOTIPY_CLIENT_ID']
-		client_secret = os.environ['SPOTIPY_CLIENT_SECRET']
-		redirect_uri = os.environ['SPOTIPY_REDIRECT_URI']
-		scope = 'playlist-modify-public'
-		if not URL.startswith("https://open.spotify.com/"):
-			return await ctx.send("Invalid spotify link")
-		# auth = oauth2.SpotifyClientCredentials(
-		# 	client_id=client_id,
-		# 	client_secret=client_secret
-		# )
-
-		# token = auth.get_access_token()
-		token = util.prompt_for_user_token(username=username, scope=scope, redirect_uri='https://example.com', client_id=client_id, client_secret=client_secret)
-		print(token)
-		sp = spotipy.Spotify(auth=token,auth_manager=spotipy.oauth2.SpotifyOAuth(username=username, scope=scope,\
-        					redirect_uri=redirect_uri, client_id=client_id, client_secret=client_secret))
-		if "playlist" in URL:
-			playlist = URL.split("/")[-1]
-			res = sp.user_playlist_tracks(username, playlist)
-			await ctx.send(res)
-			for items in res["items"]:
-				song = items["track"]["name"]
-				artist = items["track"]["artists"][0]["name"]
-				songToPlay = str(song) + " by " + str(artist) + " Lyrics"
-				await self._play(songToPlay)
-		elif "track" in URL:
-			track = URL.split("/")[-1]
-			res = sp.track(track)
-			song = res['name']
-			artist = res['artists'][0]['name']
-			songToPlay = str(song) + " by " + str(artist) + " Lyrics"
-			await self._play(songToPlay)
-		elif "album" in URL:
-			album = URL.split("/")[-1]
-			res = sp.album_tracks(album)
-			for items in res["items"]:
-				song = items["name"]
-				artist = items["artists"][0]["name"]
-				songToPlay = str(song) + " by " + str(artist) + " Lyrics"
-				await self._play(songToPlay)
 
 	@commands.command(name='lyrics')
 	@commands.guild_only()

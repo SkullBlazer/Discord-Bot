@@ -128,6 +128,11 @@ async def on_guild_join(guild):
 		except:
 			i += 1
 
+@bot.event
+async def on_guild_remove(guild):
+	user = bot.get_user(305341210443382785)
+	await user.send(f"Aww I just got kicked from {guild.name}")
+
 
 #	await guild.create_role(name="Moderator", colour=discord.Colour(0x7289da), permissions=discord.Permissions.all())
 	await guild.create_role(name="Invisible", colour=discord.Colour(0x36393e))
@@ -348,7 +353,7 @@ async def on_message(message):
 			await message.channel.send(":fire: Blaze it :fire:")
 		elif 'sorry' == message.content.lower():
 			await message.channel.send("It's okay I forgive you")
-		elif 'kabam' == message.content.lower(
+		elif 'kabam' in message.content.lower(
 		):
 			if message.guild:
 				if message.guild.id in trusted:
@@ -435,7 +440,8 @@ async def on_message(message):
 			await message.channel.send("No problemo")
 		elif 'test' == message.content.lower() and str(
 			message.author) == "SkullBlazer#9339":
-			await message.channel.send(message.channel.id)
+			await message.channel.send(':ballot_box_with_check: Seen at ' + datetime.now().strftime("%H:%M:%S"))
+			await message.channel.send(f':ballot_box_with_check: Seen at {datetime.utcnow()}')
 #	 else:
 #		 if str(message.author) == "Pokétwo#8236" and temp:
 #			 temp = 0

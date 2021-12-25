@@ -69,17 +69,13 @@ class Fun(commands.Cog):
 					await m2.add_reaction("✂️")
 
 					def check1(reaction, user):
-						return str(reaction.emoji) in [
+						return (str(reaction.emoji) in [
 							"🪨", "📄", "✂️"
-						] and (reaction.message in [m1, m2])
+						] and (reaction.message in [m1, m2]) and (user in [ctx.author, member]))
 
 					def check2(reaction, user):
-						if reaction1.message == m1:
-							m = m2
-						else:
-							m = m1
-						return str(reaction.emoji) in ["🪨", "📄", "✂️"
-													] and (reaction.message == m)
+						return (str(reaction.emoji) in ["🪨", "📄", "✂️"
+													] and (reaction.message in [m1, m2]) and (user in [ctx.author, member]))
 
 					try:
 						reaction1, user1 = await self.bot.wait_for('reaction_add',
@@ -139,7 +135,7 @@ class Fun(commands.Cog):
 							l = [
 								f"Game ended. {member.name} won",
 								f"Game ended. {member.name} won and gets to keep {ctx.author.name}'s kidneys",
-								f"Game ended. {member.name} won and has the right to own{ctx.author.name}'s soul"
+								f"Game ended. {member.name} won and has the right to own {ctx.author.name}'s soul"
 							]
 							await ctx.send(random.choice(l))
 						else:
@@ -196,6 +192,7 @@ class Fun(commands.Cog):
 				elif bchoice == 'scissors' and choice.lower() == 'rock':
 					await ctx.send("WHAT! how did you win")
 				self.onmessage = True
+				self.gaem.remove(ctx.channel.id)
 			else:
 				await ctx.reply(
 					"You have entered an invalid input. Bot will self destruct in",
@@ -205,6 +202,7 @@ class Fun(commands.Cog):
 					await ctx.send(i)
 				await ctx.send("boom")
 				self.onmessage = True
+				self.gaem.remove(ctx.channel.id)
 
 
 	@commands.command(aliases=['bs'])
