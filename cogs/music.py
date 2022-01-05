@@ -711,7 +711,6 @@ class Music(commands.Cog):
 				await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
 			else:
 				song = Song(source)
-
 				await ctx.voice_state.songs.put(song)
 
 	@commands.command(name='lyrics')
@@ -725,6 +724,10 @@ class Music(commands.Cog):
 			songs = ctx.voice_state.current
 			if songs:
 				query = songs.source.title
+				_start = query.find("(")
+				_end = query.find(")")
+				if _start >= 0 and _start < _end:
+					query = query[:_start] + query[_end+1:]
 			else:
 				return await ctx.reply("I'm not currently playing anything", mention_author=False)
 		# if not player.is_playing():
@@ -736,8 +739,8 @@ class Music(commands.Cog):
 					genius = Genius(g_api)
 					genius.verbose = False
 					genius.remove_section_headers = True
-					genius.skip_non_songs = False
-					genius.excluded_terms = ["(Remix)", "(Live)"]
+					genius.skip_non_songs = True
+					genius.excluded_terms = ["Remix", "Live"]
 					songs = genius.search_songs(query)
 					try:
 						url = songs['hits'][1]['result']['url']

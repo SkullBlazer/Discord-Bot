@@ -855,7 +855,7 @@ class Utilities(commands.Cog):
 			elif role.name == "JAIL":
 				if ctx.author.top_role > member.top_role and member != ctx.author:
 					for usr_role in member.roles:
-						if usr_role.name != "@everyone" or not usr_role.is_premium_subscriber() or not usr_role.is_bot_managed():
+						if (usr_role.name != "@everyone") and (not usr_role.is_premium_subscriber()) and (not usr_role.is_bot_managed()):
 							await member.remove_roles(usr_role)
 					await member.add_roles(role, atomic=True)
 					embed.title = "Success!"
@@ -959,7 +959,6 @@ class Utilities(commands.Cog):
 			await ctx.send(
 				"This user is not in this guild. Invite them here maybe, server's dead anyway"
 			)
-			
 			return
 		if user.premium_since:
 			if user.id == 305341210443382785 or user.id == 822702422303571989:

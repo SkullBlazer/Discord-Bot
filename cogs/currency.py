@@ -155,9 +155,9 @@ class Currency(commands.Cog):
 
 	@commands.command(pass_context=True, aliases=['reg'])
 	async def register(self, ctx):
-		mid = str(ctx.message.author.id)
+		mid = str(ctx.author.id)
 		if mid not in db:
-			db[mid] = [0, 100]
+			db[mid] = [0, 100, {'daily': False, 'charm': 0, 'supercharm':0}]
 			e = discord.Embed(description="You are now registered!",
 							colour=discord.Colour.gold(),
 							timestamp=datetime.utcnow())
@@ -352,9 +352,16 @@ class Currency(commands.Cog):
 	async def getdata(self, ctx):
 		s = ""
 		for i in db:
-			s += ("db[\"" + str(i) + "\"]=[" + str(db[i][0]) + "," + str(db[i][1]) + "," + str(db[i][2].value) + "]\n")
+			s += ("db[\"" + str(i) + "\"]=[" + str(db[i][0]) + "," + str(db[i][1]) + "," + str(db[i][2]) + "]\n")
 		await ctx.send(f"```java\n{s[:len(s)//2]}```")
 		await ctx.send(f"```java\n{s[len(s)//2:]}```")
+
+	@commands.command()
+	@commands.check_any(commands.is_owner())
+	async def deldata(self, ctx, uid:str=None):
+		if uid in db:
+			del db[uid]
+		await ctx.message.add_reaction('🗑️')
 
 	@commands.command(pass_context=True)
 	@commands.cooldown(1, 10, commands.BucketType.user)
@@ -844,8 +851,8 @@ class Currency(commands.Cog):
 			bal2 = bal
 			price = 0
 			count = 0
-			if item.lower() != "supercharm":
-				bal2 -= amt*self.shop[item.lower()]
+			# if item.lower() != "supercharm":
+			# 	bal2 -= amt*self.shop[item.lower()]
 			for i in range(amt):
 				if price > bal2:
 					break
@@ -872,7 +879,10 @@ class Currency(commands.Cog):
 				return
 			else:
 				e = discord.Embed(title="Confirmation", description = f"Are you sure you want to buy {amt} {item} for {price:,}?", timestamp = datetime.utcnow(), colour = discord.Colour.green())
-				e.set_footer(text=f"Your balance will be {bal2:,}")
+				if item.lower() != "supercharm":
+					e.set_footer(text=f"Your balance will be {bal2-price:,}")
+				else:
+					e.set_footer(text=f"Your balance will be {bal2:,}")
 			msg = await ctx.send(embed = e)
 			await msg.add_reaction("✅")
 			await msg.add_reaction("❎")

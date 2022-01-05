@@ -84,7 +84,7 @@ async def on_ready():
 	await bot.wait_until_ready()
 	# await bot.change_presence(activity=discord.Activity(
 	# 	type=discord.ActivityType.watching, name="Avadhoot's birthday"))
-	await bot.change_presence(activity=discord.Game(name="Final exams ;-;"))
+	await bot.change_presence(activity=discord.Game(name="Offline college? Online college?"))
 	# await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="my master panik about exams"))
 	# await bot.change_presence(status=discord.Status.dnd)
 	# await bot.change_presence(activity=discord.Streaming(name="the exam answers", url="https://youtu.be/dQw4w9WgXcQ"))
@@ -111,7 +111,7 @@ async def on_guild_join(guild):
 	# with open('datafiles/prefixes.json') as fle:
 		# prefixes = json.load(fle)
 	if str(guild.id) not in db:
-		db[str(guild.id)] = ['false', '>>']
+		db[str(guild.id)] = ['false', '>>', {}]
 	# with open('datafiles/prefixes.json', 'w') as fle:
 	# 	json.dump(prefixes, fle, indent=4)
 	# with open('datafiles/onmessage.json', 'w') as fle:
@@ -127,14 +127,7 @@ async def on_guild_join(guild):
 			break
 		except:
 			i += 1
-
-@bot.event
-async def on_guild_remove(guild):
-	user = bot.get_user(305341210443382785)
-	await user.send(f"Aww I just got kicked from {guild.name}")
-
-
-#	await guild.create_role(name="Moderator", colour=discord.Colour(0x7289da), permissions=discord.Permissions.all())
+	#	await guild.create_role(name="Moderator", colour=discord.Colour(0x7289da), permissions=discord.Permissions.all())
 	await guild.create_role(name="Invisible", colour=discord.Colour(0x36393e))
 	await guild.create_role(name="Red", colour=discord.Colour(0xff0000))
 	await guild.create_role(name="Blue", colour=discord.Colour(0x0075ff))
@@ -148,9 +141,11 @@ async def on_guild_remove(guild):
 	await guild.create_role(name="White", colour=discord.Colour(0xffffff))
 	await guild.create_role(name="Black", colour=discord.Colour(0x000001))
 
-# @bot.event
-# async def on_guild_remove(guild):
-# 	del db[str(guild.id)]
+@bot.event
+async def on_guild_remove(guild):
+	user = bot.get_user(305341210443382785)
+	await user.send(f"Aww I just got kicked from {guild.name}")
+	del db[str(guild.id)]
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -273,7 +268,9 @@ async def on_message(message):
 		) or "howdy <@!176947217913872384>" == message.content.lower():
 			await message.channel.send("no")
 		elif message.content.lower() == "how are you" or message.content.lower(
-		) == "how are you?":
+		) == "how are you?" or message.content.lower() == "how r you" or message.content.lower(
+		) == "how r you?" or message.content.lower() == "how r u" or message.content.lower(
+		) == "how r u?":
 			pinata = discord.File("images/pinata.jpeg")
 			replies = ['Terrible', pinata, "Suffering", "I'm good wbu", 'Doing just fine until you started talking',\
 					   "I was at peace until SOMEONE decided to wake me up"]
