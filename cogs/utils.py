@@ -90,7 +90,7 @@ class Utilities(commands.Cog):
 		if page is None or page.lower() in ("1", "2", "3", "4", "5", "6", "7", "8",
 											"action", "actions", "utilities",
 											"utils", "fun", "games", "currency",
-											"stonks", "music", "songs"):
+											"stonks", "music", "song", "songs"):
 			contents = [
 				f"**Side note: Commands in `<brackets>` are required, commands in `[brackets]` are optional,\
 		and `x|y` signifies x OR y**\n \
@@ -232,7 +232,7 @@ class Utilities(commands.Cog):
 					else:
 						ncontents = contents
 						cur_page = 6
-				elif page == "7" or page.lower() == "music" or page.lower(
+				elif page == "7" or page.lower() == "music" or page.lower() == "song" or page.lower(
 				) == "songs":
 					if page.isalpha():
 						ncontents.append(contents[6])
@@ -1144,11 +1144,31 @@ class Utilities(commands.Cog):
 		elif str(member) == "SlaveBot#1382":
 			await ctx.reply("Hah I cannot be kicked", mention_author=False)
 		else:
-			e = discord.Embed(title=f"{member} has been kicked", description = f"{ctx.author} kicked {member} due to the following reason:```{reason}```",\
-									colour = discord.Colour.dark_red(), timestamp=datetime.utcnow())
-			await ctx.reply(embed=e, mention_author=False)
-			await member.kick(reason=reason)
+			emojis = ["✅", "❎"]
+			e = discord.Embed(title="Ban confirmation", description = f"Are you sure you want to kick {member.mention}?",\
+								colour = discord.Colour.random(), timestamp=datetime.utcnow())
+			msg = await ctx.send(embed=e)
+			await msg.add_reaction(emojis[0])
+			await msg.add_reaction(emojis[1])
 
+			def check2(reaction, user):
+				return str(
+					reaction.emoji
+				) in emojis and user == ctx.author and reaction.message == msg
+
+			try:
+				reaction, user = await self.bot.wait_for('reaction_add', check=check2, timeout=30)
+
+				await msg.delete()
+				if str(reaction.emoji) == "✅":
+					e = discord.Embed(title=f"{member} has been kicked", description = f"{ctx.author} kicked {member} due to the following reason:```{reason}```",\
+											colour = discord.Colour.dark_red(), timestamp=datetime.utcnow())
+					await ctx.reply(embed=e, mention_author=False)
+					await member.kick(reason=reason)
+				else:
+					await ctx.reply("Ugh I really wanted to kick someone", mention_author=False)
+			except asyncio.TimeoutError:
+				await ctx.reply("You're taking so long, kinda tempted to kick YOU", mention_author=False)
 	@_kick.error
 	async def kick_error(self, ctx, error):
 		if isinstance(error, commands.MissingPermissions):
@@ -1306,24 +1326,31 @@ class Utilities(commands.Cog):
 			embed=embed)
 		
 
-
 	@commands.command()
 	@commands.guild_only()
 	@commands.cooldown(1, 5, commands.BucketType.user)
 	async def nick(self, ctx, member: Optional[discord.Member], *, name: str = None):
 		member = member or ctx.author
 		og = str(member.name)
-		if name is None:
-			if member.display_name == og:
-				await ctx.reply(f"Believe it or not, {og} is their real name",
+		if member == ctx.author:
+			if name:
+				if member.display_name == name:
+					await ctx.reply(f"Believe it or not, {member.display_name} is already your nickname",
+									mention_author=False)
+					return
+			elif member.display_name == og:
+				await ctx.reply(f"Believe it or not, {og} is your real name",
 								mention_author=False)
-				
 				return
 		else:
-			if member.display_name == name:
+			if name:
+				if member.display_name == name:
+					await ctx.reply(f"Believe it or not, {member.display_name} is already their nickname",
+									mention_author=False)
+					return
+			elif member.display_name == og:
 				await ctx.reply(f"Believe it or not, {og} is their real name",
 								mention_author=False)
-				
 				return
 		if name:
 			if len(name) > 32:
@@ -1510,6 +1537,7 @@ class Utilities(commands.Cog):
 
 	@commands.command(aliases=['ut'])
 	async def uptime(self, ctx):
+		#await ctx.reply(f"Bot was started <t:{int(self.start_time)}:R>", mention_author = False)
 		second = time() - self.start_time
 		minute, second = divmod(second, 60)
 		hour, minute = divmod(minute, 60)

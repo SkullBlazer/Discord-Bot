@@ -359,47 +359,54 @@ class Actions(commands.Cog):
 			return m.author == ctx.author and m.channel == ctx.message.channel
 
 		if question is None:
-			await ctx.send("You can't make a poll without a question now, can you?"
-						)
-		else:
-			if ctx.guild:
-				await ctx.message.delete()
-			a = await ctx.send("Add options (max. 10) separated by commas")
+			b = await ctx.send("Ask your question:")
 			try:
-				msg = await self.bot.wait_for('message', check=check, timeout=60.0)
-				options = str(msg.content).split(",")
+				question = await self.bot.wait_for('message', check=check, timeout=30.0)
 			except asyncio.TimeoutError:
 				await ctx.send("Poll closed due to inactivity.")
 				return
-			await a.delete()
-			if ctx.guild:
-				await msg.delete()
-			if len(options) <= 1:
-				await ctx.send('You need more than one option to make a poll')
-				return
-			if len(options) > 10:
-				await ctx.send('You cannot make a poll for more than 10 things!')
-				return
-			if len(options) == 2 and (options[0].lower() == 'yes' or options[1].lower() == 'y')\
-			and (options[1].lower() == 'no' or options[1].lower() == 'n'):
-				reactions = ['✅', '❎']
-			else:
-				reactions = [
-					'1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟'
-				]
+		await b.delete()
+		q = question.content
+		if ctx.guild:
+			await question.delete()
+			await ctx.message.delete()
+		a = await ctx.send("Add options (max. 10) separated by `|`")
+		try:
+			msg = await self.bot.wait_for('message', check=check, timeout=90.0)
+			options = str(msg.content).split("|")
+		except asyncio.TimeoutError:
+			await ctx.send("Poll closed due to inactivity.")
+			return
+		await a.delete()
+		if ctx.guild:
+			await msg.delete()
+		if len(options) <= 1:
+			await ctx.send('You need more than one option to make a poll')
+			return
+		if len(options) > 10:
+			await ctx.send('You cannot make a poll for more than 10 things!')
+			return
+		if len(options) == 2 and (options[0].lower() == 'yes' or options[1].lower() == 'y')\
+		and (options[1].lower() == 'no' or options[1].lower() == 'n'):
+			reactions = ['✅', '❎']
+		else:
+			reactions = [
+				'1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟'
+			]
 
-			description = []
-			for x, option in enumerate(options):
-				description += '\n {} {}'.format(reactions[x], option)
-			embed = discord.Embed(description=''.join(description),
-								color=discord.Colour.random(),
-								timestamp=datetime.utcnow())
-			embed.set_author(name=f"{ctx.author.name} asks: {question}",
-							icon_url=ctx.author.avatar_url)
-			react_message = await ctx.send(embed=embed)
-			for reaction in reactions[:len(options)]:
-				await react_message.add_reaction(reaction)
-			await react_message.edit(embed=embed)
+		description = []
+		for x, option in enumerate(options):
+			description += '\n {} {}'.format(reactions[x], option)
+		embed = discord.Embed(description=''.join(description),
+							color=discord.Colour.random(),
+							timestamp=datetime.utcnow())
+		embed.set_author(name=q,
+						icon_url=ctx.author.avatar_url)
+		embed.set_footer(text=f"Asked by {ctx.author}")
+		react_message = await ctx.send(embed=embed)
+		for reaction in reactions[:len(options)]:
+			await react_message.add_reaction(reaction)
+		await react_message.edit(embed=embed)
 
 
 	@commands.command(aliases=['patpat'])
@@ -415,8 +422,8 @@ class Actions(commands.Cog):
 			)
 			return
 		else:
-			patted = ", ".join(x.name for x in members)
-		await ctx.send('{} just got patted {}'.format(patted, reason))
+			patted = ", ".join(x.mention for x in members)
+		await ctx.send('{} just got patted {}'.format(patted, reason), allowed_mentions=discord.AllowedMentions.none())
 		if patted == "SlaveBot":
 			await asyncio.sleep(1)
 			await ctx.send("yay")
@@ -439,11 +446,11 @@ class Actions(commands.Cog):
 			await ctx.send(file=fle)
 			return
 		else:
-			stabbed = ", ".join(x.name for x in members)
+			stabbed = ", ".join(x.mention for x in members)
 		if stabbed == 'asgardian88' or stabbed == 'Akshita':
 			await ctx.send(file=discord.File('images/scary.jpeg'))
 		else:
-			await ctx.send('{} just got stabbed {}'.format(stabbed, reason))
+			await ctx.send('{} just got stabbed {}'.format(stabbed, reason), allowed_mentions=discord.AllowedMentions.none())
 			if stabbed == "SlaveBot":
 				await ctx.channel.trigger_typing()
 				await asyncio.sleep(1)
@@ -500,10 +507,10 @@ class Actions(commands.Cog):
 		base.paste(rav2, (498, 182), rav2)
 		base.save("bonky/edit.png")
 		if bonker == ctx.author:
-			await ctx.send('{} just got bonked {}'.format(bonked.name, reason))
+			await ctx.send('{} just got bonked {}'.format(bonked.mention, reason), allowed_mentions=discord.AllowedMentions.none())
 		else:
 			await ctx.send('{} just got bonked by {} {}'.format(
-				bonked.name, bonker.name, reason))
+				bonked.mention, bonker.mention, reason), allowed_mentions=discord.AllowedMentions.none())
 		await ctx.send(file=discord.File('bonky/edit.png'))
 		if bonked.name == "SlaveBot":
 			await ctx.channel.trigger_typing()
@@ -538,7 +545,7 @@ class Actions(commands.Cog):
 		base.paste(rav1, (220, 40), rav1)
 		base.paste(rav2, (305, 12), rav2)
 		base.save("yeetus/yedit.png")
-		await ctx.send(f"{ctx.author.name} yeeted {member.name} into oblivion because {reason}")
+		await ctx.send(f"{ctx.author.mention} yeeted {member.mention} into oblivion because {reason}", allowed_mentions=discord.AllowedMentions.none())
 		await ctx.send(file=discord.File('yeetus/yedit.png'))
 		if member.name == "SlaveBot":
 			await ctx.channel.trigger_typing()

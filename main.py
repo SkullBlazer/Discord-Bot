@@ -27,6 +27,7 @@ from datetime import datetime
 #import scipy.ndimage
 ##import urllib.parse, urllib.request
 import requests
+# import aiohttp
 #import itertools
 #import functools
 #import wikipedia
@@ -61,6 +62,7 @@ try:
 	print(f"Rate limit {int(r.headers['Retry-After']) / 60} minutes left")
 except:
 	print("No rate limit")
+#url = "https://discord.com/api/v1"
 #kclient = ksoftapi.Client('')
 count = 7
 temp = 0
@@ -74,7 +76,12 @@ trusted = [
 
 @bot.event
 async def on_ready():
-	global once
+	# async with aiohttp.ClientSession() as session: 
+	# 	async with session.get(url=url) as resp:
+	# 		try:
+	# 			print(f"Rate limit {int(resp.headers['Retry-After']) / 60} minutes left")
+	# 		except:
+	# 			print("No rate limit")
 	# try:
 	# 	with open("datafiles/data.txt") as json_file:
 	# 		credits = json.load(json_file)
@@ -104,10 +111,10 @@ async def on_ready():
 @bot.event
 async def on_guild_join(guild):
 	channel = guild.text_channels[0]
-	link = await channel.create_invite()
+	#link = await channel.create_invite()
 	user = bot.get_user(305341210443382785)
-	await user.send(f"I have been added to a server {guild.name} and its owner is {guild.owner}")
-	await user.send(link)
+	await user.send(f"I have been added to a server {guild.name} (id: {guild.id}) and its owner is {guild.owner}")
+	#await user.send(link)
 	# with open('datafiles/prefixes.json') as fle:
 		# prefixes = json.load(fle)
 	if str(guild.id) not in db:
@@ -128,18 +135,38 @@ async def on_guild_join(guild):
 		except:
 			i += 1
 	#	await guild.create_role(name="Moderator", colour=discord.Colour(0x7289da), permissions=discord.Permissions.all())
-	await guild.create_role(name="Invisible", colour=discord.Colour(0x36393e))
-	await guild.create_role(name="Red", colour=discord.Colour(0xff0000))
-	await guild.create_role(name="Blue", colour=discord.Colour(0x0075ff))
-	await guild.create_role(name="Green", colour=discord.Colour(0xb0ff00))
-	await guild.create_role(name="Yellow", colour=discord.Colour(0xffff00))
-	await guild.create_role(name="Gold", colour=discord.Colour(0xffb700))
-	await guild.create_role(name="Purple", colour=discord.Colour(0x8700ff))
-	await guild.create_role(name="Orange", colour=discord.Colour(0xff8b00))
-	await guild.create_role(name="Cyan", colour=discord.Colour(0x1abc9c))
-	await guild.create_role(name="Pink", colour=discord.Colour(0xff1493))
-	await guild.create_role(name="White", colour=discord.Colour(0xffffff))
-	await guild.create_role(name="Black", colour=discord.Colour(0x000001))
+	msg = await channel.send("Do you want me to add colour roles to be able to use the `>>colourchange` command?")
+	emojis = ["✅", "❎"]
+	await msg.add_reaction(emojis[0])
+	await msg.add_reaction(emojis[1])
+
+	def check2(reaction, user):
+		return str(
+			reaction.emoji
+		) in emojis and (user.guild_permissions.administrator or user == guild.owner) and (not user.bot) and reaction.message == msg
+
+	try:
+		reaction, user = await bot.wait_for('reaction_add',
+													check=check2,
+													timeout=60)
+		if str(reaction.emoji) == "✅":
+			await guild.create_role(name="Invisible", colour=discord.Colour(0x36393e))
+			await guild.create_role(name="Red", colour=discord.Colour(0xff0000))
+			await guild.create_role(name="Blue", colour=discord.Colour(0x0075ff))
+			await guild.create_role(name="Green", colour=discord.Colour(0xb0ff00))
+			await guild.create_role(name="Yellow", colour=discord.Colour(0xffff00))
+			await guild.create_role(name="Gold", colour=discord.Colour(0xffb700))
+			await guild.create_role(name="Purple", colour=discord.Colour(0x8700ff))
+			await guild.create_role(name="Orange", colour=discord.Colour(0xff8b00))
+			await guild.create_role(name="Cyan", colour=discord.Colour(0x1abc9c))
+			await guild.create_role(name="Pink", colour=discord.Colour(0xff1493))
+			await guild.create_role(name="White", colour=discord.Colour(0xffffff))
+			await guild.create_role(name="Black", colour=discord.Colour(0x000001))
+			await channel.send("Added colour roles, you can get them by doing `>>colourchange <Colour>`. If you want to see the list of available colours, do `>>help colourchange`")
+		else:
+			await channel.send("Alright, no roles added")
+	except asyncio.TimeoutError:
+		await channel.send("No one responded, ig I won't add them")
 
 @bot.event
 async def on_guild_remove(guild):
@@ -308,16 +335,18 @@ async def on_message(message):
 			if message.guild:
 				if message.guild.id in trusted:
 					await message.channel.send("Goodbye sir")
-			else:
-				await message.channel.send("Goodbye sir")
 		elif 'chup' == message.content.lower(
 		) or 'shup' == message.content.lower(
 		) or 'shut up' == message.content.lower():
 			await message.channel.send("no u")
 		elif 'shut' == message.content.lower():
+			if message.channel.guild:
+				await message.delete()
 			fle = discord.File('images/shut.png')
 			await message.channel.send(file=fle)
 		elif message.content == 'E':
+			if message.channel.guild:
+				await message.delete()
 			mark = discord.File("images/e.jpeg")
 			await message.channel.send(file=mark)
 		elif message.content.lower() == "f":
@@ -421,20 +450,24 @@ async def on_message(message):
 				if message.guild.id in trusted:
 					apoora = discord.File('images/apoorafull.jpeg')
 					await message.channel.send(file=apoora)
-		elif message.content.lower() == "troll hehe" and message.channel.guild:
-			await message.delete()
-			await message.guild.me.edit(nick="Real Pokecord")
-			fle = discord.File('images/tom.jpeg', filename="image.jpeg")
-			e = discord.Embed(title = "A wild pokemon has appeared",\
-							  description = f"Use `pp!release <pokemon name> to catch it`")
-			e.set_image(url="attachment://image.jpeg")
-			e.set_footer(text="The next pokemon will replace this one!")
-			e.timestamp = datetime.utcnow()
-			await message.channel.send(file=fle, embed=e)
-			await asyncio.sleep(30)
-			await message.guild.me.edit(nick="SlaveBot")
+		elif message.content.lower() == "troll hehe":
+			if message.channel.guild:
+				await message.delete()
+				await message.guild.me.edit(nick="Real Pokecord")
+				fle = discord.File('images/tom.jpeg', filename="image.jpeg")
+				e = discord.Embed(title = "A wild pokemon has appeared",\
+								description = f"Use `pp!release <pokemon name> to catch it`")
+				e.set_image(url="attachment://image.jpeg")
+				e.set_footer(text="The next pokemon will replace this one!")
+				e.timestamp = datetime.utcnow()
+				await message.channel.send(file=fle, embed=e)
+				await asyncio.sleep(30)
+				await message.guild.me.edit(nick="SlaveBot")
 		elif 'thanks' == message.content.lower():
 			await message.channel.send("No problemo")
+		# elif 'pping' == message.content.lower():
+		# 	await message.channel.send(message.author.mention)
+		# 	await message.channel.send(message.author.mention, allowed_mentions=discord.AllowedMentions.none())
 		elif 'test' == message.content.lower() and str(
 			message.author) == "SkullBlazer#9339":
 			await message.channel.send(':ballot_box_with_check: Seen at ' + datetime.now().strftime("%H:%M:%S"))
