@@ -26,8 +26,8 @@ from datetime import datetime
 #import imageio
 #import scipy.ndimage
 ##import urllib.parse, urllib.request
-import requests
-# import aiohttp
+#import requests
+import aiohttp
 #import itertools
 #import functools
 #import wikipedia
@@ -57,12 +57,21 @@ bot = commands.Bot(command_prefix=get_prefix,
 				   case_insensitive=True,
 				   intents=intents)
 bot.remove_command('help')
-r = requests.head(url="https://discord.com/api/v1")
-try:
-	print(f"Rate limit {int(r.headers['Retry-After']) / 60} minutes left")
-except:
-	print("No rate limit")
-#url = "https://discord.com/api/v1"
+
+async def zindahaikya():
+	async with aiohttp.ClientSession() as session: 
+		async with session.get(url="https://discord.com/api/v1") as resp:
+			try:
+				print(f"Rate limit {int(resp.headers['Retry-After']) / 60} minutes left")
+			except:
+				print("No rate limit")
+loop = asyncio.get_event_loop()
+loop.run_until_complete(zindahaikya())
+# r = requests.head(url="https://discord.com/api/v1")
+# try:
+# 	print(f"Rate limit {int(r.headers['Retry-After']) / 60} minutes left")
+# except:
+# 	print("No rate limit")
 #kclient = ksoftapi.Client('')
 count = 7
 temp = 0

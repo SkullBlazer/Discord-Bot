@@ -4,6 +4,7 @@ import os
 from discord.ext import commands
 #import openai
 import random
+import aiohttp
 from datetime import datetime
 from PIL import Image
 from typing import Optional
@@ -11,7 +12,7 @@ import numpy as np
 import cv2
 import imageio
 import scipy.ndimage
-import requests
+#import requests
 import wikipedia
 import xkcd
 
@@ -155,29 +156,33 @@ class Actions(commands.Cog):
 		
 		URL = 'https://official-joke-api.appspot.com/random_joke'
 
-		def check_valid_status_code(request):
-			if request.status_code == 200:
-				return request.json()
+		async def check_valid_status_code(request):
+			if request.status == 200:
+				return await request.json()
 			return False
 
-		def get_joke():
-			request = requests.get(URL)
-			data = check_valid_status_code(request)
-			return data
+		async def get_joke():
+			async with aiohttp.ClientSession() as session: 
+				async with session.get(url=URL) as resp:
+					# request = requests.get(URL)
+					data = await check_valid_status_code(resp)
+					return data
 
-		joke = get_joke()
+		joke = await get_joke()
 		if joke == False:
 			await ctx.send("Couldn't get joke from API. Try again later.")
 		else:
 			await ctx.send(joke['setup'] + '\n' + f"||{joke['punchline']}||")
 
 
-	def download_file(self, url, destination):
-		req = requests.get(url)
-		file = open(destination, "wb")
-		for chunk in req.iter_content(100000):
-			file.write(chunk)
-		file.close()
+	async def download_file(self, url, destination):
+		async with aiohttp.ClientSession() as session: 
+			async with session.get(url=url) as resp:
+				#req = requests.get(url)
+				file = open(destination, "wb")
+				async for chunk in resp.content.iter_chunked(100000):
+					file.write(chunk)
+				file.close()
 
 
 	def get_avatar(self, user, animate=True):
@@ -213,7 +218,7 @@ class Actions(commands.Cog):
 		if member is None:
 			member = ctx.author
 		actions = self.bot.get_cog('Actions')
-		actions.download_file(actions.get_avatar(member, True), "images/trigger.png")
+		await actions.download_file(actions.get_avatar(member, True), "images/trigger.png")
 		avatar = Image.open("images/trigger.png")
 		triggered = actions.rescale(Image.open("images/triggered.jpeg"), avatar.size)
 		position = 0, avatar.getbbox()[3] - triggered.getbbox()[3]
@@ -228,7 +233,7 @@ class Actions(commands.Cog):
 		if user is None:
 			user = ctx.author
 		actions = self.bot.get_cog('Actions')
-		actions.download_file(actions.get_avatar(user, True), "images/blackandwhite.png")
+		await actions.download_file(actions.get_avatar(user, True), "images/blackandwhite.png")
 		avatar = Image.open("images/blackandwhite.png").convert("L")
 		avatar.save("images/blackandwhite.png")
 		await ctx.send(file=discord.File("images/blackandwhite.png"))
@@ -240,7 +245,7 @@ class Actions(commands.Cog):
 		if user is None:
 			user = ctx.author
 		actions = self.bot.get_cog('Actions')
-		actions.download_file(actions.get_avatar(user, False), "images/cartoon.jpg")
+		await actions.download_file(actions.get_avatar(user, False), "images/cartoon.jpg")
 		img = cv2.imread("images/cartoon.jpg")
 		gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 		gray = cv2.medianBlur(gray, 5)
@@ -258,7 +263,7 @@ class Actions(commands.Cog):
 		if not user:
 			user = ctx.author
 		actions = self.bot.get_cog('Actions')
-		actions.download_file(actions.get_avatar(user, False), "images/draw.png")
+		await actions.download_file(actions.get_avatar(user, False), "images/draw.png")
 		s = imageio.imread("images/draw.png")
 		g = actions.grayscale(s)
 		i = 255 - g
@@ -362,17 +367,26 @@ class Actions(commands.Cog):
 			b = await ctx.send("Ask your question:")
 			try:
 				question = await self.bot.wait_for('message', check=check, timeout=30.0)
+				await b.delete()
+				q = question.content
+				if q.lower() == "cancel":
+					await ctx.send("Cancelled")
+					return
+				if ctx.guild:
+					await question.delete()
 			except asyncio.TimeoutError:
 				await ctx.send("Poll closed due to inactivity.")
 				return
-		await b.delete()
-		q = question.content
+		else:
+			q = question
 		if ctx.guild:
-			await question.delete()
 			await ctx.message.delete()
 		a = await ctx.send("Add options (max. 10) separated by `|`")
 		try:
 			msg = await self.bot.wait_for('message', check=check, timeout=90.0)
+			if msg.content.lower() == "cancel":
+				await ctx.send("Cancelled")
+				return
 			options = str(msg.content).split("|")
 		except asyncio.TimeoutError:
 			await ctx.send("Poll closed due to inactivity.")
@@ -415,7 +429,7 @@ class Actions(commands.Cog):
 				*,
 				reason='for doing an excellent job'):
 		if members is None:
-			patted = "SkullBlazer"
+			patted = "<@305341210443382785>"
 		elif ctx.author in members:
 			await ctx.send(
 				"Patting yourself is banned in 130 countries. Ask someone else to do it"
@@ -424,10 +438,10 @@ class Actions(commands.Cog):
 		else:
 			patted = ", ".join(x.mention for x in members)
 		await ctx.send('{} just got patted {}'.format(patted, reason), allowed_mentions=discord.AllowedMentions.none())
-		if patted == "SlaveBot":
+		if "<@783314693086380032>" in patted:
 			await asyncio.sleep(1)
 			await ctx.send("yay")
-		if patted == 'SkullBlazer':
+		if patted == 'SkullBlazer' or patted == "<@305341210443382785>":
 			await ctx.send(file=discord.File('images/patpat.jpeg'))
 
 
@@ -440,18 +454,18 @@ class Actions(commands.Cog):
 			await ctx.send("Excuse me this is a mass-murder free zone.")
 			return
 		if members is None:
-			stabbed = "SlaveBot"
+			stabbed = ctx.guild.me
 		elif ctx.author in members:
 			fle = discord.File('images/scarn.gif')
 			await ctx.send(file=fle)
 			return
 		else:
 			stabbed = ", ".join(x.mention for x in members)
-		if stabbed == 'asgardian88' or stabbed == 'Akshita':
+		if stabbed == '<@767734877515939900>' or stabbed == '<@785348314019266560>':
 			await ctx.send(file=discord.File('images/scary.jpeg'))
 		else:
 			await ctx.send('{} just got stabbed {}'.format(stabbed, reason), allowed_mentions=discord.AllowedMentions.none())
-			if stabbed == "SlaveBot":
+			if "<@783314693086380032>" in stabbed:
 				await ctx.channel.trigger_typing()
 				await asyncio.sleep(1)
 				await ctx.send("owie")
@@ -486,10 +500,10 @@ class Actions(commands.Cog):
 			return
 		else:
 			#		 bonked = member.name
-			a.download_file(a.get_avatar(bonked, False), "bonky/bonk2.png")
+			await a.download_file(a.get_avatar(bonked, False), "bonky/bonk2.png")
 			av2 = Image.open("bonky/bonk2.png")
 		base = Image.open("bonky/cheemsbonk.png")
-		a.download_file(a.get_avatar(bonker, False), "bonky/bonk1.png")
+		await a.download_file(a.get_avatar(bonker, False), "bonky/bonk1.png")
 		av1 = Image.open("bonky/bonk1.png")
 		#	 txt = Image.new("RGBA", base.size, (255,255,255,0))
 		#	 fnt = ImageFont.truetype("/usr/share/fonts/truetype/msttcorefonts/Comic_Sans_MS_Bold.ttf", 40)
@@ -531,10 +545,10 @@ class Actions(commands.Cog):
 			fle = discord.File('images/scarn.gif')
 			await ctx.send(file=fle)
 			return
-		a.download_file(a.get_avatar(member, False), "yeetus/yeet2.png")
+		await a.download_file(a.get_avatar(member, False), "yeetus/yeet2.png")
 		av2 = Image.open("yeetus/yeet2.png")
 		base = Image.open("yeetus/yeet.png")
-		a.download_file(a.get_avatar(ctx.author, False), "yeetus/yeet1.png")
+		await a.download_file(a.get_avatar(ctx.author, False), "yeetus/yeet1.png")
 		av1 = Image.open("yeetus/yeet1.png")
 		rav1 = a.rescale(av1, (35, 35))
 		rav2 = a.rescale(av2, (35, 35))
@@ -600,44 +614,46 @@ class Actions(commands.Cog):
 		api_key = os.environ['WEATHER_KEY']
 		base_url = "https://api.openweathermap.org/data/2.5/weather?"
 		complete_url = base_url + "appid=" + api_key + "&q=" + city
-		response = requests.get(complete_url)
-		x = response.json()
-		if x["cod"] != "404":
-			y = x["main"]
-			current_temperature_celsius = str(round(y["temp"] - 273.15))
-			current_pressure = (y["pressure"]*100/101325)
-			current_humidity = y["humidity"]
-			z = x["weather"]
-			desc = z[0]["description"]
-			embed = discord.Embed(title=f"Weather in {city.title()}",
-								color=discord.Colour.random(),
-								timestamp=ctx.message.created_at)
-			embed.add_field(name="Description", value=f"**{desc.capitalize()}**", inline=False)
-			embed.add_field(name="Temperature", value=f"**{current_temperature_celsius}°C**", inline=False)
-			embed.add_field(name="Humidity", value=f"**{current_humidity}%**", inline=False)
-			embed.add_field(name="Atmospheric Pressure", value=f"**{round(current_pressure,3)}atm**", inline=False)
-			if "clouds" in desc:
-				fle = discord.File("weather/cloudy.png", filename="image.png")
-			elif desc == "haze" or desc == "smoke":
-				fle = discord.File("weather/haze.png", filename="image.png")
-			elif desc == "clear sky":
-				fle = discord.File("weather/sunny.png", filename="image.png")
-			elif desc == "light rain" or desc == "light intensity drizzle":
-				fle = discord.File("weather/light_rain.png", filename="image.png")
-			elif desc == "moderate rain" or desc == "heavy intensity rain":
-				fle = discord.File("weather/heavy_rain.png", filename="image.png")
-			elif desc == "light snow":
-				fle = discord.File("weather/snowy.png", filename="image.png")
-			elif desc == "mist":
-				fle = discord.File("weather/mist.png", filename="image.png")
-			else:
-				fle = discord.File("weather/wind.png", filename="image.png")
-			embed.set_thumbnail(url="attachment://image.png")
-			embed.set_footer(icon_url=ctx.author.avatar_url,
-								text=f"Requested by {ctx.author.name}")
-			await ctx.reply(file=fle, embed=embed, mention_author=False)
-		else:
-			await ctx.reply("That city doesn't exist yet", mention_author=False)
+		async with aiohttp.ClientSession() as session:
+			async with session.get(url=complete_url) as resp:
+				#response = requests.get(complete_url)
+				x = await resp.json()
+				if x["cod"] != "404":
+					y = x["main"]
+					current_temperature_celsius = str(round(y["temp"] - 273.15))
+					current_pressure = (y["pressure"]*100/101325)
+					current_humidity = y["humidity"]
+					z = x["weather"]
+					desc = z[0]["description"]
+					embed = discord.Embed(title=f"Weather in {city.title()}",
+										color=discord.Colour.random(),
+										timestamp=ctx.message.created_at)
+					embed.add_field(name="Description", value=f"**{desc.capitalize()}**", inline=False)
+					embed.add_field(name="Temperature", value=f"**{current_temperature_celsius}°C**", inline=False)
+					embed.add_field(name="Humidity", value=f"**{current_humidity}%**", inline=False)
+					embed.add_field(name="Atmospheric Pressure", value=f"**{round(current_pressure,3)}atm**", inline=False)
+					if "clouds" in desc:
+						fle = discord.File("weather/cloudy.png", filename="image.png")
+					elif desc == "haze" or desc == "smoke":
+						fle = discord.File("weather/haze.png", filename="image.png")
+					elif desc == "clear sky":
+						fle = discord.File("weather/sunny.png", filename="image.png")
+					elif desc == "light rain" or desc == "light intensity drizzle":
+						fle = discord.File("weather/light_rain.png", filename="image.png")
+					elif desc == "moderate rain" or desc == "heavy intensity rain":
+						fle = discord.File("weather/heavy_rain.png", filename="image.png")
+					elif desc == "light snow":
+						fle = discord.File("weather/snowy.png", filename="image.png")
+					elif desc == "mist":
+						fle = discord.File("weather/mist.png", filename="image.png")
+					else:
+						fle = discord.File("weather/wind.png", filename="image.png")
+					embed.set_thumbnail(url="attachment://image.png")
+					embed.set_footer(icon_url=ctx.author.avatar_url,
+										text=f"Requested by {ctx.author.name}")
+					await ctx.reply(file=fle, embed=embed, mention_author=False)
+				else:
+					await ctx.reply("That city doesn't exist yet", mention_author=False)
 
 def setup(bot):
 	bot.add_cog(Actions(bot))

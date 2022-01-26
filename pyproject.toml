@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "repl_python3_Discord-Bot"
-version = "2.0.2"
-description = ""
+version = "3.2.0"
+description = "I.... have no idea"
 authors = ["Avaneesh Shetye"]
 
 [tool.poetry.dependencies]
