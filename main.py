@@ -9,7 +9,7 @@ import os
 from dotenv import load_dotenv
 from discord.ext import commands
 ##subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'discord-py-slash-command'])
-#from discord_slash import SlashCommand
+#from discord_slash import SlashCommand	
 #from discord_slash.utils.manage_commands import create_option
 #import openai
 import random
@@ -49,17 +49,17 @@ def get_prefix(bot, message):
 		# prefixes = json.load(fle)
 	if not isinstance(message.channel, discord.DMChannel):
 		return db[str(message.guild.id)][1]
-	else:
-		return ">>"
+	return ">>"
 
 
 bot = commands.Bot(command_prefix=get_prefix,
 				   case_insensitive=True,
-				   intents=intents)
+				   intents=intents,
+				  activity=discord.Game(name="Offline college 😕"))
 bot.remove_command('help')
 
 async def zindahaikya():
-	async with aiohttp.ClientSession() as session: 
+	async with aiohttp.ClientSession() as session:
 		async with session.get(url="https://discord.com/api/v1") as resp:
 			try:
 				print(f"Rate limit {int(resp.headers['Retry-After']) / 60} minutes left")
@@ -80,7 +80,8 @@ queues = {}
 gaem = []
 trusted = [
 	785230154258448415, 781150150630440970, 777217934074445834,
-	785564485384405033, 783643344202760213, 767752540980248586
+	785564485384405033, 783643344202760213, 767752540980248586,
+	786275986857525248
 ]
 
 @bot.event
@@ -100,7 +101,7 @@ async def on_ready():
 	await bot.wait_until_ready()
 	# await bot.change_presence(activity=discord.Activity(
 	# 	type=discord.ActivityType.watching, name="Avadhoot's birthday"))
-	await bot.change_presence(activity=discord.Game(name="Offline college? Online college?"))
+	# await bot.change_presence(activity=discord.Game(name="Offline college? Online college?"))
 	# await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="my master panik about exams"))
 	# await bot.change_presence(status=discord.Status.dnd)
 	# await bot.change_presence(activity=discord.Streaming(name="the exam answers", url="https://youtu.be/dQw4w9WgXcQ"))
@@ -113,8 +114,8 @@ async def on_ready():
 
 # @bot.event
 # async def on_member_remove(member):
-#	 channel = bot.get_channel(781150150630440973)
-#	 await channel.send(f"{member} couldn't handle this server")
+# 	channel = bot.get_channel(781150150630440973)
+# 	await channel.send(f"{member} couldn't handle this server")
 
 
 @bot.event
@@ -143,7 +144,7 @@ async def on_guild_join(guild):
 			break
 		except:
 			i += 1
-	#	await guild.create_role(name="Moderator", colour=discord.Colour(0x7289da), permissions=discord.Permissions.all())
+		# await guild.create_role(name="Moderator", colour=discord.Colour(0x7289da), permissions=discord.Permissions.all())
 	msg = await channel.send("Do you want me to add colour roles to be able to use the `>>colourchange` command?")
 	emojis = ["✅", "❎"]
 	await msg.add_reaction(emojis[0])
@@ -202,13 +203,18 @@ async def on_command_error(ctx, error):
 				await ctx.send("~~Jk it's not a valid command, but you received the secret error message!~~")
 			else:
 				await ctx.send("That.... that's not a valid command")
+	elif isinstance(error, commands.CommandOnCooldown):
+		currency = bot.get_cog('Currency')
+		e = discord.Embed(title=f'Error in {ctx.command.name}', description = f'[This command is ratelimited, please try again in {currency.convert(error.retry_after)}.]({ctx.message.jump_url})', timestamp=datetime.utcnow(), colour=discord.Color.red())
+		e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+		await ctx.reply(embed=e, mention_author=False)
 	elif isinstance(error, commands.CheckAnyFailure):
-		await ctx.send("That.... that's not a valid command")
+		await ctx.send("That... that's not a valid command")
 		return
-	elif (not isinstance(error, commands.CheckAnyFailure)):
+	else:
 		e = discord.Embed(title=f'Error in {ctx.command.name}', description = f'[{error}]({ctx.message.jump_url})', timestamp=datetime.utcnow(), colour=discord.Color.red())
 		e.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
-		await ctx.send(embed=e)
+		await ctx.reply(embed=e, mention_author=False)
 
 @bot.command()
 @commands.check_any(commands.is_owner())
@@ -273,6 +279,7 @@ async def on_message(message):
 		if not something:
 			await bot.process_commands(message)
 			return
+
 		if message.content.lower(
 		) == "<@!783314693086380032> hello" or message.content.lower(
 		) == "hello <@!783314693086380032>":
@@ -300,9 +307,9 @@ async def on_message(message):
 		) or 'henlo' == message.content.lower(
 		) and message.guild.id in trusted:
 			await message.channel.send("Hai!!")
-		elif "howdy" == message.content.lower(
-		) or "howdy <@!176947217913872384>" == message.content.lower():
-			await message.channel.send("no")
+		# elif "howdy" == message.content.lower(
+		# ) or "howdy <@!176947217913872384>" == message.content.lower():
+		# 	await message.channel.send("no")
 		elif message.content.lower() == "how are you" or message.content.lower(
 		) == "how are you?" or message.content.lower() == "how r you" or message.content.lower(
 		) == "how r you?" or message.content.lower() == "how r u" or message.content.lower(
@@ -326,11 +333,11 @@ async def on_message(message):
 		elif message.content.lower(
 		) == "pp!release spoilerman":  # or message.content.lower() == "pp!release apoora":
 			e = discord.Embed(
-				title="Pokémon Caught",
+				title="A Pokémon has been Caught",
 				description=
-				f"{message.author.mention} ~~stole~~ caught a level **69 Spoilerman:star:**."
+				f"**Name**: Spoilerman :star:\n**Level**: 69\n**IV Percent**: 42.069%\n\nCongratulations {message.author.mention}!"
 			)
-			e.set_footer(text="You have caught a Pokémon.")
+			e.set_footer(text="The Pokémon has been added to your collection.")
 			e.timestamp = datetime.utcnow()
 			await message.channel.send(embed=e)
 		elif message.content.lower() == "bye" or message.content.lower(
@@ -349,23 +356,25 @@ async def on_message(message):
 		) or 'shut up' == message.content.lower():
 			await message.channel.send("no u")
 		elif 'shut' == message.content.lower():
-			if message.channel.guild:
+			if message.guild:
 				await message.delete()
 			fle = discord.File('images/shut.png')
 			await message.channel.send(file=fle)
 		elif message.content == 'E':
-			if message.channel.guild:
+			if message.guild:
 				await message.delete()
 			mark = discord.File("images/e.jpeg")
 			await message.channel.send(file=mark)
-		elif message.content.lower() == "f":
-			if message.content.isupper():
+		elif message.content.lower() == "f" or message.content == ":regional_indicator_f:":
+			if message.content == "F":
 				await message.channel.send("F")
-			else:
+			elif message.content == "f":
 				await message.channel.send("f")
+			else:
+				await message.channel.send("🇫")
 		elif message.content.lower() == "no u":
 			await message.channel.send("I can do this all day")
-		elif str(6 * 9 + 6 + 9) == message.content:
+		elif "69" == message.content:
 			await message.channel.send("nice")
 		elif message.content.lower() == "not you" or message.content.lower(
 		) == 'not u':
@@ -425,17 +434,17 @@ async def on_message(message):
 				"Where did you come from Cotton Eyed Joe")
 		elif message.content.lower() == 'stonks':
 			await message.channel.send(file=discord.File('images/stonks.jpg'))
-		elif "why aren't pokemon spawning" in message.content.lower(
-		):
-			if message.guild:
-				if message.guild.id in trusted:
-					await message.guild.me.edit(nick="Pokecord")
-					await message.channel.send("Mujhe kya pata, mai Pokecord nahi hu")
-					await message.channel.trigger_typing()
-					await asyncio.sleep(3)
-					await message.channel.send("wait a minute")
-					await asyncio.sleep(1)
-					await message.guild.me.edit(nick="SlaveBot")
+		# elif "why aren't pokemon spawning" in message.content.lower(
+		# ):
+		# 	if message.guild:
+		# 		if message.guild.id in trusted:
+		# 			await message.guild.me.edit(nick="Pokecord")
+		# 			await message.channel.send("Mujhe kya pata, mai Pokecord nahi hu")
+		# 			await message.channel.trigger_typing()
+		# 			await asyncio.sleep(3)
+		# 			await message.channel.send("wait a minute")
+		# 			await asyncio.sleep(1)
+		# 			await message.guild.me.edit(nick="SlaveBot")
 #		 elif 'start the spam' == message.content.lower():
 #			 temp = 1
 #			 while True:
@@ -460,16 +469,17 @@ async def on_message(message):
 					apoora = discord.File('images/apoorafull.jpeg')
 					await message.channel.send(file=apoora)
 		elif message.content.lower() == "troll hehe":
-			if message.channel.guild:
+			if message.guild:
 				await message.delete()
 				await message.guild.me.edit(nick="Real Pokecord")
-				fle = discord.File('images/tom.jpeg', filename="image.jpeg")
-				e = discord.Embed(title = "A wild pokemon has appeared",\
-								description = f"Use `pp!release <pokemon name> to catch it`")
-				e.set_image(url="attachment://image.jpeg")
-				e.set_footer(text="The next pokemon will replace this one!")
-				e.timestamp = datetime.utcnow()
-				await message.channel.send(file=fle, embed=e)
+			fle = discord.File('images/tom.jpeg', filename="image.jpeg")
+			e = discord.Embed(title = "A wild pokemon has appeared",\
+							description = f"Use `pp!release <pokemon name> to catch it`")
+			e.set_image(url="attachment://image.jpeg")
+			e.set_footer(text="The next pokemon will replace this one!")
+			e.timestamp = datetime.utcnow()
+			await message.channel.send(file=fle, embed=e)
+			if message.guild:
 				await asyncio.sleep(30)
 				await message.guild.me.edit(nick="SlaveBot")
 		elif 'thanks' == message.content.lower():
@@ -481,6 +491,9 @@ async def on_message(message):
 			message.author) == "SkullBlazer#9339":
 			await message.channel.send(':ballot_box_with_check: Seen at ' + datetime.now().strftime("%H:%M:%S"))
 			await message.channel.send(f':ballot_box_with_check: Seen at {datetime.utcnow()}')
+		# elif message.content.lower() == "ping shubhi":
+		# 	for i in range(6):
+		# 		await message.channel.send("<@827085021705535488>")
 #	 else:
 #		 if str(message.author) == "Pokétwo#8236" and temp:
 #			 temp = 0

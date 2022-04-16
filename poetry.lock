@@ -205,21 +205,6 @@ MarkupSafe = ">=2.0"
 i18n = ["Babel (>=2.7)"]
 
 [[package]]
-name = "lavalink"
-version = "3.1.5"
-description = "A lavalink interface built for discord.py"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-aiohttp = ">=3.7.4,<3.9.0"
-
-[package.extras]
-development = ["pylint", "flake8"]
-docs = ["sphinx", "pygments", "guzzle-sphinx-theme"]
-
-[[package]]
 name = "lyricsgenius"
 version = "3.0.1"
 description = "Download lyrics and metadata from Genius.com"
@@ -481,7 +466,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "a90c6cbc5c04af0586ddb6624e1dc7fb0506b82be451c01c63b8239abe2782b6"
+content-hash = "a66637499845d8fbbc6f40b30f7d8e6faa9c4569ccd6bcace019cd4e0159fdc7"
 
 [metadata.files]
 aiohttp = [
@@ -634,9 +619,6 @@ itsdangerous = [
 jinja2 = [
     {file = "Jinja2-3.0.3-py3-none-any.whl", hash = "sha256:077ce6014f7b40d03b47d1f1ca4b0fc8328a692bd284016f806ed0eaca390ad8"},
     {file = "Jinja2-3.0.3.tar.gz", hash = "sha256:611bb273cd68f3b993fabdc4064fc858c5b47a973cb5aa7999ec1ba405c87cd7"},
-]
-lavalink = [
-    {file = "lavalink-3.1.5.tar.gz", hash = "sha256:9a1e6af1db19b1080b0d85533308e311bf7bc3a7eefdd53ef7f2acc4f76176f1"},
 ]
 lyricsgenius = [
     {file = "lyricsgenius-3.0.1-py3-none-any.whl", hash = "sha256:145df7d79e6b6ebe7ff6da9ed08c0cb43b251bb88f859339224b20e3f8399b05"},

@@ -107,7 +107,7 @@ class Currency(commands.Cog):
 						timestamp=datetime.utcnow())
 					e.set_footer(text="sucks to be you")
 				elif str(db[aid][1]).startswith("-"):
-					e = discord.Embed(
+					e = discord.Embed( 
 						description=f"You have {db[aid][1]:,} in your bank",
 						colour=discord.Colour.green(),
 						timestamp=datetime.utcnow())
@@ -256,7 +256,7 @@ class Currency(commands.Cog):
 					mention_author=False)
 				return
 			await ctx.send("Operator and amount")
-			mesg = await self.bot.wait_for("message", check=check, timeout=30)
+			mesg = await self.bot.wait_for("message", check=check, timeout=20)
 			emojis = ["✅", "❎"]
 			amt = str(mesg.content)
 			amt = amt.replace(",", "")
@@ -328,7 +328,7 @@ class Currency(commands.Cog):
 
 		reaction, user = await self.bot.wait_for('reaction_add',
 												 check=check2,
-												 timeout=30)
+												 timeout=20)
 		await msg.delete()
 		if str(reaction.emoji) == "✅":
 			if amt[0] == "+":
@@ -399,7 +399,7 @@ class Currency(commands.Cog):
 			reaction, user = await self.bot.wait_for('reaction_add',
 														check=check2,
 														timeout=30)
-			await msg.delete()
+			# await msg.delete()
 			if str(reaction.emoji) == "✅":
 				del db[uid]
 				await ctx.message.add_reaction('🗑️')
@@ -411,9 +411,8 @@ class Currency(commands.Cog):
 	@commands.command(pass_context=True)
 	@commands.cooldown(1, 10, commands.BucketType.user)
 	async def transfer(self, ctx,
-					   other: discord.Member = None,
-					   *,
-					   amount: str = None):
+					   amount: str = None,
+					   other: discord.Member = None):
 		if other is None:
 			await ctx.reply(
 				"Since no recipient was mentioned, all your money will go to ~~me~~ charity",
@@ -437,6 +436,8 @@ class Currency(commands.Cog):
 				amount = int(amount[:-1]) * 1000000000000
 			elif amount[-1].lower() == 'q':
 				amount = int(amount[:-1]) * 1000000000000000
+			elif amount[-1].lower() == 'i':
+				amount = int(amount[:-1]) * 1000000000000000000
 			elif amount[:1] == "sc" or amount[0] == "s":
 				amount = amount.split(" ")
 				if len(amount) != 2:
@@ -599,7 +600,6 @@ class Currency(commands.Cog):
 		 "<:4th:836165757641162792>", "<:5th:836165757418209292>", "<:6th:836165757595025430>", \
 		 "<:7th:836165757502095471>", "<:8th:836165757309550603>", "<:9th:836165757561602048>", \
 		 "<:769010theqts:836165757926113290>"]
-		count = 0
 		p = db[str(ctx.guild.id)][1]
 		if not term and not glbal:
 			async with ctx.typing():
@@ -752,36 +752,36 @@ class Currency(commands.Cog):
 				await ctx.reply(embed=e, mention_author=False)
 				db[aid][1] += 1000000000
 				return
-			if db[str(ctx.author.id)][0] == 70:
-				e1 = discord.Embed(
-					description=
-					"You will lose your 69 day streak, do you wish to continue?",
-					colour=discord.Colour.red(),
-					timestamp=datetime.utcnow())
-				e1.set_author(name="Confirmation",
-							  icon_url=ctx.author.avatar_url)
-				msg = await ctx.send(embed=e1)
-				await msg.add_reaction("✅")
-				await msg.add_reaction("❎")
+			# if db[str(ctx.author.id)][0] == 70:
+			# 	e1 = discord.Embed(
+			# 		description=
+			# 		"You will lose your 69 day streak, do you wish to continue?",
+			# 		colour=discord.Colour.red(),
+			# 		timestamp=datetime.utcnow())
+			# 	e1.set_author(name="Confirmation",
+			# 				  icon_url=ctx.author.avatar_url)
+			# 	msg = await ctx.send(embed=e1)
+			# 	await msg.add_reaction("✅")
+			# 	await msg.add_reaction("❎")
 
-				def check(reaction, user):
-					return str(reaction.emoji) in [
-						"✅", "❎"
-					] and user == ctx.author and reaction.message == msg
+			# 	def check(reaction, user):
+			# 		return str(reaction.emoji) in [
+			# 			"✅", "❎"
+			# 		] and user == ctx.author and reaction.message == msg
 
-				try:
-					reaction, user = await self.bot.wait_for("reaction_add",
-															 check=check,
-															 timeout=69)
-					await msg.delete()
-					if str(reaction.emoji) == "✅":
-						pass
-					else:
-						db[str(ctx.author.id)][0] -= 1
-						return
-				except asyncio.TimeoutError:
-					await ctx.reply(
-						"Easter egg heheh \n also here's a ping for no reason")
+			# 	try:
+			# 		reaction, user = await self.bot.wait_for("reaction_add",
+			# 												 check=check,
+			# 												 timeout=69)
+			# 		await msg.delete()
+			# 		if str(reaction.emoji) == "✅":
+			# 			pass
+			# 		else:
+			# 			db[str(ctx.author.id)][0] -= 1
+			# 			return
+			# 	except asyncio.TimeoutError:
+			# 		await ctx.reply(
+			# 			"Easter egg heheh \n also here's a ping for no reason")
 			if db[str(ctx.author.id)][2]["daily"]:
 				e = discord.Embed(
 					description=f"Added {10000+(2000*s):,} credits to bank.",
@@ -825,12 +825,12 @@ class Currency(commands.Cog):
 				if db[str(ctx.author.id)][2]["daily"]:
 					e.add_field(
 						name=f"{s} days wtf",
-						value=f"Damn bruh you a real one, have some supercharms")
-					db[aid][2]['supercharm'] += s/500 * 10
+						value=f"Damn bruh you a real one, have {s//10} supercharms")
+					db[aid][2]['supercharm'] += s//10
 				else:
 					e.add_field(name=f"{s} days wth",
-								value=f"Damn bruh you a real one, have some charms")
-					db[aid][2]['charm'] += s/500 * 10
+								value=f"Damn bruh you a real one, have {s//10} charms")
+					db[aid][2]['charm'] += s//10
 			elif s % 50 == 0 and s != 0:
 				if db[str(ctx.author.id)][2]["daily"]:
 					e.add_field(
@@ -890,19 +890,30 @@ class Currency(commands.Cog):
 			mplur = "minute"
 		if seconds == 1:
 			splur = "second"
-
-		return f"%d {hplur} %02d {mplur} %02d {splur}" % (hours, minutes,
-														  seconds)
-
-	@daily.error
-	async def daily_error(self, ctx, error):
-		if isinstance(error, commands.CommandOnCooldown):
-			currency = self.bot.get_cog('Currency')
-			msg = ('This command is ratelimited, please try again in %s' %
-				   currency.convert(error.retry_after))
-			await ctx.reply(msg, mention_author=False)
+		if hours == 0 and minutes == 0:
+			return f"%02d {splur}" % seconds
+		elif hours == 0 and int(seconds) == 0:
+			return f"%02d {mplur}" % minutes
+		elif minutes == 0 and int(seconds) == 0:
+			return f"%02d {hplur}" % hours
+		elif hours == 0:
+			return f"%02d {mplur} %02d {splur}" % (minutes, seconds)
+		elif minutes == 0:
+			return f"%d {hplur} %02d {splur}" % (hours, seconds)
+		elif int(seconds) == 0:
+			return f"%d {hplur} %02d {mplur}" % (hours, minutes)
 		else:
-			raise error
+			return f"%d {hplur} %02d {mplur} %02d {splur}" % (hours, minutes, seconds)
+
+	# @daily.error
+	# async def daily_error(self, ctx, error):
+	# 	if isinstance(error, commands.CommandOnCooldown):
+	# 		currency = self.bot.get_cog('Currency')
+	# 		msg = ('This command is ratelimited, please try again in %s' %
+	# 			   currency.convert(error.retry_after))
+	# 		await ctx.reply(msg, mention_author=False)
+	# 	else:
+	# 		raise error
 
 	@commands.command()
 	async def shop(self, ctx, page: str = "1"):
@@ -923,11 +934,11 @@ class Currency(commands.Cog):
 			e.add_field(name="Extra daily coins (`daily`)",
 						value="Cost - 1,000,000,000 coins",
 						inline=True)
-			e.add_field(name=f"Lucky charm for `{p}slots` (`charm`)",
+			e.add_field(name=f"Lucky charm (pack of 5) for `{p}slots` (`charm`)",
 						value="Cost - 25,000,000 coins",
 						inline=True)
 			e.add_field(
-				name=f"Super lucky charm for `{p}slots` (`supercharm`)",
+				name=f"Super lucky charm (pack of 3) for `{p}slots` (`supercharm`)",
 				value="Cost - 0.5% of your balance or 15,000,000,000",
 				inline=True)
 			e.set_footer(
@@ -973,9 +984,9 @@ class Currency(commands.Cog):
 		if amt < 1:
 			await ctx.send("-_-")
 			return
-		if item.lower() == "sc" or item.lower() == "s":
+		if item.lower() == "sc" or item.lower() == "s" or item.lower() == "sp":
 			item = "supercharm"
-		if item.lower() == "c":
+		if item.lower() == "c" or item.lower() == "cp":
 			item = "charm"
 		if item.lower() in self.shop:
 			bal = db[str(ctx.author.id)][1]
@@ -1017,7 +1028,7 @@ class Currency(commands.Cog):
 				e = discord.Embed(
 					title="Confirmation",
 					description=
-					f"Are you sure you want to buy {amt} {item} for {price:,}?",
+					f"Are you sure you want to buy {amt} {item} pack for {price:,}?",
 					timestamp=datetime.utcnow(),
 					colour=discord.Colour.green())
 				if item.lower() != "supercharm":
@@ -1036,7 +1047,7 @@ class Currency(commands.Cog):
 			try:
 				reaction, user = await self.bot.wait_for("reaction_add",
 														 check=check,
-														 timeout=69)
+														 timeout=30)
 				await msg.clear_reactions()
 				if str(reaction.emoji) == "✅":
 					db[str(ctx.author.id)][1] -= price
@@ -1092,7 +1103,7 @@ class Currency(commands.Cog):
 		try:
 			reaction, user = await self.bot.wait_for("reaction_add",
 													 check=check,
-													 timeout=69)
+													 timeout=30)
 			await msg.clear_reactions()
 			if str(reaction.emoji) == "✅":
 				db[str(ctx.author.id)][2][item.lower()] -= amt

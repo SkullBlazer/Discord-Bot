@@ -194,13 +194,25 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
 		duration = []
 		if days > 0:
-			duration.append('{} days'.format(days))
+			if days == 1:
+				duration.append('{} day'.format(days))
+			else:
+				duration.append('{} days'.format(days))
 		if hours > 0:
-			duration.append('{} hours'.format(hours))
+			if hours == 1:
+				duration.append('{} hour'.format(hours))
+			else:
+				duration.append('{} hours'.format(hours))
 		if minutes > 0:
-			duration.append('{} minutes'.format(minutes))
+			if minutes == 1:
+				duration.append('{} minute'.format(minutes))
+			else:
+				duration.append('{} minutes'.format(minutes))
 		if seconds > 0:
-			duration.append('{} seconds'.format(seconds))
+			if seconds == 1:
+				duration.append('{} second'.format(seconds))
+			else:
+				duration.append('{} seconds'.format(seconds))
 
 		return ', '.join(duration)
 
@@ -395,6 +407,22 @@ class Music(commands.Cog):
 		del self.voice_states[ctx.guild.id]
 		await ctx.send(f"Left **{ctx.guild.me.voice.channel}**")
 		
+	# @commands.command()
+	# async def voice_connect(self, ctx):
+	# 	if ctx.author == self.bot.user:
+	# 		return
+
+	# 	channel = ctx.author.voice.channel
+	# 	voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
+
+	# 	if voice and voice.is_connected():
+	# 		return voice, voice.source
+	# 	else:
+	# 		voice = await channel.connect()
+	# 		voice.source = discord.PCMVolumeTransformer(voice.source, volume=1.0)
+	# 		print(f"The bot has connected to {channel}\n")
+
+	# 	return voice, voice.source
 
 	@commands.command(name='volume')
 	async def _volume(self, ctx: commands.Context, *, volume: int=50):
@@ -409,11 +437,15 @@ class Music(commands.Cog):
 		if 0 > volume or volume > 100:
 			return await ctx.send('Volume must be between 0 and 100')
 
-		state = VoiceState(self.bot, ctx)
-		state._volume = volume/100
-		state.volume = volume/100
-		state.volume_change(volume/100)
-		ctx.voice_state.volume = volume / 100
+		# music = self.bot.get_cog('Music')
+		# voice, voice.source = await music.voice_connect(ctx)
+		voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
+		voice.source.volume = volume/100
+		# state = VoiceState(self.bot, ctx)
+		# state._volume = volume/100
+		# state.volume = volume/100
+		# state.volume_change(volume/100)
+		# ctx.voice_state.volume = volume / 100
 		await ctx.send('Volume of the player set to {}%'.format(volume))
 		
 
@@ -509,7 +541,25 @@ class Music(commands.Cog):
 
 		else:
 			await ctx.send('You have already voted to skip this song.')
+
+	@commands.command(aliases=['forceskip', 'fs'])
+	async def _forceskip(self, ctx: commands.Context):
+		"""Vote to skip a song. The requester can automatically skip.
+		3 skip votes are needed for the song to be skipped.
+		"""
+		try:
+			ctx.author.voice.channel
+		except AttributeError:
+			return await ctx.send("You're not in a voice channel.")
+
+		if not ctx.voice_state.is_playing:
+			return await ctx.send('Not playing any music right now...')
 		
+		if ctx.author.guild_permissions.administrator or ctx.author == ctx.guild.owner or ctx.author == ctx.voice_state.current.requester:
+			await ctx.message.add_reaction('⏭')
+			ctx.voice_state.skip()
+		else:
+			await ctx.reply("Plebs can't use this command lol get rekt", mention_author=False)
 
 	@commands.command(aliases=['queue', 'q'])
 	async def _queue(self, ctx: commands.Context, *, page: int = 1):
@@ -592,12 +642,16 @@ class Music(commands.Cog):
 		"""
 		if not ctx.voice_state.voice:
 			await ctx.invoke(self._join)
+		# elif ctx.voice_state.voice and len(ctx.voice_state.songs) == 0:
+		# 	await ctx.invoke(self._leave)
+		# 	await ctx.invoke(self._join)
 
 		ctx.voice_state.skip_votes = set()
 
 		if not search.startswith("https://open.spotify.com/"):
 			async with ctx.typing():
 				try:
+					subprocess.check_call(["youtube-dl", "--rm-cache-dir"])
 					source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
 				except YTDLError as e:
 					await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
@@ -706,6 +760,7 @@ class Music(commands.Cog):
 
 		async with ctx.typing():
 			try:
+				subprocess.check_call(["youtube-dl", "--rm-cache-dir"])
 				source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
 			except YTDLError as e:
 				await ctx.send('An error occurred while processing this request: {}'.format(str(e)))

@@ -1000,20 +1000,19 @@ class Fun(commands.Cog):
 
 
 	@commands.command()
-	async def roll(self, ctx, guess=None):
+	async def roll(self, ctx, guess:int=None):
 		self.onmessage = False
 		dieroll = random.randint(1, 6)
 		if guess is None:
 			await ctx.send(f"The die says {dieroll}!")
 		else:
-			if guess.isdigit():
-				if dieroll == int(guess):
-					await ctx.reply(f"Your guess was correct, it is a {dieroll}!",
-									mention_author=False)
-				else:
-					await ctx.reply(
-						f"Aw man, you didn't get it right! The die gave a {dieroll}.",
-						mention_author=False)
+			if dieroll == guess:
+				await ctx.reply(f"Your guess was correct, it is a {dieroll}!",
+								mention_author=False)
+			else:
+				await ctx.reply(
+					f"Aw man, you didn't get it right! The die gave a {dieroll}.",
+					mention_author=False)
 		self.onmessage = True
 
 

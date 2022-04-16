@@ -20,6 +20,7 @@ class Utilities(commands.Cog):
 		self.e_author = {}
 		self.e_content1 = {}
 		self.e_content2 = {}
+		self.e_editedat = {}
 		self.helpers = [827085021705535488, 752966473227698246, 549239308104499212, 545160834918121497, 481105381159075861, 805840189074440202, 672488766891622430, 766252351060312074, 812228206358560768, 783301818980630588, 348257666193293314, 755987916311756882, 785348314019266560]
 
 	@commands.Cog.listener()
@@ -70,6 +71,7 @@ class Utilities(commands.Cog):
 			self.e_author[message_before.channel.id] = message_before.author
 			self.e_content1[message_before.channel.id] = message_before.content
 			self.e_content2[message_after.channel.id] = message_after.content
+			self.e_editedat[message_after.channel.id] = message_after.edited_at
 			await asyncio.sleep(60)
 			try:
 				del self.e_author[message_before.channel.id]
@@ -166,7 +168,7 @@ class Utilities(commands.Cog):
 			`{p}register` \n > Register for a life of fun (and some ~~fake~~ dolla bills)\n \
 			`{p}daily` \n > Get that dough as you pass Go, every 23 hours (Hey that rhymed)\n \
 			`{p}balance [@person]` \n > Check how rich you are\n \
-			`{p}transfer <@person> [s|c] <amount>` \n > Feeling like a Good Samaritan? Donate! (5% of the money transferred goes to ~~me~~ taxes)\n \
+			`{p}transfer <amount> [s|c] <@person>` \n > Feeling like a Good Samaritan? Donate! (5% of the money transferred goes to ~~me~~ taxes)\n \
 			`{p}save` \n > Save your progress \n \
 			`{p}rich` \n > See the richest people in the server (Don't ask how I got 100 decillion, 10^35 for the nerds out here)",
 				f"**Side note: Commands in `<brackets>` are required, commands in `[brackets]` are optional,\
@@ -189,6 +191,7 @@ class Utilities(commands.Cog):
 			`{p}volume [volume]` \n > Change the volume to 100 when that beat drops.\n \
 			`{p}remove [index]` \n > Remove that one song from the playlist that no one likes.\n \
 			`{p}skip` \n > When the person next to you has one Uno card left, use this. Or you can also use it to skip a song.\n \
+			`{p}forceskip` \n > Use your admin powers to forcefully skip that one BTS song everyone likes and doesn't skip\n \
 			`{p}shuffle` \n > Use the bot's specially engineered shuffling mechanism to ensure all the bad songs are played together.\n \
 			`{p}loop` \n > When the song is just too good."
 			]
@@ -679,7 +682,7 @@ class Utilities(commands.Cog):
 		elif page == "volume":
 			e = discord.Embed(
 				title=f"Help on `{p}volume`",
-				description="Change the volume of the bot, from 0 to 100. DOESN'T WORK.")
+				description="Change the volume of the bot, from 0 to 100.")
 			e.add_field(name="Syntax", value=f"`{p}volume [value]`")
 		elif page == "now":
 			e = discord.Embed(
@@ -691,6 +694,11 @@ class Utilities(commands.Cog):
 				title=f"Help on `{p}skip`",
 				description="Skip the current song. (Person who requested the song can skip instantly, others need 3 skips.)")
 			e.add_field(name="Syntax", value=f"`{p}skip`")
+		elif page == "forceskip" or page == "fs":
+			e = discord.Embed(
+				title=f"Help on `{p}forceskip`",
+				description="Skip a song directly if you're either the server owner, admin, or song requester without having a vote.")
+			e.add_field(name="Syntax", value=f"`{p}forceskip|fs`")
 		elif page == "queue" or page == "q":
 			e = discord.Embed(
 				title=f"Help on `{p}queue`",
@@ -754,6 +762,10 @@ class Utilities(commands.Cog):
 				code = code[5:-3]
 			elif code[:3] == "```" and code[-3:] == "```":
 				code = code[3:-3]
+			if "bot" in code and not "self.bot" in code:
+				code = code.replace("bot", "self.bot")
+			if "await ctx.send(" in code:
+				code = code.replace("await ctx.send(", "print(")
 			str_obj = io.StringIO() #Retrieves a stream of data
 			try:
 				with contextlib.redirect_stdout(str_obj):
@@ -957,7 +969,7 @@ class Utilities(commands.Cog):
 			user.premium_since
 		except:
 			await ctx.send(
-				"This user is not in this guild. Invite them here maybe, server's dead anyway"
+				"That user is not in this guild. Invite them here maybe, server's dead anyway"
 			)
 			return
 		if user.premium_since:
@@ -1018,7 +1030,7 @@ class Utilities(commands.Cog):
 							timestamp=datetime.utcnow())
 		embed.set_thumbnail(url=guild.icon_url)
 		embed.add_field(name='Owner', value=guild.owner)
-		embed.add_field(name='Region', value=str(guild.region).title())
+		#embed.add_field(name='Region', value=str(guild.region).title())
 		embed.add_field(name='Server created on',
 						value=guild.created_at.strftime(date_format))
 		embed.add_field(name='Humans',
@@ -1145,7 +1157,7 @@ class Utilities(commands.Cog):
 			await ctx.reply("Hah I cannot be kicked", mention_author=False)
 		else:
 			emojis = ["✅", "❎"]
-			e = discord.Embed(title="Ban confirmation", description = f"Are you sure you want to kick {member.mention}?",\
+			e = discord.Embed(title="Kick confirmation", description = f"Are you sure you want to kick {member.mention}?",\
 								colour = discord.Colour.random(), timestamp=datetime.utcnow())
 			msg = await ctx.send(embed=e)
 			await msg.add_reaction(emojis[0])
@@ -1515,7 +1527,8 @@ class Utilities(commands.Cog):
 				title=f"Last edited message in {channel.name}",
 				description=f"**Original message:** {self.e_content1[cid]}\n \n \
 			**Edited message:** {self.e_content2[cid]}")
-			em.set_footer(text=f"Author: {self.e_author[cid]}")
+			em.set_footer(text=f"Author: {self.e_author[cid]}; Edited at")
+			em.timestamp = self.e_editedat[cid]
 			await ctx.send(embed=em)
 			
 		except KeyError:
