@@ -15,10 +15,12 @@ import scipy.ndimage
 #import requests
 import wikipedia
 import xkcd
+import sponsorblock as sb
 
 class Actions(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
+		self.client = sb.Client()
 
 	@commands.command()
 	async def choose(self, ctx, *, choices: str = None):
@@ -604,6 +606,34 @@ class Actions(commands.Cog):
 							text=f"Requested by: {ctx.author}")
 				await ctx.send(embed=e)
 
+	@commands.command()
+	@commands.cooldown(1, 10, commands.BucketType.user)
+	async def skips(self, ctx, url):
+		if "https://www.youtube.com/watch?v=" in url.lower():
+			#await ctx.send(video)
+			try:
+				segments = self.client.get_skip_segments(url)
+			except sb.errors.NotFoundException:
+				await ctx.send("This video has nothing to skip, you're good to go!")
+			#await message.channel.send(segments)
+			s = "```markdown\n#  Category   Action Start End\n"
+			for i in range(len(segments)):
+				s += f"{i}. {segments[i].category}  {segments[i].action_type}   {segments[i].start}  [{segments[i].end}]({url}&t={int(segments[i].end)}s)    \n"
+			s += "```"
+			await ctx.send(s)
+		elif "https://youtu.be/" in url.lower():
+			try:
+				segments = self.client.get_skip_segments(url)
+			except sb.errors.NotFoundException:
+				await ctx.send("This video has nothing to skip, you're good to go!")
+			s = "```markdown\n#  Category   Action Start End\n"
+			for i in range(len(segments)):
+				s += f"{i}. {segments[i].category}  {segments[i].action_type}   {segments[i].start}  [{segments[i].end}]({url}?t={int(segments[i].end)})    \n"
+			s += "```"
+			await ctx.send(s)
+		else:
+			await ctx.send("I want YouTube URLs not this crap")
+	
 	@commands.command()
 	@commands.cooldown(1, 5, commands.BucketType.user)
 	async def weather(self, ctx, *, city=None):

@@ -468,6 +468,7 @@ class Currency(commands.Cog):
 						description="You do not have an account",
 						timestamp=datetime.utcnow())
 					await ctx.send(embed=embed)
+					return
 				elif other_id not in db:
 					embed = discord.Embed(
 						colour=discord.Colour.red(),
@@ -706,6 +707,7 @@ class Currency(commands.Cog):
 								  description="You do not have an account",
 								  timestamp=datetime.utcnow())
 			await ctx.reply(embed=embed, mention_author=False)
+			return
 		if (ctx.guild.id == 828343472120922173 and ctx.message.channel.id != 828545948338749470):
 			await ctx.send(f"Why {ctx.author.mention} why, just do it in <#828545948338749470>", allowed_mentions=discord.AllowedMentions.none())
 			ctx.command.reset_cooldown(ctx)

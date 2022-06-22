@@ -656,7 +656,7 @@ class Fun(commands.Cog):
 				second += 1
 
 			try:
-				msg = await self.bot.wait_for('message', check=check, timeout=30.0)
+				msg = await self.bot.wait_for('message', check=check, timeout=45.0)
 				guess = str(msg.content).lower()
 				if guess == 'end':
 					await ctx.send("You quit :clown:")

@@ -9,7 +9,7 @@ import os
 from dotenv import load_dotenv
 from discord.ext import commands
 ##subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'discord-py-slash-command'])
-#from discord_slash import SlashCommand	
+#from discord_slash import SlashCommand
 #from discord_slash.utils.manage_commands import create_option
 #import openai
 import random
@@ -36,6 +36,7 @@ import aiohttp
 #import pycountry
 #import xkcd
 #import pypokedex
+#import sponsorblock as sb
 from keep_alive import keep_alive
 from replit import db
 
@@ -307,9 +308,9 @@ async def on_message(message):
 		) or 'henlo' == message.content.lower(
 		) and message.guild.id in trusted:
 			await message.channel.send("Hai!!")
-		# elif "howdy" == message.content.lower(
-		# ) or "howdy <@!176947217913872384>" == message.content.lower():
-		# 	await message.channel.send("no")
+		elif "howdy" == message.content.lower(
+		) or "howdy <@!176947217913872384>" == message.content.lower():
+			await message.channel.send("no")
 		elif message.content.lower() == "how are you" or message.content.lower(
 		) == "how are you?" or message.content.lower() == "how r you" or message.content.lower(
 		) == "how r you?" or message.content.lower() == "how r u" or message.content.lower(
