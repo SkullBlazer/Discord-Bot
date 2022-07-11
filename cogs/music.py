@@ -320,9 +320,10 @@ class Music(commands.Cog):
 		"""Make the bot join the voice channel you're connected to."""
 		destination = ctx.author.voice.channel
 
-		if ctx.voice_state.voice:
-			await ctx.voice_state.voice.move_to(destination)
-			return
+		# if ctx.voice_state.voice:
+		# 	await ctx.voice_state.voice.move_to(destination)
+		# 	await ctx.send(f"Joined **{ctx.guild.me.voice.channel}**")
+		# 	return
 
 		ctx.voice_state.voice = await destination.connect()
 		await ctx.send(f"Joined **{ctx.guild.me.voice.channel}**")
