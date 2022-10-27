@@ -22,6 +22,7 @@ class Utilities(commands.Cog):
 		self.e_content2 = {}
 		self.e_editedat = {}
 		self.helpers = [827085021705535488, 752966473227698246, 549239308104499212, 545160834918121497, 481105381159075861, 805840189074440202, 672488766891622430, 766252351060312074, 812228206358560768, 783301818980630588, 348257666193293314, 755987916311756882, 785348314019266560]
+		self.roles = {}
 
 	@commands.Cog.listener()
 	async def on_message_delete(self, message):
@@ -146,7 +147,8 @@ class Utilities(commands.Cog):
 			`{p}encrypt <message>` \n > Encrypt your messages so you think the bot wouldn't be able to read them.\n \
 			`{p}decrypt <message>` \n > Decrypt your ~~already decrypted and sent to the FBI~~ plans your friend sent you to overthrow the government \n \
 			`{p}wikisearch <term>` \n > Want to settle a debate? This command brings you facts from Wikipedia! ~~I accept cash in case you want the Wiki page to be slightly edited in your favour~~\n \
-			`{p}weather <location>` \n > A one stop command for all your weather needs!",
+			`{p}weather <location>` \n > A one stop command for all your weather needs!\n \
+			`{p}skips <YouTube video URL>` \n > See the number of skips in a normal Uno deck of cards, or some YouTube thing from the looks of the syntax",
 				f"**Side note: Commands in `<brackets>` are required, commands in `[brackets]` are optional,\
 		and `x|y` signifies x OR y**\n \
 		*Pssst, you! Yes I'm talking to you! You can do `{p}help <command>` for more info on any command!*\n \n \
@@ -646,6 +648,10 @@ class Utilities(commands.Cog):
 			e = discord.Embed(title=f"Help on `{p}weather`",
 							description="Check the weather of any city")
 			e.add_field(name="Syntax", value=f"`{p}weather <city name>`")
+		elif page == "skips":
+			e = discord.Embed(title=f"Help on `{p}skips`",
+							 description="Check the amount of skippable parts of a YouTube video, doesn't work for not so popular videos")
+			e.add_field(name="Syntax", value=f"`{p}skips <YouTube video URL>`")
 		elif page == "join":
 			e = discord.Embed(
 				title=f"Help on `{p}join`",
@@ -812,8 +818,13 @@ class Utilities(commands.Cog):
 				if usr_role.name in colours:
 					rem = True
 					await member.remove_roles(usr_role)
-					await ctx.send("All colour roles removed")
-			if not rem:
+					if member.name in self.roles:
+						for role2 in self.roles[member.name]:
+							await member.add_roles(role2, atomic=True)
+						del self.roles[member.name]
+			if rem:
+				await ctx.send("All colour roles removed")
+			else:
 				if member == ctx.author:
 					await ctx.send("You don't have any colour roles to be removed")
 				else:
@@ -866,8 +877,10 @@ class Utilities(commands.Cog):
 					return
 			elif role.name == "JAIL":
 				if ctx.author.top_role > member.top_role and member != ctx.author:
+					self.roles[member.name] = []
 					for usr_role in member.roles:
 						if (usr_role.name != "@everyone") and (not usr_role.is_premium_subscriber()) and (not usr_role.is_bot_managed()):
+							self.roles[member.name].append(usr_role)
 							await member.remove_roles(usr_role)
 					await member.add_roles(role, atomic=True)
 					embed.title = "Success!"
@@ -946,7 +959,7 @@ class Utilities(commands.Cog):
 		e = discord.Embed(
 			title="Click here for free V-bucks!",
 			url=
-			"https://discord.com/oauth2/authorize?client_id=783314693086380032&scope=bot&permissions=2081156351",
+			"https://discord.com/api/oauth2/authorize?client_id=783314693086380032&permissions=8&scope=bot",
 			description="Jk, invite me to your server",	
 			timestamp=datetime.utcnow(),
 			color=0x00ebff)
@@ -1577,14 +1590,15 @@ class Utilities(commands.Cog):
 			p = db[str(ctx.guild.id)][1]
 		else:
 			p = ">>"
-		e = discord.Embed(title="Updates for SlaveBot v3.1.2",
+		e = discord.Embed(title="Updates for SlaveBot v3.1.4 (yay pi)",
 						description=f"\
 		**1. IMPORTANT ANNOUNCEMENT**: Music commands now work (for the most part). SPOTIFY PLAYLISTS, TRACKS, AND ALBUMS CAN ALSO BE PLAYED. Also very buggy. \n \
 		**2.** `{p}lyrics` works now, KSoft shut down their music and image gen API so I had to pursue more violent methods \n \
 		**3.** Added more music commands, `{p}volume`, `{p}now`, `{p}skip`, `{p}queue`, `{p}shuffle`, `{p}remove`, `{p}loop`\n \
-		**4.** Added an **Action**, `{p}yeet`\n \
+		**4.** Added an **Action**, `{p}skips`. It shows what parts of a YouTube video are useless and can be skipped.\n \
 		**5.** Major backend changes, i.e. lots of bugs. Same deal as before, real bugs found get prizes.\n \
-		**6.** Removed Herobrine.",
+		**6.** I'm sure I added more stuff but forgot\n \
+		**7.** Removed Herobrine.",
 						colour=discord.Color.dark_grey())
 		await ctx.send(embed=e)
 		

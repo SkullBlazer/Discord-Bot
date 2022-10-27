@@ -411,8 +411,8 @@ class Currency(commands.Cog):
 	@commands.command(pass_context=True)
 	@commands.cooldown(1, 10, commands.BucketType.user)
 	async def transfer(self, ctx,
-					   amount: str = None,
-					   other: discord.Member = None):
+					   other: discord.Member = None,
+					   amount: str = None):
 		if other is None:
 			await ctx.reply(
 				"Since no recipient was mentioned, all your money will go to ~~me~~ charity",
@@ -847,11 +847,11 @@ class Currency(commands.Cog):
 				if db[str(ctx.author.id)][2]["daily"]:
 					e.add_field(
 						name=f"noice",
-						value=f"Extra {('6969'*(s-689)):,} added (`daily` active)")
+						value=f"Extra {int('6969'*(s-689)):,} added (`daily` active)")
 					db[aid][1] += int("6969"*(s-689))
 				else:
 					e.add_field(name=f"noice",
-								value=f"Extra {('69'*(s-689)):,} added")
+								value=f"Extra {int('69'*(s-689)):,} added")
 					db[aid][1] += int("69"*(s-689))
 			elif "69" in str(s):
 				if db[str(ctx.author.id)][2]["daily"]:

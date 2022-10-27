@@ -615,6 +615,7 @@ class Actions(commands.Cog):
 				segments = self.client.get_skip_segments(url)
 			except sb.errors.NotFoundException:
 				await ctx.send("This video has nothing to skip, you're good to go!")
+				return
 			#await message.channel.send(segments)
 			s = "```markdown\n#  Category   Action Start End\n"
 			for i in range(len(segments)):
@@ -626,6 +627,7 @@ class Actions(commands.Cog):
 				segments = self.client.get_skip_segments(url)
 			except sb.errors.NotFoundException:
 				await ctx.send("This video has nothing to skip, you're good to go!")
+				return
 			s = "```markdown\n#  Category   Action Start End\n"
 			for i in range(len(segments)):
 				s += f"{i}. {segments[i].category}  {segments[i].action_type}   {segments[i].start}  [{segments[i].end}]({url}?t={int(segments[i].end)})    \n"

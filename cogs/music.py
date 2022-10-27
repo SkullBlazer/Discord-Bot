@@ -2,7 +2,7 @@ import discord
 import asyncio
 from async_timeout import timeout
 import youtube_dl
-from discord.ext import commands
+from discord.ext import tasks, commands
 #from discord_slash import SlashCommand, SlashContext
 #from discord_slash.utils.manage_commands import create_option
 #import lavalink
@@ -359,6 +359,9 @@ class Music(commands.Cog):
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 		self.voice_states = {}
+		self.song_queue = []
+		self.playlist_length = 246
+		self.check_update.start()
 
 	def get_voice_state(self, ctx: commands.Context):
 		state = self.voice_states.get(ctx.guild.id)
@@ -383,6 +386,8 @@ class Music(commands.Cog):
 
 	@commands.command(name='join', invoke_without_subcommand=True)
 	async def _join(self, ctx: commands.Context):
+		#a = await self.bot.wait_for('playlist_update')
+		#self.bot.dispatch('playlist_update', a)
 		destination = ctx.author.voice.channel
 
 		if ctx.voice_state.voice:
@@ -391,7 +396,7 @@ class Music(commands.Cog):
 
 		ctx.voice_state.voice = await destination.connect()
 		await ctx.send(f"Joined **{ctx.guild.me.voice.channel}**")
-		
+	
 
 	@commands.command(name='leave', aliases=['disconnect'])
 	@commands.has_permissions(manage_guild=True)
@@ -632,14 +637,6 @@ class Music(commands.Cog):
 	@commands.command(name='play')
 	@commands.guild_only()
 	async def _play(self, ctx: commands.Context, *, search: str):
-		"""Plays a song.
-
-		If there are songs in the queue, this will be queued until the
-		other songs finished playing.
-
-		This command automatically searches from various sites if no URL is provided.
-		A list of these sites can be found here: https://rg3.github.io/youtube-dl/supportedsites.html
-		"""
 		if not ctx.voice_state.voice:
 			await ctx.invoke(self._join)
 		# elif ctx.voice_state.voice and len(ctx.voice_state.songs) == 0:
@@ -848,6 +845,33 @@ class Music(commands.Cog):
 				await ctx.send(embed=embed)
 			r.close()
 
+	@tasks.loop(hours=12.0)
+	#@commands.check_any(commands.is_owner())
+	async def check_update(self):
+		# redirect_uri = os.environ['SPOTIPY_REDIRECT_URI']
+		username = 'xzxtecn4384hqvazcdhvjeoij'
+		client_id = os.environ['SPOTIPY_CLIENT_ID']
+		client_secret = os.environ['SPOTIPY_CLIENT_SECRET']
+		redirect_uri = os.environ['SPOTIPY_REDIRECT_URI']
+		scope = 'playlist-modify-public'
+		# auth = oauth2.SpotifyClientCredentials(
+		# 	client_id=client_id,
+		# 	client_secret=client_secret
+		# )
+
+		# token = auth.get_access_token()
+		manager=spotipy.oauth2.SpotifyOAuth(username=username, scope=scope,\
+							redirect_uri=redirect_uri, client_id=client_id, client_secret=client_secret)
+		# cc = self.bot.get_channel(853643406329118740)
+		# await cc.send(manager.get_authorize_url())
+		token = util.prompt_for_user_token(username=username, scope=scope, redirect_uri=redirect_uri, client_id=client_id, client_secret=client_secret)
+		sp = spotipy.Spotify(auth=token,auth_manager=manager)
+		playlist = sp.playlist_tracks("1zPMKVdDDpBqiOOD7nuFjK")
+		channel = await self.bot.fetch_channel(853643406329118740)
+		if playlist['total'] != self.playlist_length:
+			await channel.send(f"Length was {self.playlist_length}, now it's {playlist['total']}")
+			self.playlist_length = playlist['total']
+	
 	@_join.before_invoke
 	@_play.before_invoke
 	async def ensure_voice_state(self, ctx: commands.Context):
@@ -857,6 +881,7 @@ class Music(commands.Cog):
 		if ctx.voice_client:
 			if ctx.voice_client.channel != ctx.author.voice.channel:
 				raise commands.CommandError('Bot is already in a voice channel.')
+	
 def setup(bot):
 	bot.add_cog(Music(bot))
 
